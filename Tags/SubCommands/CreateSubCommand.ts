@@ -24,6 +24,13 @@ export function RunCreateSubCommand(ctx: Context, interaction: ChatInputCommandI
       const modal: ModalBuilder = new ModalBuilder()
         .setCustomId(`tag_create_${interaction.user.id}`)
         .setTitle("Support Tag Create");
+      const tagEmbedName: TextInputBuilder = new TextInputBuilder()
+        .setCustomId("tag_create_embed_name")
+        .setLabel("Tag")
+        .setPlaceholder("support")
+        .setMaxLength(80)
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true);
       const tagEmbedTitle: TextInputBuilder = new TextInputBuilder()
         .setCustomId("tag_create_embed_title")
         .setLabel("Embed Title")
@@ -34,7 +41,7 @@ export function RunCreateSubCommand(ctx: Context, interaction: ChatInputCommandI
       const TagEmbedDescription: TextInputBuilder = new TextInputBuilder()
         .setCustomId("tag_create_embed_description")
         .setLabel("Embed Description")
-        .setPlaceholder("You can react us in the support threads!")
+        .setPlaceholder("You can contact us in the support threads!")
         .setMaxLength(3000)
         .setStyle(TextInputStyle.Paragraph)
         .setRequired(false);
@@ -45,10 +52,11 @@ export function RunCreateSubCommand(ctx: Context, interaction: ChatInputCommandI
         .setMaxLength(40)
         .setStyle(TextInputStyle.Short)
         .setRequired(false);
+      const tagEmbedNameRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(tagEmbedName);
       const tagEmbedTitleRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(tagEmbedTitle);
       const TagEmbedDescriptionRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(TagEmbedDescription);
       const tagEmbedFooterRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(TagEmbedFooter);
-      modal.addComponents(tagEmbedTitleRow, TagEmbedDescriptionRow, tagEmbedFooterRow);
+      modal.addComponents(tagEmbedNameRow, tagEmbedTitleRow, TagEmbedDescriptionRow, tagEmbedFooterRow);
       await interaction.showModal(modal);
     }
   });
