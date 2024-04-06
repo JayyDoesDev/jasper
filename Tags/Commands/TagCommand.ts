@@ -5,8 +5,10 @@ import {
 import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChatInputCommandInteraction, Snowflake } from "discord.js";
-const subCommands : ApplicationCommandOptions[] = [
-
+import { RunCreateSubCommand } from "../SubCommands/CreateSubCommand";
+import { CreateSubCommand } from "../SubCommands"
+const subCommands: ApplicationCommandOptions[] = [
+  CreateSubCommand
 ];
 
 export const TagCommand: Command = DefineCommand({
@@ -16,20 +18,20 @@ export const TagCommand: Command = DefineCommand({
     description: "Create, list, edit, and delete tags!",
     options: subCommands
   },
-  on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
+  on: (ctx: Context, interaction: ChatInputCommandInteraction) => {
     if (
       checkForRoles(interaction, process.env.SUPPORT_ROLE) ||
       checkForRoles(interaction, process.env.ADMIN_ROLE) ||
       checkForRoles(interaction, process.env.STAFF_ROLE)
     ) {
-
+      RunCreateSubCommand(ctx, interaction);
     } else {
       return interaction.reply({
         content: "Sorry but you can't use this command.",
         ephemeral: true
       });
     };
-  };
+  }
 }) as Command;
 
 
