@@ -45,7 +45,8 @@ export const TagCreateModal: Event = DefineEvent({
                 description: embedObject?.description,
                 footer: embedObject?.footer
               }
-            ]
+            ],
+            ephemeral: true
           });
         };
       }
