@@ -36,7 +36,6 @@ export const TagEvent: Event = DefineEvent({
         return;
       }
     }
-
     if (tagname) {
       const wrappedTag = await Wrap(TagGet(tagname, message.guild.id));
       if ('TagName' in wrappedTag.data) {
@@ -46,18 +45,17 @@ export const TagEvent: Event = DefineEvent({
         const reply = {
           content: null,
           embeds: [
-           {
-            title: wrappedTag.data.TagEmbedTitle,
-            color: 0xff9a00,
-            description: embedObject?.description,
-            footer: embedObject?.footer
-           }
+            {
+              title: wrappedTag.data.TagEmbedTitle,
+              color: 0xff9a00,
+              description: embedObject?.description,
+              footer: embedObject?.footer
+            }
           ]
         };
         if (actions.includes('-msg') || parameters['-msg']) {
-
           reply.content =
-          parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here") ? null : parameters['-msg'];
+            parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here") ? null : parameters['-msg'];
         }
         if (actions.includes('-del') || parameters['-del']) {
           await message.channel.send(reply);
