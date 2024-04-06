@@ -1,0 +1,33 @@
+{
+  "name": "japser",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "J_DDev <69683068+JayyDoesDev@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "i18n": "gulp i18n",
+    "start": "yarn build && eslint . && node dist/index.js",
+    "eslint": "eslint .",
+    "builddocker": "docker build -t japser .",
+    "docker": "docker run -dp 127.0.0.1:3000:8000 --name japser japser:latest",
+    "dockerstop": "docker stop japser"
+  },
+  "dependencies": {
+    "@antibot/interactions": "^1.4.1",
+    "@antibot/zilla": "^1.0.2",
+    "@types/mongoose": "^5.11.97",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "cross-fetch": "^4.0.0",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.2",
+    "eslint": "^8.56.0",
+    "eslint-plugin-json": "^3.1.0",
+    "glob": "7.2.0",
+    "moment": "^2.30.1",
+    "mongoose": "^8.3.0",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^0.0.1-alpha.0"
+  }
+}

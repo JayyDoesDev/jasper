@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "skipLibCheck": false,
+        "module": "commonjs",
+        "target": "ES2022",
+        "outDir": "dist",
+        "pretty": true,
+        "noImplicitAny": false,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+    },
+    "exclude": [
+        "node_modules",
+        "Libraries"
+    ],
+}
