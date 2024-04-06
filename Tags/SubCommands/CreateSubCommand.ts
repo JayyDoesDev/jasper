@@ -20,21 +20,30 @@ export function RunCreateSubCommand(ctx: Context, interaction: ChatInputCommandI
     subCommand: "create",
     ctx: ctx,
     interaction: interaction,
-    callback: async (ctx, Context, interaction: ChatInputCommandInteraction) => {
+    callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
       const modal: ModalBuilder = new ModalBuilder()
         .setCustomId(`tag_create_${interaction.user.id}`)
         .setTitle("Support Tag Create");
       const tagEmbedTitle: TextInputBuilder = new TextInputBuilder()
+        .setCustomId("tag_create_embed_title")
         .setLabel("Embed Title")
+        .setPlaceholder("How do I contact support?")
         .setMaxLength(200)
+        .setStyle(TextInputStyle.Short)
         .setRequired(true);
       const TagEmbedDescription: TextInputBuilder = new TextInputBuilder()
+        .setCustomId("tag_create_embed_description")
         .setLabel("Embed Description")
+        .setPlaceholder("You can react us in the support threads!")
         .setMaxLength(3000)
+        .setStyle(TextInputStyle.Paragraph)
         .setRequired(false);
       const TagEmbedFooter: TextInputBuilder = new TextInputBuilder()
+        .setCustomId("tag_create_embed_footer")
         .setLabel("Embed Footer")
+        .setPlaceholder("Make sure to be patient!")
         .setMaxLength(40)
+        .setStyle(TextInputStyle.Short)
         .setRequired(false);
       const tagEmbedTitleRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(tagEmbedTitle);
       const TagEmbedDescriptionRow: ActionRowBuilder<TextInputBuilder> = new ActionRowBuilder<TextInputBuilder>().addComponents(TagEmbedDescription);
