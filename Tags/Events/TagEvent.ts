@@ -59,7 +59,11 @@ export const TagEvent: Event = DefineEvent({
         }
         if (actions.includes('-del') || parameters['-del']) {
           await message.channel.send(reply);
-          await message.delete();
+          try {
+            await message.delete()
+          } catch (e) {
+            return;
+          }
         } else {
           return message.reply(reply);
         }
