@@ -5,7 +5,9 @@
 ## Introduction
 Jasper is a Discord bot designed to provide utility features such as tag management and subscriber count tracking for the No Text To Speech Discord Server. With Jasper, users can create, edit, delete, and use tags within the server, as well as keep track of the server's subscriber count.
 
+<p align="center">
 <img src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/Discord_AQ502PtCZj.gif?raw=true" alt="showcase">
+</p>
 
 ## Features
 - **Tag Management**: Jasper allows users to create custom tags containing text or embeds, which can be used by other members of the server.
