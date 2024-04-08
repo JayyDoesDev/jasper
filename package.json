@@ -2,7 +2,7 @@
   "name": "japser",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "J_DDev <69683068+JayyDoesDev@users.noreply.github.com>",
+  "author": "JayyDoesDev",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
