@@ -6,9 +6,11 @@ import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChatInputCommandInteraction, Snowflake } from "discord.js";
 import { RunCreateSubCommand } from "../SubCommands/CreateSubCommand";
-import { CreateSubCommand } from "../SubCommands"
+import { CreateSubCommand, DeleteSubCommand, ListSubCommand, RunDeleteSubCommand, RunListSubCommand } from "../SubCommands";
 const subCommands: ApplicationCommandOptions[] = [
-  CreateSubCommand
+  CreateSubCommand,
+  ListSubCommand,
+  DeleteSubCommand
 ];
 
 export const TagCommand: Command = DefineCommand({
@@ -20,11 +22,18 @@ export const TagCommand: Command = DefineCommand({
   },
   on: (ctx: Context, interaction: ChatInputCommandInteraction) => {
     if (
-      checkForRoles(interaction, process.env.SUPPORT_ROLE) ||
       checkForRoles(interaction, process.env.ADMIN_ROLE) ||
       checkForRoles(interaction, process.env.STAFF_ROLE)
     ) {
       RunCreateSubCommand(ctx, interaction);
+      RunListSubCommand(ctx, interaction);
+      RunDeleteSubCommand(ctx, interaction);
+    } else if (
+      checkForRoles(interaction, process.env.ADMIN_ROLE) ||
+      checkForRoles(interaction, process.env.STAFF_ROLE) ||
+      checkForRoles(interaction, process.env.SUPPORT_ROLE)
+    ) {
+      RunListSubCommand(ctx, interaction);
     } else {
       return interaction.reply({
         content: "Sorry but you can't use this command.",

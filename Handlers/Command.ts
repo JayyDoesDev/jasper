@@ -25,5 +25,5 @@ export default function (ctx: Context): Promise<void> {
     commandArray.push(x.command);
   });
   //@ts-ignore
-  process.env.GUILD_ONLY_COMMANDS ? ctx.interact.overwriteGuildCommands(process.env.GUILD_ONLY_COMMANDS_GIULD_ID, commandArray) : ctx.interact.overwriteGlobalCommands(commandArray);
+  process.env.GUILD_ONLY_COMMANDS == "1" ? ctx.interact.overwriteGuildCommands(process.env.GUILD_ONLY_COMMANDS_GIULD_ID, commandArray) : ctx.interact.overwriteGlobalCommands(commandArray);
 }

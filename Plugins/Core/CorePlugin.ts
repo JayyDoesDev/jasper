@@ -55,6 +55,15 @@ export = DefinePlugin({
 				}
 			},
 		}),
+    DefineEvent({
+      event: {
+        name: "error",
+        once: false
+      },
+      on: (e) => {
+        console.log(`Error: ${e.rawError.message}\nMethod: ${e.method}\nUrl: ${e.url} `);
+      }
+    })
 	],
 	public_plugin: false
 }) as Plugin;

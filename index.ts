@@ -11,7 +11,8 @@ const ctx: Context = new Context();
 
 SetupMongo({ uri: process.env.MONGODB });
 
-if (process.env.SUB_COUNT_UPDATE) {
+if (process.env.SUB_COUNT_UPDATE == "0") {
+  console.log("test")
   setInterval(async () => {
     const data = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${process.env.YOUTUBE_CHANNEL_ID}&key=${process.env.YOUTUBE_KEY}`);
     data.json().then((x) => {
@@ -22,4 +23,5 @@ if (process.env.SUB_COUNT_UPDATE) {
     })
   }, Number(process.env.SUB_COUNT_TIMER))
 }
+
 ctx.login(process.env.TOKEN);

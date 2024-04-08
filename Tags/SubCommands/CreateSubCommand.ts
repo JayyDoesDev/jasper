@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ApplicationCommandOptions, ApplicationCommandType, PermissionBitToString, Permissions } from "@antibot/interactions";
+import { ApplicationCommandOptionType, ApplicationCommandOptions } from "@antibot/interactions";
 import { Context } from "../../Context";
 import {
   ActionRowBuilder,

@@ -24,7 +24,7 @@ export class Context extends Client {
         Partials.User,
       ],
       allowedMentions: {
-        parse: ["everyone"],
+        parse: ["everyone", "roles"],
       },
     });
     this.plugin = new ZillaCollection<string, Plugin>();
