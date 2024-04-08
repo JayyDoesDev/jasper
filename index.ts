@@ -11,12 +11,11 @@ const ctx: Context = new Context();
 
 SetupMongo({ uri: process.env.MONGODB });
 
-if (process.env.SUB_COUNT_UPDATE == "0") {
-  console.log("test")
+if (process.env.SUB_COUNT_UPDATE == "1") {
   setInterval(async () => {
     const data = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${process.env.YOUTUBE_CHANNEL_ID}&key=${process.env.YOUTUBE_KEY}`);
     data.json().then((x) => {
-      const subscriberCount = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
+      const subscriberCount: string = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
       ctx.channels.cache.get(process.env.SUB_COUNT_CHANNEL)
         //@ts-ignore
         .setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
