@@ -1,13 +1,35 @@
 import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
 import { DefineEvent } from "../../Common/DefineEvent";
-import { ChannelType } from "discord.js";
+import { ChannelType, ChatInputCommandInteraction, Interaction } from "discord.js";
 import { Command, DefineCommand } from "../../Common/DefineCommand";
-import { ApplicationCommandType, PermissionsToHuman, PlantPermission } from "@antibot/interactions";
+import { ApplicationCommandType, PermissionsToHuman, PlantPermission, Permissions, PermissionBitToString } from "@antibot/interactions";
 import numeral from "numeral";
+import { Context } from "../../Context";
 export = DefinePlugin({
 	name: "Core",
 	description: "Core process.",
-	commands: [],
+	commands: [
+    DefineCommand({
+      command: {
+        name: "secret",
+        type: ApplicationCommandType.CHAT_INPUT,
+        description: "nothing to see here",
+        default_member_permissions: PermissionBitToString(Permissions({ Administrator: true })),
+        options: [],
+      },
+      on: (ctx: Context, interaction: ChatInputCommandInteraction) => {
+        return interaction.reply({
+          embeds: [
+            {
+              title: "Secret",
+              description: `**• Commands:** ${Array.from(ctx.interactions).map((x) => x[1].command.name).join(", ")}\n**• Permissions:** ${PermissionsToHuman(interaction.appPermissions.bitfield).join(", ")} `,
+              color: 0xff9a00
+            }
+          ]
+        })
+      }
+    })
+  ],
 	events: [
 		DefineEvent({
 			event: {
@@ -76,5 +98,5 @@ export = DefinePlugin({
       }
     })
 	],
-	public_plugin: false
+	public_plugin: true
 }) as Plugin;
