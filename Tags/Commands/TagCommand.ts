@@ -34,6 +34,7 @@ export const TagCommand: Command = DefineCommand({
       checkForRoles(interaction, process.env.SUPPORT_ROLE)
     ) {
       RunListSubCommand(ctx, interaction);
+      RunCreateSubCommand(ctx, interaction);
     } else {
       return interaction.reply({
         content: "Sorry but you can't use this command.",
