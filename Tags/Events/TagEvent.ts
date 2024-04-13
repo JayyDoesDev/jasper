@@ -59,7 +59,7 @@ export const TagEvent: Event = DefineEvent({
                 }
               ]
             };
-            if (actions.includes('-msg') || parameters['-m']) {
+            if (actions.includes('-msg') || parameters['-msg']) {
               reply.content =
                 parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here") ? null : parameters['-msg'];
             }
