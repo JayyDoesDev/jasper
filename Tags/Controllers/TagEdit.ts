@@ -22,5 +22,4 @@ export async function TagEdit(guildId: Snowflake, options: TagEditOptions): Prom
       }
     }
   )
-  console.log(await TagSchema.findOne({ _id: guildId, "Tags.TagName": options.name }))
 }
