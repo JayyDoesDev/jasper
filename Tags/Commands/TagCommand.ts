@@ -6,11 +6,12 @@ import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChatInputCommandInteraction, Snowflake } from "discord.js";
 import { RunCreateSubCommand } from "../SubCommands/CreateSubCommand";
-import { CreateSubCommand, DeleteSubCommand, ListSubCommand, RunDeleteSubCommand, RunListSubCommand } from "../SubCommands";
+import { CreateSubCommand, DeleteSubCommand, ListSubCommand, RunDeleteSubCommand, RunListSubCommand, EditSubCommand, RunEditSubCommand } from "../SubCommands";
 const subCommands: ApplicationCommandOptions[] = [
   CreateSubCommand,
   ListSubCommand,
-  DeleteSubCommand
+  DeleteSubCommand,
+  EditSubCommand
 ];
 
 export const TagCommand: Command = DefineCommand({
@@ -28,6 +29,7 @@ export const TagCommand: Command = DefineCommand({
       RunCreateSubCommand(ctx, interaction);
       RunListSubCommand(ctx, interaction);
       RunDeleteSubCommand(ctx, interaction);
+      RunEditSubCommand(ctx, interaction);
     } else if (
       checkForRoles(interaction, process.env.ADMIN_ROLE) ||
       checkForRoles(interaction, process.env.STAFF_ROLE) ||

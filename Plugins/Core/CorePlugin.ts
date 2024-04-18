@@ -25,7 +25,8 @@ export = DefinePlugin({
               description: `**• Commands:** ${Array.from(ctx.interactions).map((x) => x[1].command.name).join(", ")}\n**• Permissions:** ${PermissionsToHuman(interaction.appPermissions.bitfield).join(", ")} `,
               color: 0xff9a00
             }
-          ]
+          ],
+          ephemeral: true
         })
       }
     })
