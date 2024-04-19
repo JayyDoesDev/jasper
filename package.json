@@ -1,5 +1,5 @@
 {
-  "name": "japser",
+  "name": "jasper",
   "version": "1.0.0",
   "main": "index.js",
   "author": "JayyDoesDev",
@@ -9,9 +9,9 @@
     "i18n": "gulp i18n",
     "start": "yarn build && eslint . && node dist/index.js",
     "eslint": "eslint .",
-    "builddocker": "docker build -t japser .",
-    "docker": "docker run -dp 127.0.0.1:3000:8000 --name japser japser:latest",
-    "dockerstop": "docker stop japser"
+    "builddocker": "docker build -t jasper .",
+    "docker": "docker run -dp 127.0.0.1:3000:8000 --name jasper jasper:latest",
+    "dockerstop": "docker stop jasper"
   },
   "dependencies": {
     "@antibot/interactions": "^1.4.1",
