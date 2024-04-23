@@ -6,7 +6,17 @@ import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChatInputCommandInteraction, Snowflake } from "discord.js";
 import { RunCreateSubCommand } from "../SubCommands/CreateSubCommand";
-import { CreateSubCommand, DeleteSubCommand, ListSubCommand, RunDeleteSubCommand, RunListSubCommand, EditSubCommand, RunEditSubCommand, ShowSubCommand, RunShowSubCommand } from "../SubCommands";
+import { 
+  CreateSubCommand, 
+  DeleteSubCommand, 
+  ListSubCommand, 
+  RunDeleteSubCommand, 
+  RunListSubCommand, 
+  EditSubCommand, 
+  RunEditSubCommand, 
+  ShowSubCommand, 
+  RunShowSubCommand 
+} from "../SubCommands";
 const subCommands: ApplicationCommandOptions[] = [
   CreateSubCommand,
   ListSubCommand,
