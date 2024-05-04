@@ -61,7 +61,13 @@ export const TagEvent: Event = DefineEvent({
             };
             if (actions.includes('-msg') || parameters['-msg']) {
               reply.content =
-                parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here") ? null : parameters['-msg'];
+                parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here")
+                  ? null
+                  : wrappedTag.data.TagName == "done"
+                    ? message.channel.isThread()
+                        ? `(<@${(await message.thread.fetchOwner()).id}> ${parameters['-msg']}`
+                        : parameters['-msg']
+                    : parameters['-msg'];
             }
             if (actions.includes('-del') || parameters['-del']) {
               await message.channel.send(reply);
