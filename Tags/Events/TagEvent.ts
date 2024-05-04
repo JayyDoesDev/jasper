@@ -48,8 +48,9 @@ export const TagEvent: Event = DefineEvent({
             const embedObject: any = {};
             wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });
             wrappedTag.data.TagEmbedFooter ? Object.defineProperty(embedObject, "footer", { value: { text: wrappedTag.data.TagEmbedFooter } }) : Object.defineProperty(embedObject, "footer", { value: null });
+            const originalPosterPing: String = message.channel.isThread() ? `<@${(await message.thread.fetchOwner()).id}>` : "";
             const reply = {
-              content: null,
+              content: originalPosterPing,
               embeds: [
                 {
                   title: wrappedTag.data.TagEmbedTitle,
@@ -64,9 +65,7 @@ export const TagEvent: Event = DefineEvent({
                 parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here")
                   ? null
                   : wrappedTag.data.TagName == "done"
-                    ? message.channel.isThread()
-                        ? `(<@${(await message.thread.fetchOwner()).id}> ${parameters['-msg']}`
-                        : parameters['-msg']
+                    ? `<@${originalPosterPing ? originalPosterPing + " " : ""}>${parameters['-msg']}`
                     : parameters['-msg'];
             }
             if (actions.includes('-del') || parameters['-del']) {
