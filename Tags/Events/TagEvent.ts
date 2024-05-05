@@ -48,7 +48,7 @@ export const TagEvent: Event = DefineEvent({
             const embedObject: any = {};
             wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });
             wrappedTag.data.TagEmbedFooter ? Object.defineProperty(embedObject, "footer", { value: { text: wrappedTag.data.TagEmbedFooter } }) : Object.defineProperty(embedObject, "footer", { value: null });
-            const originalPosterPing: string = message.channel.isThread() ? `<@${(await message.thread.fetchOwner()).id}>` : "";
+            const originalPosterPing: string = message.channel.parent.type == ChannelType.GuildForum ? `<@${(await message.thread.fetchOwner()).id}>` : "";
             const reply = {
               content: originalPosterPing,
               embeds: [
