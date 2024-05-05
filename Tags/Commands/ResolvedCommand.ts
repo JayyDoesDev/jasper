@@ -4,6 +4,7 @@ import {
 import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChannelType, ChatInputCommandInteraction, Snowflake } from "discord.js";
+import { ApplicationCommandOptionType } from "@antibot/interactions";
 
 export const ResolvedCommand: Command = DefineCommand({
   command: {
@@ -11,12 +12,12 @@ export const ResolvedCommand: Command = DefineCommand({
     type: ApplicationCommandType.CHAT_INPUT,
     description: "Marks post as resolved and sends a message to inform OP",
     options: [{
-      type: 3,
+      type: ApplicationCommandOptionType.String,
       name: "original_question",
       description: "Original Question asked by OP",
       required: false
     }, {
-      type: 3,
+      type: ApplicationCommandOptionType.String,
       name: "summarized_answer",
       description: "Summarization of the answer to the OP's original question",
       required: false
