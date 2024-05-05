@@ -22,15 +22,16 @@ export const ResolvedCommand: Command = DefineCommand({
         return interaction.reply({ content: "Channel is not a Forum Post. This command **must be** executed in Forum Posts!" });
       }
       if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
-        await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags])
+        await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags]);
       }
+      await interaction.reply(`Post marked as Resolved by <@${interaction.user.id}>`);
       if (!interaction.channel.locked) {
         await interaction.channel.setLocked(true);
       }
       if (!interaction.channel.archived) {
         await interaction.channel.setArchived(true);
       }
-      return interaction.reply(`Post marked as Resolved by <@${interaction.user.id}>`)
+      return;
     } else {
       return interaction.reply({
         content: "Sorry but you can't use this command.",
