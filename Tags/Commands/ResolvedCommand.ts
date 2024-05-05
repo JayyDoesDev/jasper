@@ -9,7 +9,8 @@ export const ResolvedCommand: Command = DefineCommand({
   command: {
     name: "resolved",
     type: ApplicationCommandType.CHAT_INPUT,
-    description: "Resolve a forum post"
+    description: "Marks post as resolved and sends a message to inform OP",
+    options: []
   },
   on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     if (
@@ -17,7 +18,7 @@ export const ResolvedCommand: Command = DefineCommand({
       checkForRoles(interaction, process.env.STAFF_ROLE) ||
       checkForRoles(interaction, process.env.SUPPORT_ROLE)
     ) {
-      if ((!interaction.channel.parent.type == ChannelType.GuildForum) || (!interaction.channel.isThread())) {
+      if ((interaction.channel.parent.type != ChannelType.GuildForum) || (!interaction.channel.isThread())) {
         return interaction.reply({ content: "Channel is not a Forum Post. This command **must be** executed in Forum Posts!" });
       }
       if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
