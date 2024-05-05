@@ -12,12 +12,12 @@ export const ResolvedCommand: Command = DefineCommand({
     type: ApplicationCommandType.CHAT_INPUT,
     description: "Marks post as resolved and sends a message to inform OP",
     options: [{
-      type: ApplicationCommandOptionType.String,
+      type: ApplicationCommandOptionType.STRING,
       name: "original_question",
       description: "Original Question asked by OP",
       required: false
     }, {
-      type: ApplicationCommandOptionType.String,
+      type: ApplicationCommandOptionType.STRING,
       name: "summarized_answer",
       description: "Summarization of the answer to the OP's original question",
       required: false
