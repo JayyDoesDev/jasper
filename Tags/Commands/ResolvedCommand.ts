@@ -10,7 +10,17 @@ export const ResolvedCommand: Command = DefineCommand({
     name: "resolved",
     type: ApplicationCommandType.CHAT_INPUT,
     description: "Marks post as resolved and sends a message to inform OP",
-    options: []
+    options: [{
+      type: 3,
+      name: "original_question",
+      description: "Original Question asked by OP",
+      required: false
+    }, {
+      type: 3,
+      name: "summarized_answer",
+      description: "Summarization of the answer to the OP's original question",
+      required: false
+    }]
   },
   on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     if (
@@ -18,13 +28,28 @@ export const ResolvedCommand: Command = DefineCommand({
       checkForRoles(interaction, process.env.STAFF_ROLE) ||
       checkForRoles(interaction, process.env.SUPPORT_ROLE)
     ) {
+      const finalReply = {
+        content: `Post marked as Resolved by <@${interaction.user.id}>`
+      },
+        originalQuestion = await interaction.options.getString("original_question"),
+        summarizedAnswer = await interaction.options.getString("summarized_answer"),
+        embeds = [{ title: "Overview", fields: [] }];
       if ((interaction.channel.parent.type != ChannelType.GuildForum) || (!interaction.channel.isThread())) {
         return interaction.reply({ content: "Channel is not a Forum Post. This command **must be** executed in Forum Posts!" });
       }
       if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
         await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags]);
       }
-      await interaction.reply(`Post marked as Resolved by <@${interaction.user.id}>`);
+      if (originalQuestion) {
+        embeds[0].fields.push({ name: "Original Question", value: originalQuestion });
+      }
+      if (summarizedAnswer) {
+        embeds[0].fields.push({ name: "Summarized Answer", value: summarizedAnswer });
+      }
+      if (embeds[0].fields.size > 0) {
+        finalReply["embeds"] = embeds;
+      }
+      await interaction.reply(finalReply);
       if (!interaction.channel.locked) {
         await interaction.channel.setLocked(true);
       }
