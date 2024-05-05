@@ -1,9 +1,10 @@
 import {
   ApplicationCommandType,
+  Snowflake
 } from "@antibot/interactions";
 import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
-import { ChannelType, ChatInputCommandInteraction, Snowflake } from "discord.js";
+import { ChannelType, ChatInputCommandInteraction } from "discord.js";
 import { ApplicationCommandOptionType } from "@antibot/interactions";
 
 export const ResolvedCommand: Command = DefineCommand({
