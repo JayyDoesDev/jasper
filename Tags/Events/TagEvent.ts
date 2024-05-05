@@ -65,7 +65,7 @@ export const TagEvent: Event = DefineEvent({
                 parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here")
                   ? null
                   : wrappedTag.data.TagName == "done"
-                    ? `<@${originalPosterPing ? originalPosterPing + " " : ""}>${parameters['-msg']}`
+                    ? `${originalPosterPing ? originalPosterPing + " " : ""}${parameters['-msg']}`
                     : parameters['-msg'];
             }
             if (actions.includes('-del') || parameters['-del']) {
