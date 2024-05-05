@@ -1,10 +1,11 @@
 import {
   ApplicationCommandOptions,
   ApplicationCommandType,
+  Snowflake
 } from "@antibot/interactions";
 import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
-import { ChatInputCommandInteraction, Snowflake } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { RunCreateSubCommand } from "../SubCommands/CreateSubCommand";
 import { 
   CreateSubCommand, 
