@@ -30,14 +30,12 @@ export const ResolvedCommand: Command = DefineCommand({
       checkForRoles(interaction, process.env.STAFF_ROLE) ||
       checkForRoles(interaction, process.env.SUPPORT_ROLE)
     ) {
-      const finalReply = {
-        content: `Post marked as Resolved by <@${interaction.user.id}>`
-      },
-        originalQuestion = await interaction.options.getString("original_question"),
-        summarizedAnswer = await interaction.options.getString("summarized_answer"),
+        const finalReply: Record<"content", string> = { content: `Post marked as Resolved by <@${interaction.user.id}>` };
+        const originalQuestion: string = await interaction.options.getString("original_question");
+        const summarizedAnswer: string = await interaction.options.getString("summarized_answer");
         embeds = [{ title: "Overview", fields: [] }];
       if ((interaction.channel.parent.type != ChannelType.GuildForum) || (!interaction.channel.isThread())) {
-        return interaction.reply({ content: "Channel is not a Forum Post. This command **must be** executed in Forum Posts!" });
+        return interaction.reply({ content: "Channel is not a Forum Post. This command **must be** executed in Forum Posts!", ephemeral: true });
       }
       if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
         await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags]);
