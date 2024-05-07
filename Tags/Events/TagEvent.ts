@@ -48,8 +48,9 @@ export const TagEvent: Event = DefineEvent({
             const embedObject: any = {};
             wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });
             wrappedTag.data.TagEmbedFooter ? Object.defineProperty(embedObject, "footer", { value: { text: wrappedTag.data.TagEmbedFooter } }) : Object.defineProperty(embedObject, "footer", { value: null });
+            const originalPosterPing: string = message.channel.parent.type == ChannelType.GuildForum ? `<@${(await message.thread.fetchOwner()).id}>` : "";
             const reply = {
-              content: null,
+              content: originalPosterPing,
               embeds: [
                 {
                   title: wrappedTag.data.TagEmbedTitle,
@@ -61,7 +62,11 @@ export const TagEvent: Event = DefineEvent({
             };
             if (actions.includes('-msg') || parameters['-msg']) {
               reply.content =
-                parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here") ? null : parameters['-msg'];
+                parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here")
+                  ? null
+                  : wrappedTag.data.TagName == "done"
+                    ? `${originalPosterPing ? originalPosterPing + " " : ""}${parameters['-msg']}`
+                    : parameters['-msg'];
             }
             if (actions.includes('-del') || parameters['-del']) {
               await message.channel.send(reply);
