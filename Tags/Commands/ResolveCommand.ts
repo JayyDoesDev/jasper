@@ -37,7 +37,7 @@ export const ResolveCommand: Command = DefineCommand({
       const originalQuestion: string = interaction.options.getString("original_question");
       const summarizedAnswer: string = interaction.options.getString("summarized_answer");
       const embeds: Array<{ title: string; fields: Array<any>, color: number; }>
-        = [{ title: "Overview", fields: [], color: 0xff9a00 }];
+        = [ { title: "Overview", fields: [], color: 0xff9a00 } ];
         if (interaction.channel.type == ChannelType.PublicThread) {
           if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
             await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags]);
