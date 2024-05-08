@@ -5,7 +5,7 @@ import {
 import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChannelType, ChatInputCommandInteraction } from "discord.js";
-import { ApplicationCommandOptionType } from "@antibot/interactions";
+import { ApplicationCommandOptionType, PermissionsBitField } from "@antibot/interactions";
 
 export const ResolveCommand: Command = DefineCommand({
   command: {
@@ -26,6 +26,7 @@ export const ResolveCommand: Command = DefineCommand({
       }
     ]
   },
+  permissions: [PermissionsBitField.MANAGE_THREADS],
   on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     if (
       checkForRoles(interaction, process.env.ADMIN_ROLE) ||
@@ -37,7 +38,6 @@ export const ResolveCommand: Command = DefineCommand({
       const summarizedAnswer: string = interaction.options.getString("summarized_answer");
       const embeds: Array<{ title: string; fields: Array<any>, color: number; }>
         = [{ title: "Overview", fields: [], color: 0xff9a00 }];
-      if (interaction.channel.id == "1141179304269598751") {
         if (interaction.channel.type == ChannelType.PublicThread) {
           if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
             await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags]);
@@ -65,12 +65,6 @@ export const ResolveCommand: Command = DefineCommand({
             ephemeral: true
           });
         }
-      } else {
-        return interaction.reply({
-          content: "This command can only be used in <#1141179304269598751>.",
-          ephemeral: true
-        });
-      }
     } return interaction.reply({
       content: "Sorry but you can't use this command.",
       ephemeral: true

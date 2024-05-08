@@ -68,7 +68,7 @@ export = DefinePlugin({
 						let permDisplay: string = "";
 						if (!interaction.appPermissions.has(command.permissions)) {
 							//@ts-ignore
-							for (var i = 0; i < command.permissions.length; i++) {
+							for (let i = 0; i < command.permissions.length; i++) {
 								perms.push(
 									PermissionsToHuman(PlantPermission(command.permissions[i]))
 								);
@@ -81,6 +81,7 @@ export = DefinePlugin({
 							//@ts-ignore
 							return interaction.reply({
 								content: `I'm missing permissions! (${permDisplay})`,
+                ephemeral: true
 							});
 						}
 					}
