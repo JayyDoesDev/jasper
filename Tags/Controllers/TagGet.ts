@@ -3,12 +3,14 @@ import TagSchema from "../../Models/TagSchema";
 import { TagExists } from "./TagExists";
 import { Wrap } from "../../Common/Wrap";
 import { Tag } from "../../Models/TagDocument";
-export async function TagGet(name: string, guildId: Snowflake): Promise<{
-  TagName: string,
-  TagEmbedTitle: string,
-  TagEmbedDescription: string | null,
-  TagEmbedFooter: string | null
-}>;
+export type TagGetPromise = {
+  TagAuthor: Snowflake;
+  TagName: string;
+  TagEmbedTitle: string | null;
+  TagEmbedDescription: string | null;
+  TagEmbedFooter: string | null;
+};
+export async function TagGet(name: string, guildId: Snowflake): Promise<TagGetPromise>;
 export async function TagGet(name: string, guildId: Snowflake): Promise<{ Response: string }>;
 export async function TagGet<T>(name: string, guildId: Snowflake): Promise<T> {
   if (await TagExists(guildId, name)) {
@@ -18,6 +20,7 @@ export async function TagGet<T>(name: string, guildId: Snowflake): Promise<T> {
     });
     if (findTag) {
       return {
+        TagAuthor: findTag.TagAuthor,
         TagName: findTag.TagName,
         TagEmbedTitle: findTag.TagResponse.TagEmbedTitle,
         TagEmbedDescription: findTag.TagResponse.TagEmbedDescription,

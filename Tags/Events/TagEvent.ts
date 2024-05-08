@@ -1,8 +1,6 @@
 import { Message, ChannelType } from "discord.js";
 import { Event, DefineEvent } from "../../Common/DefineEvent";
 import { Wrap } from "../../Common/Wrap";
-import { Context } from "../../Context";
-import TagSchema from "../../Models/TagSchema";
 import { TagGet } from "../Controllers/TagGet";
 import type { Snowflake } from "@antibot/interactions";
 

@@ -1,7 +1,9 @@
+import type { Snowflake } from "@antibot/interactions";
 import { Document } from "mongoose";
 
 export interface Tag {
   TagName: string;
+  TagAuthor: Snowflake;
   TagResponse: {
     TagEmbedTitle: string;
     TagEmbedDescription: string | null;

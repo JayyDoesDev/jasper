@@ -9,6 +9,7 @@ const TagSchema: Schema = new Schema(
       type: [
         {
           TagName: String,
+          TagAuthor: String,
           TagResponse: {
             TagEmbedTitle: MO(String, undefined, true),
             TagEmbedDescription: MO(String, null, false),

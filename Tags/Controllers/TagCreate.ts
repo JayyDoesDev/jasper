@@ -2,6 +2,7 @@ import { GuildExists } from "../../Common/GuildExists";
 import TagSchema from "../../Models/TagSchema";
 import type { Snowflake } from "@antibot/interactions";
 export interface TagCreateOptions {
+  author: Snowflake;
   name: string;
   title: string;
   description: string | null;
@@ -18,6 +19,7 @@ export async function TagCreate(guildId: Snowflake, options: TagCreateOptions): 
         $push: {
           "Tags": {
             TagName: options.name,
+            TagAuthor: options.author,
             TagResponse: {
               TagEmbedTitle: options.title,
               TagEmbedDescription: options.description ? options.description : null,
@@ -37,6 +39,7 @@ export async function TagCreate(guildId: Snowflake, options: TagCreateOptions): 
         $push: {
           "Tags": {
             TagName: options.name,
+            TagAuthor: options.author,
             TagResponse: {
               TagEmbedTitle: options.title,
               TagEmbedDescription: options.description ? options.description : null,

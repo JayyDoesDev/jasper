@@ -24,6 +24,7 @@ export const TagCreateModal: Event = DefineEvent({
         const TagEmbedDescription: string = interaction.fields.getTextInputValue("tag_create_embed_description");
         const tagEmbedFooter: string = interaction.fields.getTextInputValue("tag_create_embed_footer");
         const tag: TagCreateOptions = {
+          author: interaction.user.id,
           name: tagEmbedName,
           title: tagEmbedTitle,
           description: TagEmbedDescription ? TagEmbedDescription : null,
@@ -32,10 +33,16 @@ export const TagCreateModal: Event = DefineEvent({
         if (await TagExists(interaction.guild.id, tag.name)) {
           return interaction.reply({ content: `> The support tag \`${tag.name}\` already exists!`, ephemeral: true });
         } else {
-          await TagCreate(interaction.guild.id, { name: tag.name, title: tag.title, description: tag.description, footer: tag.footer });
+          await TagCreate(interaction.guild.id, {
+            author: tag.author,
+            name: tag.name,
+            title: tag.title,
+            description: tag.description,
+            footer: tag.footer
+          });
           const embedObject: any = {};
           tag.description ? Object.defineProperty(embedObject, "description", { value: tag.description }) : Object.defineProperty(embedObject, "description", { value: null });
-          tag.footer ? Object.defineProperty(embedObject, "footer", { value: { text: tag.footer }}) : Object.defineProperty(embedObject, "footer", { value: null });
+          tag.footer ? Object.defineProperty(embedObject, "footer", { value: { text: tag.footer } }) : Object.defineProperty(embedObject, "footer", { value: null });
           return interaction.reply({
             content: `${Emojis.CHECK_MARK} Successfully created \`${tag.name}\`!`,
             embeds: [

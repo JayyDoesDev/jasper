@@ -2,25 +2,28 @@ import { ApplicationCommandOptionType, ApplicationCommandOptions } from "@antibo
 import { Context } from "../../Context";
 import { RegisterSubCommand } from "../../Common/RegisterSubCommand";
 import { ChatInputCommandInteraction } from "discord.js";
+import { GuildExists } from "../../Common/GuildExists";
+import TagSchema from "../../Models/TagSchema";
+import { Wrap } from "../../Common/Wrap";
 import { TagExists } from "../Controllers/TagExists";
 import { TagGet, TagGetPromise } from "../Controllers/TagGet";
-export const ShowSubCommand: ApplicationCommandOptions = {
-  name: "show",
-  description: "Show a tag!",
+export const InfoSubCommand: ApplicationCommandOptions = {
+  name: "info",
+  description: "Get the info of a tag!",
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: "tag-name",
-      description: "Provide the name of the tag you would like to check out!",
+      description: "Provide the tag name of the tag you would like to check!",
       type: ApplicationCommandOptionType.STRING,
       required: true
     }
   ]
 } as ApplicationCommandOptions;
 
-export function RunShowSubCommand(ctx: Context, interaction: ChatInputCommandInteraction): void {
+export function RunInfoSubCommand(ctx: Context, interaction: ChatInputCommandInteraction): void {
   RegisterSubCommand({
-    subCommand: "show",
+    subCommand: "info",
     ctx: ctx,
     interaction: interaction,
     callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
@@ -30,18 +33,18 @@ export function RunShowSubCommand(ctx: Context, interaction: ChatInputCommandInt
         return interaction.reply({
           embeds: [
             {
-              title: getTag.TagEmbedTitle,
+              title: tagName,
               color: 0xff9a00,
-              description: getTag.TagEmbedDescription ? getTag.TagEmbedDescription : null,
-              footer: {
-                text: getTag.TagEmbedFooter ? getTag.TagEmbedFooter : null
-              }
+              description: `> **Created by ${getTag.TagAuthor ? `<@${getTag.TagAuthor}>` : "Unknown (created before the update)"}**`
             }
           ],
           ephemeral: true
         })
       } else {
-        return interaction.reply({ content: `> The support tag \`${tagName}\` doesn't exists!`, ephemeral: true });
+        return interaction.reply({
+          content: `Tag not found!`,
+          ephemeral: true
+        })
       }
     }
   });

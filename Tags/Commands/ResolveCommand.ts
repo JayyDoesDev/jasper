@@ -7,7 +7,7 @@ import { Context } from "../../Context";
 import { ChannelType, ChatInputCommandInteraction } from "discord.js";
 import { ApplicationCommandOptionType } from "@antibot/interactions";
 
-export const ResolvedCommand: Command = DefineCommand({
+export const ResolveCommand: Command = DefineCommand({
   command: {
     name: "resolve",
     type: ApplicationCommandType.CHAT_INPUT,
@@ -37,30 +37,37 @@ export const ResolvedCommand: Command = DefineCommand({
       const summarizedAnswer: string = interaction.options.getString("summarized_answer");
       const embeds: Array<{ title: string; fields: Array<any>, color: number; }>
         = [{ title: "Overview", fields: [], color: 0xff9a00 }];
-      if (interaction.channel.type == ChannelType.PublicThread) {
-        if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
-          await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags]);
+      if (interaction.channel.id == "1141179304269598751") {
+        if (interaction.channel.type == ChannelType.PublicThread) {
+          if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
+            await interaction.channel.setAppliedTags(["1144008960966402149", ...interaction.channel.appliedTags]);
+          }
+          if (originalQuestion) {
+            embeds[0].fields.push({ name: "Original Question", value: originalQuestion });
+          }
+          if (summarizedAnswer) {
+            embeds[0].fields.push({ name: "Summarized Answer", value: summarizedAnswer });
+          }
+          if (embeds[0].fields.length > 0) {
+            finalReply["embeds"] = embeds;
+          }
+          await interaction.reply(finalReply);
+          if (!interaction.channel.locked) {
+            await interaction.channel.setLocked(true);
+          }
+          if (!interaction.channel.archived) {
+            await interaction.channel.setArchived(true);
+          }
+          return;
+        } else {
+          return interaction.reply({
+            content: "Channel is not a thread. This command **must be** executed in Forum Posts!",
+            ephemeral: true
+          });
         }
-        if (originalQuestion) {
-          embeds[0].fields.push({ name: "Original Question", value: originalQuestion });
-        }
-        if (summarizedAnswer) {
-          embeds[0].fields.push({ name: "Summarized Answer", value: summarizedAnswer });
-        }
-        if (embeds[0].fields.length > 0) {
-          finalReply["embeds"] = embeds;
-        }
-        await interaction.reply(finalReply);
-        if (!interaction.channel.locked) {
-          await interaction.channel.setLocked(true);
-        }
-        if (!interaction.channel.archived) {
-          await interaction.channel.setArchived(true);
-        }
-        return;
       } else {
         return interaction.reply({
-          content: "Channel is not a Forum Post. This command **must be** executed in Forum Posts!",
+          content: "This command can only be used in <#1141179304269598751>.",
           ephemeral: true
         });
       }

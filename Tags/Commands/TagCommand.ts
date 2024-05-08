@@ -7,23 +7,26 @@ import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChatInputCommandInteraction } from "discord.js";
 import { RunCreateSubCommand } from "../SubCommands/CreateSubCommand";
-import { 
-  CreateSubCommand, 
-  DeleteSubCommand, 
-  ListSubCommand, 
-  RunDeleteSubCommand, 
-  RunListSubCommand, 
-  EditSubCommand, 
-  RunEditSubCommand, 
-  ShowSubCommand, 
-  RunShowSubCommand 
+import {
+  CreateSubCommand,
+  DeleteSubCommand,
+  ListSubCommand,
+  RunDeleteSubCommand,
+  RunListSubCommand,
+  EditSubCommand,
+  RunEditSubCommand,
+  ShowSubCommand,
+  RunShowSubCommand,
+  InfoSubCommand,
+  RunInfoSubCommand
 } from "../SubCommands";
 const subCommands: ApplicationCommandOptions[] = [
   CreateSubCommand,
   ListSubCommand,
   DeleteSubCommand,
   EditSubCommand,
-  ShowSubCommand
+  ShowSubCommand,
+  InfoSubCommand
 ];
 
 export const TagCommand: Command = DefineCommand({
@@ -43,6 +46,7 @@ export const TagCommand: Command = DefineCommand({
       RunDeleteSubCommand(ctx, interaction);
       RunEditSubCommand(ctx, interaction);
       RunShowSubCommand(ctx, interaction);
+      RunInfoSubCommand(ctx, interaction);
     } else if (
       checkForRoles(interaction, process.env.ADMIN_ROLE) ||
       checkForRoles(interaction, process.env.STAFF_ROLE) ||
@@ -52,6 +56,7 @@ export const TagCommand: Command = DefineCommand({
       RunCreateSubCommand(ctx, interaction);
       RunEditSubCommand(ctx, interaction);
       RunShowSubCommand(ctx, interaction);
+      RunInfoSubCommand(ctx, interaction);
     } else {
       return interaction.reply({
         content: "Sorry but you can't use this command.",
