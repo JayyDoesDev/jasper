@@ -3,6 +3,7 @@ import { DefineEvent } from "../../Common/DefineEvent";
 import { ChannelType, ChatInputCommandInteraction, Interaction } from "discord.js";
 import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { ApplicationCommandType, PermissionsToHuman, PlantPermission, Permissions, PermissionBitToString } from "@antibot/interactions";
+import { PingCommand } from "../../Javascript/CoreCommands";
 import numeral from "numeral";
 import { Context } from "../../Context";
 export = DefinePlugin({
@@ -29,7 +30,8 @@ export = DefinePlugin({
           ephemeral: true
         })
       }
-    })
+    }),
+    PingCommand
   ],
 	events: [
 		DefineEvent({

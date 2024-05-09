@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "i18n": "gulp i18n",
-    "start": "yarn build && eslint . && node dist/index.js",
+    "start": "yarn build && eslint . && gulp js && node dist/index.js",
     "eslint": "eslint .",
     "builddocker": "docker build -t jasper .",
     "docker": "docker run -dp 127.0.0.1:3000:8000 --name jasper jasper:latest",
@@ -25,6 +25,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-json": "^3.1.0",
     "glob": "7.2.0",
+    "gulp": "^5.0.0",
     "moment": "^2.30.1",
     "mongoose": "^8.3.0",
     "numeral": "^2.0.6",
