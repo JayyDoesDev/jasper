@@ -13,6 +13,6 @@ module.exports = {
         content: "pong!",
         ephemeral: true
       });
-    };
-  });
+    }
+  })
 };
