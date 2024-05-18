@@ -1,6 +1,6 @@
 import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
 import { DefineEvent } from "../../Common/DefineEvent";
-import { ActivityType, ChannelType, ChatInputCommandInteraction, Interaction } from "discord.js";
+import { ActivityType, ChatInputCommandInteraction } from "discord.js";
 import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { ApplicationCommandType, PermissionsToHuman, PlantPermission, Permissions, PermissionBitToString } from "@antibot/interactions";
 import { PingCommand } from "../../Javascript/CoreCommands";
@@ -46,7 +46,7 @@ export = DefinePlugin({
             data.json().then((x) => {
               const subscriberCount: string = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
               ctx.channels.cache.get(process.env.SUB_COUNT_CHANNEL)
-                //@ts-ignore
+                 //@ts-ignore
                 .setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
             });
           })()
@@ -78,7 +78,6 @@ export = DefinePlugin({
             const perms: any[] = [];
             let permDisplay: string = "";
             if (!interaction.appPermissions.has(command.permissions)) {
-              //@ts-ignore
               for (let i = 0; i < command.permissions.length; i++) {
                 perms.push(
                   PermissionsToHuman(PlantPermission(command.permissions[i]))
@@ -89,7 +88,6 @@ export = DefinePlugin({
               } else {
                 permDisplay = perms.join(", ");
               }
-              //@ts-ignore
               return interaction.reply({
                 content: `I'm missing permissions! (${permDisplay})`,
                 ephemeral: true
@@ -107,7 +105,7 @@ export = DefinePlugin({
         once: false
       },
       on: (e) => {
-        console.log(`Error: ${e.rawError.message}\nMethod: ${e.method}\nUrl: ${e.url} `);
+        console.log(`Error: ${e}\nMethod: ${e.method}\nUrl: ${e.url} `);
       }
     })
   ],

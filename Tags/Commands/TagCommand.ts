@@ -20,6 +20,7 @@ import {
   InfoSubCommand,
   RunInfoSubCommand
 } from "../SubCommands";
+import { CheckForRoles } from "../../Common/CheckForRoles";
 const subCommands: ApplicationCommandOptions[] = [
   CreateSubCommand,
   ListSubCommand,
@@ -37,21 +38,14 @@ export const TagCommand: Command = DefineCommand({
     options: subCommands
   },
   on: (ctx: Context, interaction: ChatInputCommandInteraction) => {
-    if (
-      checkForRoles(interaction, process.env.ADMIN_ROLE) ||
-      checkForRoles(interaction, process.env.STAFF_ROLE)
-    ) {
+    if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
       RunCreateSubCommand(ctx, interaction);
       RunListSubCommand(ctx, interaction);
       RunDeleteSubCommand(ctx, interaction);
       RunEditSubCommand(ctx, interaction);
       RunShowSubCommand(ctx, interaction);
       RunInfoSubCommand(ctx, interaction);
-    } else if (
-      checkForRoles(interaction, process.env.ADMIN_ROLE) ||
-      checkForRoles(interaction, process.env.STAFF_ROLE) ||
-      checkForRoles(interaction, process.env.SUPPORT_ROLE)
-    ) {
+    } else if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
       RunListSubCommand(ctx, interaction);
       RunCreateSubCommand(ctx, interaction);
       RunEditSubCommand(ctx, interaction);
@@ -67,15 +61,3 @@ export const TagCommand: Command = DefineCommand({
 }) as Command;
 
 
-function checkForRoles(r: ChatInputCommandInteraction, role: Snowflake): boolean {
-  const roles = r.member.roles.valueOf();
-  const convertToArray: string[] = Array.from(roles as any);
-  let response: boolean;
-  for (let i = 0; i < convertToArray.length; i++) {
-    if (convertToArray[i][0].includes(role)) {
-      response = true;
-      break;
-    };
-  };
-  return response;
-}

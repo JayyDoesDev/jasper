@@ -1,9 +1,8 @@
-import { Message, ChannelType } from "discord.js";
+import { Message, ChannelType, EmbedData } from "discord.js";
 import { Event, DefineEvent } from "../../Common/DefineEvent";
 import { Wrap } from "../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
-import type { Snowflake } from "@antibot/interactions";
-
+import { CheckForRoles } from "../../Common/CheckForRoles";
 export const TagEvent: Event = DefineEvent({
   event: {
     name: "messageCreate",
@@ -37,16 +36,22 @@ export const TagEvent: Event = DefineEvent({
         }
       }
       if (tagname) {
-        if (checkForRoles(message, process.env.ADMIN_ROLE) ||
-          checkForRoles(message, process.env.STAFF_ROLE) ||
-          checkForRoles(message, process.env.SUPPORT_ROLE)
-        ) {
+        if (CheckForRoles(message, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
           const wrappedTag = await Wrap(TagGet(tagname, message.guild.id));
           if ('TagName' in wrappedTag.data) {
             const embedObject: any = {};
             wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });
             wrappedTag.data.TagEmbedFooter ? Object.defineProperty(embedObject, "footer", { value: { text: wrappedTag.data.TagEmbedFooter } }) : Object.defineProperty(embedObject, "footer", { value: null });
-            const reply = {
+            const reply: {
+              content?: null | string,
+              embeds:
+              {
+                title: string | null,
+                color: number,
+                description: string | null,
+                footer: { text: string, value: string }
+              }[]
+            } = {
               content: null,
               embeds: [
                 {
@@ -81,20 +86,7 @@ export const TagEvent: Event = DefineEvent({
         return;
       }
     } catch (error) {
-      return;
-    }
-
-    function checkForRoles(r: Message, role: Snowflake): boolean {
-      const roles = r.member.roles.valueOf();
-      const convertToArray: string[] = Array.from(roles as any);
-      let response: boolean;
-      for (let i = 0; i < convertToArray.length; i++) {
-        if (convertToArray[i][0].includes(role)) {
-          response = true;
-          break;
-        };
-      };
-      return response;
+      console.log(error)
     }
   }
 }) as Event;

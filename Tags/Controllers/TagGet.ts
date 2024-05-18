@@ -15,9 +15,7 @@ export async function TagGet(name: string, guildId: Snowflake): Promise<{ Respon
 export async function TagGet<T>(name: string, guildId: Snowflake): Promise<T> {
   if (await TagExists(guildId, name)) {
     const wrappedGuild = await Wrap(TagSchema.findOne({ _id: guildId }));
-    const findTag = wrappedGuild.data.Tags.find((t: Tag) => {
-      return t.TagName === name;
-    });
+    const findTag = wrappedGuild.data.Tags.find((t: Tag) => { return t.TagName === name; });
     if (findTag) {
       return {
         TagAuthor: findTag.TagAuthor,

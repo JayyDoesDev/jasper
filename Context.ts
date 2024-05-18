@@ -32,7 +32,7 @@ export class Context extends Client {
     this.interactions = new ZillaCollection<string, Command>();
     this.interact = new Interactions({
       publicKey: process.env.PUBLICKEY as unknown as string,
-      botID: process.env.BOTID as unknown as string,
+      botID: process.env.BOTID as unknown as Snowflake,
       botToken: process.env.TOKEN as unknown as string,
       debug: true,
     });

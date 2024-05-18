@@ -19,6 +19,4 @@ setInterval(async () => {
         .setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
     })
 }, Number(process.env.SUB_COUNT_TIMER))
-
-
 ctx.login(process.env.TOKEN);

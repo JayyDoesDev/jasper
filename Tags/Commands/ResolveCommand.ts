@@ -6,6 +6,7 @@ import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { Context } from "../../Context";
 import { ChannelType, ChatInputCommandInteraction } from "discord.js";
 import { ApplicationCommandOptionType, PermissionsBitField } from "@antibot/interactions";
+import { CheckForRoles } from "../../Common/CheckForRoles";
 
 export const ResolveCommand: Command = DefineCommand({
   command: {
@@ -28,11 +29,7 @@ export const ResolveCommand: Command = DefineCommand({
   },
   permissions: [PermissionsBitField.MANAGE_THREADS],
   on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
-    if (
-      checkForRoles(interaction, process.env.ADMIN_ROLE) ||
-      checkForRoles(interaction, process.env.STAFF_ROLE) ||
-      checkForRoles(interaction, process.env.SUPPORT_ROLE)
-    ) {
+    if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
       const finalReply: Record<"content", string> = { content: `Post marked as Resolved by <@${interaction.user.id}>` };
       const originalQuestion: string = interaction.options.getString("original_question");
       const summarizedAnswer: string = interaction.options.getString("summarized_answer");
@@ -73,15 +70,3 @@ export const ResolveCommand: Command = DefineCommand({
 }) as Command;
 
 
-function checkForRoles(r: ChatInputCommandInteraction, role: Snowflake): boolean {
-  const roles = r.member.roles.valueOf();
-  const convertToArray: string[] = Array.from(roles as any);
-  let response: boolean;
-  for (let i = 0; i < convertToArray.length; i++) {
-    if (convertToArray[i][0].includes(role)) {
-      response = true;
-      break;
-    };
-  };
-  return response;
-}
