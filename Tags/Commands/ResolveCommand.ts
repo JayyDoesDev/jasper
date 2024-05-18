@@ -27,7 +27,7 @@ export const ResolveCommand: Command = DefineCommand({
       }
     ]
   },
-  permissions: [PermissionsBitField.MANAGE_THREADS],
+  permissions: [PermissionsBitField.ManageThreads],
   on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
       const finalReply: Record<"content", string> = { content: `Post marked as Resolved by <@${interaction.user.id}>` };

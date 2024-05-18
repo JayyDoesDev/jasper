@@ -14,7 +14,7 @@
     "dockerstop": "docker stop jasper"
   },
   "dependencies": {
-    "@antibot/interactions": "^1.4.1",
+    "@antibot/interactions": "^1.4.3",
     "@antibot/zilla": "^1.0.2",
     "@types/mongoose": "^5.11.97",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
