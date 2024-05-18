@@ -10,9 +10,7 @@ export default function (ctx: Context): Promise<void> {
     if (!file.name || !file.commands) {
       return;
     }
-    //@ts-ignore
     if (file.commands) {
-      //@ts-ignore
       ctx.plugin.set(file.name, file);
       for (let i = 0; i < file.commands.length; i++) {
         const command: Command = file.commands[i];
@@ -21,9 +19,7 @@ export default function (ctx: Context): Promise<void> {
     }
   }
   const commandArray: ICommand[] = [];
-  ctx.interactions.forEach((x) => {
-    commandArray.push(x.command);
-  });
-  //@ts-ignore
-  process.env.GUILD_ONLY_COMMANDS == "1" ? ctx.interact.overwriteGuildCommands(process.env.GUILD_ONLY_COMMANDS_GIULD_ID, commandArray) : ctx.interact.overwriteGlobalCommands(commandArray);
+  ctx.interactions.forEach((x) => { commandArray.push(x.command); });
+  // @ts-ignore
+  process.env.GUILD_ONLY_COMMANDS == "1" ? ctx.interact.overwriteGuildCommands(process.env.GUILD_ONLY_COMMANDS_GUILD_ID, commandArray) : ctx.interact.overwriteGlobalCommands(commandArray);
 }
