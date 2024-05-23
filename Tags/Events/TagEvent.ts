@@ -1,8 +1,9 @@
-import { Message, ChannelType, EmbedData } from "discord.js";
+import { Message, ChannelType } from "discord.js";
 import { Event, DefineEvent } from "../../Common/DefineEvent";
 import { Wrap } from "../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../Common/CheckForRoles";
+
 export const TagEvent: Event = DefineEvent({
   event: {
     name: "messageCreate",
@@ -10,16 +11,31 @@ export const TagEvent: Event = DefineEvent({
   },
   on: async (message: Message) => {
     try {
+      const prefixes: string[] = [process.env.PREFIX, "yo", "w", "dude,", "omg"];
       if (message.author.bot) {
         return;
       }
       if (message.channel.type == ChannelType.DM) {
         return;
       }
-      const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/g);
-      const tagname: string = args.shift().toLowerCase();
+
+      let prefixUsed: string | null = null;
+      for (const prefix of prefixes) {
+        if (message.content.toLowerCase().startsWith(prefix.toLowerCase())) {
+          prefixUsed = prefix;
+          break;
+        }
+      }
+
+      if (!prefixUsed) {
+        return;
+      }
+
+      const args = message.content.slice(prefixUsed.length).trim().split(/ +/g);
+      const tagname: string | undefined = args.shift()?.toLowerCase();
       const actions: string[] = [];
       const parameters: Record<string, string> = {};
+
       for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         if (arg.startsWith('-')) {
@@ -35,6 +51,7 @@ export const TagEvent: Event = DefineEvent({
           return;
         }
       }
+
       if (tagname) {
         if (CheckForRoles(message, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
           const wrappedTag = await Wrap(TagGet(tagname, message.guild.id));
@@ -93,7 +110,7 @@ export const TagEvent: Event = DefineEvent({
         return;
       }
     } catch (error) {
-      console.log(error)
+      return;
     }
   }
 }) as Event;
