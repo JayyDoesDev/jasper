@@ -3,7 +3,6 @@ import { Event, DefineEvent } from "../../Common/DefineEvent";
 import { Wrap } from "../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../Common/CheckForRoles";
-import { Context } from "../../Context";
 export const TagEvent: Event = DefineEvent({
   event: {
     name: "messageCreate",
@@ -63,15 +62,18 @@ export const TagEvent: Event = DefineEvent({
                 }
               ]
             };
-            if (actions.includes('-mention') || parameters['-mention']) {
-              await message.guild.members.fetch({ user: parameters['-mention'] }).then(() => true).catch(() => false)
+            const mentionActions: string | true = (actions.includes('-mention') || parameters['-mention']) || (actions.includes('-m') || parameters['-m']);
+            const deleteActions: string | true = (actions.includes('-del') || parameters['-del']) || (actions.includes('-d') || parameters['-d']);
+            const mentionParameters: string = (parameters['-mention'] || parameters['-m']);
+            if (mentionActions) {
+              await message.guild.members.fetch({ user: mentionParameters }).then(() => true).catch(() => false)
                 ? reply.content =
-                parameters['-mention'].includes("@everyone") || parameters['-mention'].includes("@here")
-                  || parameters['-mention'].includes("720820224877789204")
-                  ? null : `<@${parameters['-mention']}>`
+                mentionParameters.includes("@everyone") || mentionParameters.includes("@here")
+                  || mentionParameters.includes("720820224877789204")
+                  ? null : `<@${mentionParameters}>`
                 : reply.content = null;
             }
-            if (actions.includes('-del') || parameters['-del']) {
+            if (deleteActions) {
               await message.channel.send(reply);
               try {
                 await message.delete();
