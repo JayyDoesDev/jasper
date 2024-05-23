@@ -3,6 +3,7 @@ import { Event, DefineEvent } from "../../Common/DefineEvent";
 import { Wrap } from "../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../Common/CheckForRoles";
+import { Context } from "../../Context";
 export const TagEvent: Event = DefineEvent({
   event: {
     name: "messageCreate",
@@ -62,9 +63,13 @@ export const TagEvent: Event = DefineEvent({
                 }
               ]
             };
-            if (actions.includes('-msg') || parameters['-msg']) {
-              reply.content =
-                parameters['-msg'].includes("@everyone") || parameters['-msg'].includes("@here") ? null : parameters['-msg'];
+            if (actions.includes('-mention') || parameters['-mention']) {
+              await message.guild.members.fetch({ user: parameters['-mention'] }).then(() => true).catch(() => false)
+                ? reply.content =
+                parameters['-mention'].includes("@everyone") || parameters['-mention'].includes("@here")
+                  || parameters['-mention'].includes("720820224877789204")
+                  ? null : `<@${parameters['-mention']}>`
+                : reply.content = null;
             }
             if (actions.includes('-del') || parameters['-del']) {
               await message.channel.send(reply);

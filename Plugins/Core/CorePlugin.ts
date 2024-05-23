@@ -2,7 +2,13 @@ import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
 import { DefineEvent } from "../../Common/DefineEvent";
 import { ActivityType, ChatInputCommandInteraction } from "discord.js";
 import { Command, DefineCommand } from "../../Common/DefineCommand";
-import { ApplicationCommandType, PermissionsToHuman, PlantPermission, Permissions, PermissionBitToString } from "@antibot/interactions";
+import {
+  ApplicationCommandType,
+  PermissionsToHuman,
+  PlantPermission,
+  Permissions,
+  PermissionBitToString
+} from "@antibot/interactions";
 import { PingCommand } from "../../Javascript/CoreCommands";
 import numeral from "numeral";
 import { Context } from "../../Context";
@@ -46,7 +52,7 @@ export = DefinePlugin({
             data.json().then((x) => {
               const subscriberCount: string = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
               ctx.channels.cache.get(process.env.SUB_COUNT_CHANNEL)
-                 //@ts-ignore
+                //@ts-ignore
                 .setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
             });
           })()
