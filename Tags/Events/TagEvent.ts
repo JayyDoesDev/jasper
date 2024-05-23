@@ -11,7 +11,7 @@ export const TagEvent: Event = DefineEvent({
   },
   on: async (message: Message) => {
     try {
-      const prefixes: string[] = [process.env.PREFIX, "yo", "w", "dude,", "omg"];
+      const prefixes: string[] = [process.env.PREFIX, "yo", "w", "dude,", "omg", "lookhere", "j"];
       if (message.author.bot) {
         return;
       }
