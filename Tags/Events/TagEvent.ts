@@ -18,7 +18,6 @@ export const TagEvent: Event = DefineEvent({
       if (message.channel.type == ChannelType.DM) {
         return;
       }
-
       let prefixUsed: string | null = null;
       for (const prefix of prefixes) {
         if (message.content.toLowerCase().startsWith(prefix.toLowerCase())) {
@@ -26,16 +25,13 @@ export const TagEvent: Event = DefineEvent({
           break;
         }
       }
-
       if (!prefixUsed) {
         return;
       }
-
       const args = message.content.slice(prefixUsed.length).trim().split(/ +/g);
       const tagname: string | undefined = args.shift()?.toLowerCase();
       const actions: string[] = [];
       const parameters: Record<string, string> = {};
-
       for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         if (arg.startsWith('-')) {
@@ -51,7 +47,6 @@ export const TagEvent: Event = DefineEvent({
           return;
         }
       }
-
       if (tagname) {
         if (CheckForRoles(message, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
           const wrappedTag = await Wrap(TagGet(tagname, message.guild.id));
