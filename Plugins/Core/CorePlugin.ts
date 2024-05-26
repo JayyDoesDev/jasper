@@ -7,7 +7,7 @@ import {
   PermissionsToHuman,
   PlantPermission,
   Permissions,
-  PermissionBitToString
+  PermissionBitToString,
 } from "@antibot/interactions";
 import { PingCommand } from "../../Javascript/CoreCommands";
 import numeral from "numeral";
@@ -82,20 +82,12 @@ export = DefinePlugin({
         if (command) {
           if (command.permissions) {
             const perms: any[] = [];
-            let permDisplay: string = "";
             if (!interaction.appPermissions.has(command.permissions)) {
               for (let i = 0; i < command.permissions.length; i++) {
-                perms.push(
-                  PermissionsToHuman(PlantPermission(command.permissions[i]))
-                );
-              }
-              if (perms.length <= 2) {
-                permDisplay = perms.join(" & ");
-              } else {
-                permDisplay = perms.join(", ");
+                perms.push(PermissionsToHuman(PlantPermission(command.permissions[i])));
               }
               return interaction.reply({
-                content: `I'm missing permissions! (${permDisplay})`,
+                content: `I'm missing permissions! (${perms.length <= 2 ? perms.join(" & ") : perms.join(", ")})`,
                 ephemeral: true
               });
             }

@@ -3,13 +3,14 @@ import { Event, DefineEvent } from "../../Common/DefineEvent";
 import { Wrap } from "../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../Common/CheckForRoles";
+import { Context } from "../../Context";
 
 export const TagEvent: Event = DefineEvent({
   event: {
     name: "messageCreate",
     once: false
   },
-  on: async (message: Message) => {
+  on: async (message: Message, ctx: Context) => {
     try {
       const prefixes: string[] = [process.env.PREFIX, "yo", "w", "dude,", "omg", "lookhere", "j"];
       if (message.author.bot) {
@@ -49,7 +50,7 @@ export const TagEvent: Event = DefineEvent({
       }
       if (tagname) {
         if (CheckForRoles(message, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
-          const wrappedTag = await Wrap(TagGet(tagname, message.guild.id));
+          const wrappedTag = await Wrap(TagGet(tagname, message.guild.id, ctx));
           if ('TagName' in wrappedTag.data) {
             const embedObject: any = {};
             wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });

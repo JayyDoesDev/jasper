@@ -30,7 +30,7 @@ export const TagCreateModal: Event = DefineEvent({
           description: TagEmbedDescription ? TagEmbedDescription : null,
           footer: tagEmbedFooter ? tagEmbedFooter : null
         };
-        if (await TagExists(interaction.guild.id, tag.name)) {
+        if (await TagExists(interaction.guild.id, tag.name, ctx)) {
           return interaction.reply({ content: `> The support tag \`${tag.name}\` already exists!`, ephemeral: true });
         } else {
           await TagCreate(interaction.guild.id, {
@@ -39,7 +39,7 @@ export const TagCreateModal: Event = DefineEvent({
             title: tag.title,
             description: tag.description,
             footer: tag.footer
-          });
+          }, ctx);
           const embedObject: any = {};
           tag.description ? Object.defineProperty(embedObject, "description", { value: tag.description }) : Object.defineProperty(embedObject, "description", { value: null });
           tag.footer ? Object.defineProperty(embedObject, "footer", { value: { text: tag.footer } }) : Object.defineProperty(embedObject, "footer", { value: null });

@@ -30,9 +30,9 @@ export const TagEditModal: Event = DefineEvent({
           description: TagEmbedDescription ? TagEmbedDescription : null,
           footer: tagEmbedFooter ? tagEmbedFooter : null
         };
-        if (await TagExists(interaction.guild.id, tag.name)) {
-          await TagEdit(interaction.guild.id, { name: tag.name, title: tag.title, description: tag.description, footer: tag.footer });
-          const getTag = await TagGet(tag.name, interaction.guild.id);
+        if (await TagExists(interaction.guild.id, tag.name, ctx)) {
+          await TagEdit(interaction.guild.id, { name: tag.name, title: tag.title, description: tag.description, footer: tag.footer }, ctx);
+          const getTag: any = await TagGet(tag.name, interaction.guild.id, ctx);
           const embedObject: any = {};
           tag.description ? Object.defineProperty(embedObject, "description", { value: tag.description }) : Object.defineProperty(embedObject, "description", { value: getTag.TagEmbedDescription });
           tag.footer ? Object.defineProperty(embedObject, "footer", { value: { text: tag.footer } }) : Object.defineProperty(embedObject, "footer", { value: { text: getTag.TagEmbedFooter } });

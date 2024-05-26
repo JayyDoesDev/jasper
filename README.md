@@ -38,6 +38,8 @@ To host your own instance of Jasper, follow these steps:
     - `SUB_COUNT_CHANNEL`: ID of the channel where subscriber count updates will be posted.
     - `SUB_COUNT_TIMER`: Interval in milliseconds for subscriber count updates.
     - `SUB_COUNT_UPDATE`: Set to `true` to enable automatic subscriber count updates.
+    - `REDISHOST`: Set your redis host.
+    - `REDISPORT`: Set your redis port.
 
 4. Run the bot using `yarn start`.
 

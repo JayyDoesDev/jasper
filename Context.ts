@@ -3,12 +3,14 @@ import { ZillaCollection } from "@antibot/zilla";
 import { Command } from "./Common/DefineCommand";
 import { Interactions, Snowflake } from "@antibot/interactions";
 import { Plugin } from "./Common/DefinePlugin";
+import { TagGetPromise } from "./Tags/Controllers/TagGet";
+import { Redis } from "ioredis";
 
 export class Context extends Client {
   public plugin: ZillaCollection<string, Plugin>;
-  public cooldown: ZillaCollection<string, Command>;
   public interactions: ZillaCollection<string, Command>;
   public interact: Interactions;
+ public store: Redis;
   constructor() {
     super({
       intents: [
@@ -28,7 +30,6 @@ export class Context extends Client {
       },
     });
     this.plugin = new ZillaCollection<string, Plugin>();
-    this.cooldown = new ZillaCollection<string, Command>();
     this.interactions = new ZillaCollection<string, Command>();
     this.interact = new Interactions({
       publicKey: process.env.PUBLICKEY as unknown as string,
@@ -36,5 +37,9 @@ export class Context extends Client {
       botToken: process.env.TOKEN as unknown as string,
       debug: true,
     });
+   this.store = new Redis({
+    host: process.env.REDISHOST as string,
+    port: process.env.REDISPORT as unknown as number
+   });
   }
 }

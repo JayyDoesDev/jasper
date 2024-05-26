@@ -1,6 +1,8 @@
 import { GuildExists } from "../../Common/GuildExists";
+import { Context } from "../../Context";
 import TagSchema from "../../Models/TagSchema";
 import type { Snowflake } from "@antibot/interactions";
+import { TagGetPromise } from "./TagGet";
 export interface TagCreateOptions {
   author: Snowflake;
   name: string;
@@ -9,7 +11,29 @@ export interface TagCreateOptions {
   footer: string | null;
 }
 
-export async function TagCreate(guildId: Snowflake, options: TagCreateOptions): Promise<void> {
+export async function TagCreate(guildId: Snowflake, options: TagCreateOptions, ctx: Context): Promise<void> {
+  const key: string = JSON.stringify({ guild: guildId });
+  const exists: number = await ctx.store.exists(key);
+  if (exists) {
+    const cachedTags: TagGetPromise[] = JSON.parse(await ctx.store.get(key));
+    cachedTags.push({
+      TagName: options.name.trim(),
+      TagAuthor: options.author,
+      TagEmbedTitle: options.title,
+      TagEmbedDescription: options.description,
+      TagEmbedFooter: options.footer
+    });
+  } else {
+    await ctx.store.set(key, JSON.stringify([]));
+    const cachedTags: TagGetPromise[] = JSON.parse(await ctx.store.get(key));
+    cachedTags.push({
+      TagName: options.name.trim(),
+      TagAuthor: options.author,
+      TagEmbedTitle: options.title,
+      TagEmbedDescription: options.description,
+      TagEmbedFooter: options.footer
+    });
+  }
   if (await GuildExists(guildId)) {
     await TagSchema.updateOne(
       {
@@ -18,7 +42,7 @@ export async function TagCreate(guildId: Snowflake, options: TagCreateOptions): 
       {
         $push: {
           "Tags": {
-            TagName: options.name,
+            TagName: options.name.trim(),
             TagAuthor: options.author,
             TagResponse: {
               TagEmbedTitle: options.title,
@@ -38,7 +62,7 @@ export async function TagCreate(guildId: Snowflake, options: TagCreateOptions): 
       {
         $push: {
           "Tags": {
-            TagName: options.name,
+            TagName: options.name.trim(),
             TagAuthor: options.author,
             TagResponse: {
               TagEmbedTitle: options.title,

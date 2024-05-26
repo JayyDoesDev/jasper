@@ -3,7 +3,7 @@ import { Context } from "../../Context";
 import { RegisterSubCommand } from "../../Common/RegisterSubCommand";
 import { ChatInputCommandInteraction } from "discord.js";
 import { TagExists } from "../Controllers/TagExists";
-import { TagGet, TagGetPromise } from "../Controllers/TagGet";
+import { TagGet } from "../Controllers/TagGet";
 export const ShowSubCommand: ApplicationCommandOptions = {
   name: "show",
   description: "Show a tag!",
@@ -25,8 +25,8 @@ export function RunShowSubCommand(ctx: Context, interaction: ChatInputCommandInt
     interaction: interaction,
     callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
       const tagName: string = interaction.options.getString("tag-name");
-      if (await TagExists(interaction.guild.id, tagName)) {
-        const getTag: TagGetPromise = await TagGet(tagName, interaction.guild.id);
+      if (await TagExists(interaction.guild.id, tagName, ctx)) {
+        const getTag: any = await TagGet(tagName, interaction.guild.id, ctx);
         return interaction.reply({
           embeds: [
             {
