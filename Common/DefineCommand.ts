@@ -1,13 +1,14 @@
-import { Interaction, PermissionsBitField } from "discord.js";
+import { AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, PermissionsBitField } from "discord.js";
 import { Context } from "../Context";
 import { ICommand } from "@antibot/interactions";
 
-export interface Command {
-	command: ICommand;
-	permissions?: PermissionsBitField[] | any[];
-	on: (ctx: Context, interaction: Interaction) => void;
+export interface Command<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction> {
+    command: ICommand;
+    permissions?: PermissionsBitField[] | any[];
+    on: (ctx: Context, interaction: Interaction) => void;
+    autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => void;
 }
 
-export function DefineCommand(options: Command): Command {
-	return options;
+export function DefineCommand<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction>(options: Command<Interaction>): Command<Interaction> {
+    return options;
 }

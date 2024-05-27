@@ -1,0 +1,38 @@
+services:
+  bot:
+    build: .
+    container_name: jasper-bot
+    environment:
+      - BOTID=${BOTID}
+      - PUBLICKEY=${PUBLICKEY}
+      - TOKEN=${TOKEN}
+      - MONGODB=mongodb://mongo:27017/jasper
+      - PREFIX=${PREFIX}
+      - SUPPORT_ROLE=${SUPPORT_ROLE}
+      - ADMIN_ROLE=${ADMIN_ROLE}
+      - STAFF_ROLE=${STAFF_ROLE}
+      - GUILD_ONLY_COMMANDS=${GUILD_ONLY_COMMANDS}
+      - GUILD_ONLY_COMMANDS_GUILD_ID=${GUILD_ONLY_COMMANDS_GUILD_ID}
+      - YOUTUBE_CHANNEL_ID=${YOUTUBE_CHANNEL_ID}
+      - YOUTUBE_KEY=${YOUTUBE_KEY}
+      - SUB_COUNT_CHANNEL=${SUB_COUNT_CHANNEL}
+      - SUB_COUNT_TIMER=${SUB_COUNT_TIMER}
+      - SUB_COUNT_UPDATE=${SUB_COUNT_UPDATE}
+      - REDISHOST=redis
+      - REDISPORT=6379
+    depends_on:
+      - mongo
+      - redis
+
+  mongo:
+    image: mongo:latest
+    container_name: jasper-mongo
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:latest
+    container_name: jasper-redis
+
+volumes:
+  mongo-data:

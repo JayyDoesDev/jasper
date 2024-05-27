@@ -3,11 +3,11 @@ FROM node:20
 WORKDIR /jasper
 
 COPY package*.json ./
+COPY yarn.lock ./
 
-RUN yarn
+RUN yarn install --production
 
-COPY  . .
-
-EXPOSE 3000:8080
+COPY . .
+RUN yarn build
 
 CMD ["yarn", "start"]
