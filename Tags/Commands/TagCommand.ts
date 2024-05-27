@@ -1,6 +1,6 @@
 import { ApplicationCommandOptions, ApplicationCommandType, } from "@antibot/interactions";
 import { DefineCommand } from "../../Common/DefineCommand";
-import { Context } from "../../Context";
+import { Context } from "../../Source/Context";
 import { ChatInputCommandInteraction } from "discord.js";
 import {
     CreateSubCommand,

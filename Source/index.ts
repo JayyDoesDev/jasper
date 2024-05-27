@@ -6,7 +6,7 @@ import numeral from "numeral";
 config();
 const ctx: Context = new Context();
 [ "Command", "Event" ].forEach(async (x) => {
-    await require(`./Handlers/${ x }`).default(ctx);
+    await require(`../Handlers/${ x }`).default(ctx);
 });
 
 SetupMongo({ uri: process.env.MONGODB });

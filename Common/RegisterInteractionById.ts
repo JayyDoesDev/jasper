@@ -1,4 +1,4 @@
-import { Context } from "../Context";
+import { Context } from "../Source/Context";
 
 interface RegisterByIdOptions {
     id: string;

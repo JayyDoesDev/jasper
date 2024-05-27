@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "scripts": {
         "build": "gulp js && tsc",
-        "start": "node dist/index.js",
-        "dev": "yarn build && eslint . && node dist/index.js",
+        "start": "node dist/Source/index.js",
+        "dev": "yarn build && eslint . && node dist/Source/index.js",
         "eslint": "eslint .",
         "builddocker": "docker build -t jasper .",
         "docker": "docker run -dp 127.0.0.1:3000:8000 --name jasper jasper:latest",

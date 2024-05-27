@@ -1,4 +1,4 @@
-import { Context } from "../../Context";
+import { Context } from "../../Source/Context";
 import { RegisterSubCommand } from "../../Common/RegisterSubCommand";
 import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
 import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";

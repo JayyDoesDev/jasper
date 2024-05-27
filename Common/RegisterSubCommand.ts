@@ -1,4 +1,4 @@
-import { Context } from "../Context";
+import { Context } from "../Source/Context";
 import { AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, InteractionResponse } from "discord.js";
 
 interface RegisterSubCommandOptions<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction> {

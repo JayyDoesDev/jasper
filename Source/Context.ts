@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, Client, ContextMenuCommandInteraction, IntentsBitField, Partials } from "discord.js";
 import { ZillaCollection } from "@antibot/zilla";
-import { Command } from "./Common/DefineCommand";
+import { Command } from "../Common/DefineCommand";
 import { Interactions, Snowflake } from "@antibot/interactions";
-import { Plugin } from "./Common/DefinePlugin";
+import { Plugin } from "../Common/DefinePlugin";
 import { Redis } from "ioredis";
 
 export class Context extends Client {

@@ -1,5 +1,5 @@
 import { Interaction } from "discord.js";
-import { Context } from "../Context";
+import { Context } from "../Source/Context";
 
 export interface Event {
     event: {

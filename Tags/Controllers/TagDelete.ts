@@ -1,4 +1,4 @@
-import { Context } from "../../Context";
+import { Context } from "../../Source/Context";
 import TagSchema from "../../Models/TagSchema";
 import type { Snowflake } from "@antibot/interactions";
 import { TagGetPromise } from "./TagGet";

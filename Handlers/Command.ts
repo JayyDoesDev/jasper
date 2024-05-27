@@ -1,4 +1,4 @@
-import { Context } from "../Context";
+import { Context } from "../Source/Context";
 import glob from "glob";
 import path from "path";
 import { Command } from "../Common/DefineCommand";

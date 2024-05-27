@@ -5,7 +5,7 @@ import { Command, DefineCommand } from "../../Common/DefineCommand";
 import { ApplicationCommandType, PermissionBitToString, Permissions, PermissionsToHuman, PlantPermission, } from "@antibot/interactions";
 import { PingCommand } from "../../Javascript/CoreCommands";
 import numeral from "numeral";
-import { Context } from "../../Context";
+import { Context } from "../../Source/Context";
 
 export = DefinePlugin({
     name: "Core",

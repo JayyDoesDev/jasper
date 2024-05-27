@@ -1,6 +1,6 @@
 import { DefineEvent, Event } from "../../Common/DefineEvent";
 import { ModalSubmitInteraction } from "discord.js";
-import { Context } from "../../Context";
+import { Context } from "../../Source/Context";
 import { Emojis } from "../../Common/Emojis";
 import { RegisterInteractionById } from "../../Common/RegisterInteractionById";
 import { TagEdit, TagEditOptions } from "../Controllers/TagEdit";

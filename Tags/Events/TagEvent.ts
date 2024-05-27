@@ -3,7 +3,7 @@ import { DefineEvent, Event } from "../../Common/DefineEvent";
 import { Wrap } from "../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../Common/CheckForRoles";
-import { Context } from "../../Context";
+import { Context } from "../../Source/Context";
 
 export const TagEvent: Event = DefineEvent({
     event: {

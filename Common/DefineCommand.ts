@@ -1,5 +1,5 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, PermissionsBitField } from "discord.js";
-import { Context } from "../Context";
+import { Context } from "../Source/Context";
 import { ICommand } from "@antibot/interactions";
 
 export interface Command<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction> {
