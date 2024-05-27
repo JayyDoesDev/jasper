@@ -39,19 +39,18 @@ export const TagCommand = DefineCommand<ChatInputCommandInteraction>({
     },
     on: async (ctx: Context, interaction) => {
         const subCommand = interaction.options.getSubcommand();
+        if (subCommand === "delete") {
+          if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
+            await RunDeleteSubCommand(ctx, interaction);
+          } else {
+              return interaction.reply({
+                content: "Sorry but you can't use this command.",
+                ephemeral: true,
+            });
+          }
+      }
 
         if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
-            if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
-                if (subCommand === "delete") {
-                    await RunDeleteSubCommand(ctx, interaction);
-                }
-            } else {
-                return interaction.reply({
-                    content: "Sorry but you can't use this command.",
-                    ephemeral: true,
-                });
-            }
-
             if (subCommand === "create") {
                 await RunCreateSubCommand(ctx, interaction);
             } else if (subCommand === "list") {
