@@ -1,16 +1,13 @@
 {
     "compilerOptions": {
-        "skipLibCheck": false,
         "module": "commonjs",
-        "target": "ES2022",
+        "target": "esnext",
         "outDir": "dist",
+        "skipLibCheck": false,
         "pretty": true,
         "noImplicitAny": false,
         "esModuleInterop": true,
-        "resolveJsonModule": true,
+        "resolveJsonModule": true
     },
-    "exclude": [
-        "node_modules",
-        "Libraries"
-    ],
+    "exclude": [ "node_modules", "Libraries" ]
 }

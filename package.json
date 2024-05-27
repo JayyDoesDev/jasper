@@ -1,37 +1,44 @@
 {
-  "name": "jasper",
-  "version": "1.0.0",
-  "main": "index.js",
-  "author": "JayyDoesDev",
-  "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "i18n": "gulp i18n",
-    "start": "yarn build && eslint . && gulp js && node dist/index.js",
-    "eslint": "eslint .",
-    "builddocker": "docker build -t jasper .",
-    "docker": "docker run -dp 127.0.0.1:3000:8000 --name jasper jasper:latest",
-    "dockerstop": "docker stop jasper"
-  },
-  "dependencies": {
-    "@antibot/interactions": "^1.4.3",
-    "@antibot/zilla": "^1.0.2",
-    "@types/mongoose": "^5.11.97",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
-    "cross-fetch": "^4.0.0",
-    "discord.js": "^14.14.1",
-    "dotenv": "^16.3.2",
-    "eslint": "^8.56.0",
-    "eslint-plugin-json": "^3.1.0",
-    "glob": "7.2.0",
-    "gulp": "^5.0.0",
-    "ioredis": "^5.4.1",
-    "moment": "^2.30.1",
-    "mongoose": "^8.3.0",
-    "nanoid": "^5.0.7",
-    "numeral": "^2.0.6",
-    "typescript": "^5.3.3",
-    "typescript-eslint": "^0.0.1-alpha.0"
-  }
+    "name": "jasper",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "gulp js && tsc",
+        "start": "node dist/index.js",
+        "dev": "yarn build && eslint . && node dist/index.js",
+        "eslint": "eslint .",
+        "builddocker": "docker build -t jasper .",
+        "docker": "docker run -dp 127.0.0.1:3000:8000 --name jasper jasper:latest",
+        "dockerstop": "docker stop jasper",
+        "docker-compose": "docker-compose up -d",
+        "docker-compose-stop": "docker-compose down"
+    },
+    "main": "dist/index.js",
+    "author": "J_DDev <69683068+jayydoesdev@users.noreply.github.com>",
+    "contributors": [
+        "Tarab1te <69683068+jayydoesdev@users.noreply.github.com>",
+        "Proman4713 <85965528+proman4713@users.noreply.github.com>"
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "@antibot/interactions": "^1.4.3",
+        "@antibot/zilla": "^1.0.2",
+        "discord.js": "^14.14.1",
+        "dotenv": "^16.3.2",
+        "glob": "7.2.0",
+        "gulp": "^5.0.0",
+        "ioredis": "^5.4.1",
+        "mongoose": "^8.3.0",
+        "numeral": "^2.0.6"
+    },
+    "devDependencies": {
+        "@types/glob": "^8.1.0",
+        "@types/mongoose": "^5.11.97",
+        "@types/numeral": "^2.0.5",
+        "@typescript-eslint/eslint-plugin": "^7.10.0",
+        "@typescript-eslint/parser": "^7.10.0",
+        "eslint": "^8.56.0",
+        "eslint-plugin-json": "^3.1.0",
+        "typescript": "^5.4.5",
+        "typescript-eslint": "^7.10.0"
+    }
 }
