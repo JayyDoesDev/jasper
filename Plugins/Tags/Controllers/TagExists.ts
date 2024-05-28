@@ -1,9 +1,9 @@
-import { GuildExists } from "../../Common/GuildExists";
-import { Wrap } from "../../Common/Wrap";
-import { Tag } from "../../Models/TagDocument";
+import { GuildExists } from "../../../Common/GuildExists";
+import { Wrap } from "../../../Common/Wrap";
+import { Tag } from "../../../Models/TagDocument";
 import type { Snowflake } from "discord.js";
-import TagSchema from "../../Models/TagSchema";
-import { Context } from "../../Source/Context";
+import TagSchema from "../../../Models/TagSchema";
+import { Context } from "../../../Source/Context";
 import { TagGetPromise } from "./TagGet";
 
 export async function TagExists(

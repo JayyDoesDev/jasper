@@ -1,6 +1,6 @@
 import type { Snowflake } from "@antibot/interactions";
 import { TagExists } from "./TagExists";
-import { Context } from "../../Source/Context";
+import { Context } from "../../../Source/Context";
 
 export type TagGetPromise = {
     TagAuthor: Snowflake;

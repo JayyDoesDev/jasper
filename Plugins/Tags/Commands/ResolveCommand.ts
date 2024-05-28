@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ApplicationCommandType, PermissionsBitField } from "@antibot/interactions";
-import { DefineCommand } from "../../Common/DefineCommand";
+import { DefineCommand } from "../../../Common/DefineCommand";
 import { ChannelType, ChatInputCommandInteraction } from "discord.js";
-import { CheckForRoles } from "../../Common/CheckForRoles";
+import { CheckForRoles } from "../../../Common/CheckForRoles";
 
 export const ResolveCommand = DefineCommand<ChatInputCommandInteraction>({
     command: {

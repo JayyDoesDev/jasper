@@ -1,10 +1,10 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
-import { Context } from "../../Source/Context";
-import { RegisterSubCommand } from "../../Common/RegisterSubCommand";
+import { Context } from "../../../Source/Context";
+import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import { ChatInputCommandInteraction } from "discord.js";
-import { GuildExists } from "../../Common/GuildExists";
-import TagSchema from "../../Models/TagSchema";
-import { Wrap } from "../../Common/Wrap";
+import { GuildExists } from "../../../Common/GuildExists";
+import TagSchema from "../../../Models/TagSchema";
+import { Wrap } from "../../../Common/Wrap";
 
 export const ListSubCommand: ApplicationCommandOptions = {
     name: "list",

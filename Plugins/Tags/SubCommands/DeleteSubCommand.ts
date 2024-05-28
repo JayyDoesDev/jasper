@@ -1,19 +1,20 @@
+import { Context } from "../../../Source/Context";
+import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
-import { Context } from "../../Source/Context";
-import { RegisterSubCommand } from "../../Common/RegisterSubCommand";
 import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
 import { TagExists } from "../Controllers/TagExists";
-import { TagGet } from "../Controllers/TagGet";
+import { TagDelete } from "../Controllers/TagDelete";
+import { Emojis } from "../../../Common/Emojis";
 import { TagsGet } from "../Controllers/TagsGet";
 
-export const ShowSubCommand: ApplicationCommandOptions = {
-    name: "show",
-    description: "Show a tag!",
+export const DeleteSubCommand: ApplicationCommandOptions = {
+    name: "delete",
+    description: "Delete a tag!",
     type: ApplicationCommandOptionType.SUB_COMMAND,
     options: [
         {
             name: "tag-name",
-            description: "Provide the name of the tag you would like to check out!",
+            description: "Provide the tag name of the tag you would like to delete!",
             type: ApplicationCommandOptionType.STRING,
             required: true,
             autocomplete: true
@@ -21,30 +22,24 @@ export const ShowSubCommand: ApplicationCommandOptions = {
     ]
 } as ApplicationCommandOptions;
 
-export async function RunShowSubCommand(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
+export async function RunDeleteSubCommand(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
     await RegisterSubCommand({
-        subCommand: "show",
+        subCommand: "delete",
         ctx: ctx,
         interaction: interaction,
         callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const tagName: string = interaction.options.getString("tag-name");
             if (await TagExists(interaction.guild.id, tagName, ctx)) {
-                const getTag: any = await TagGet(tagName, interaction.guild.id, ctx);
+                await TagDelete(interaction.guild.id, tagName, ctx);
                 return interaction.reply({
-                    embeds: [
-                        {
-                            title: getTag.TagEmbedTitle,
-                            color: 0xff9a00,
-                            description: getTag.TagEmbedDescription ? getTag.TagEmbedDescription : '',
-                            footer: {
-                                text: getTag.TagEmbedFooter ? getTag.TagEmbedFooter : ''
-                            }
-                        }
-                    ],
+                    content: `${ Emojis.CHECK_MARK } Successfully deleted \`${ tagName }\`!`,
                     ephemeral: true
                 })
             } else {
-                return interaction.reply({ content: `> The support tag \`${ tagName }\` doesn't exists!`, ephemeral: true });
+                return interaction.reply({
+                    content: `Tag not found!`,
+                    ephemeral: true
+                })
             }
         },
         autocomplete: async (ctx, interaction) => {

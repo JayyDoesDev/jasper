@@ -1,6 +1,6 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
-import { Context } from "../../Source/Context";
-import { RegisterSubCommand } from "../../Common/RegisterSubCommand";
+import { Context } from "../../../Source/Context";
+import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
 import { TagExists } from "../Controllers/TagExists";
 import { TagGet } from "../Controllers/TagGet";

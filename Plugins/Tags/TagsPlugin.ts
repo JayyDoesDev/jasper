@@ -1,5 +1,5 @@
 import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
-import { ResolveCommand, TagCommand, TagCreateModal, TagEditModal, TagEvent, } from "../../Tags";
+import { ResolveCommand, TagCommand, TagCreateModal, TagEditModal, TagEvent, } from ".";
 
 export = DefinePlugin({
     name: "tags",

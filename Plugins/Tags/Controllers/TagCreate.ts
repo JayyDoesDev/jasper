@@ -1,6 +1,6 @@
-import { GuildExists } from "../../Common/GuildExists";
-import { Context } from "../../Source/Context";
-import TagSchema from "../../Models/TagSchema";
+import { GuildExists } from "../../../Common/GuildExists";
+import { Context } from "../../../Source/Context";
+import TagSchema from "../../../Models/TagSchema";
 import type { Snowflake } from "@antibot/interactions";
 import { TagGetPromise } from "./TagGet";
 

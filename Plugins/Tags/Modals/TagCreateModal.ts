@@ -1,8 +1,8 @@
-import { DefineEvent, Event } from "../../Common/DefineEvent";
+import { DefineEvent, Event } from "../../../Common/DefineEvent";
 import { ModalSubmitInteraction } from "discord.js";
-import { Context } from "../../Source/Context";
-import { Emojis } from "../../Common/Emojis";
-import { RegisterInteractionById } from "../../Common/RegisterInteractionById";
+import { Context } from "../../../Source/Context";
+import { Emojis } from "../../../Common/Emojis";
+import { RegisterInteractionById } from "../../../Common/RegisterInteractionById";
 import { TagCreate, TagCreateOptions } from "../Controllers/TagCreate";
 import { TagExists } from "../Controllers/TagExists";
 

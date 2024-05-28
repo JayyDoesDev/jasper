@@ -1,7 +1,7 @@
-import TagSchema from "../../Models/TagSchema";
+import TagSchema from "../../../Models/TagSchema";
 import type { Snowflake } from "@antibot/interactions";
 import { TagGetPromise } from "./TagGet";
-import { Context } from "../../Source/Context";
+import { Context } from "../../../Source/Context";
 import { TagExists } from "./TagExists";
 
 export interface TagEditOptions {
