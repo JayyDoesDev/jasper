@@ -16,7 +16,7 @@ export default function (ctx: Context): void {
             continue;
         }
 
-        if (Object.hasOwn(file, 'public_plugin')) {
+        if ('public_plugin' in file) {
             if (file.commands) {
                 ctx.plugin.set(file.name, file);
                 for (let j = 0; j < file.commands.length; j++) {
