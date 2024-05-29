@@ -15,9 +15,8 @@
     "main": "dist/index.js",
     "author": "J_DDev <69683068+jayydoesdev@users.noreply.github.com>",
     "contributors": [
-        "Tarab1te <69683068+jayydoesdev@users.noreply.github.com>",
         "Proman4713 <85965528+proman4713@users.noreply.github.com>",
-        "zueripat <ruedepatrick@gmail.com>"
+        "zueripat <66902977+zueripat@users.noreply.github.com>"
     ],
     "license": "MIT",
     "dependencies": {
