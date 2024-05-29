@@ -3,3 +3,4 @@ export * from "./Commands/ResolveCommand";
 export * from "./Modals/TagCreateModal";
 export * from "./Modals/TagEditModal";
 export * from "./Events/TagEvent";
+export * from "./Commands/HelpCommand";
