@@ -19,6 +19,7 @@ import {
     UseSubCommand
 } from "../SubCommands";
 import { CheckForRoles } from "../../../Common/CheckForRoles";
+import { TagGet } from "../Controllers/TagGet";
 
 const subCommands: ApplicationCommandOptions[] = [
     CreateSubCommand,
@@ -39,16 +40,20 @@ export const TagCommand = DefineCommand<ChatInputCommandInteraction>({
     },
     on: async (ctx: Context, interaction) => {
         const subCommand = interaction.options.getSubcommand();
+
         if (subCommand === "delete") {
-          if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
-            await RunDeleteSubCommand(ctx, interaction);
-          } else {
-              return interaction.reply({
-                content: "Sorry but you can't use this command.",
-                ephemeral: true,
-            });
-          }
-      }
+            const tag = interaction.options.getString("tag");
+            const dbTag = await TagGet(tag, interaction.guild.id, ctx);
+
+            if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || dbTag.TagAuthor === interaction.user.id) {
+                await RunDeleteSubCommand(ctx, interaction);
+            } else {
+                return interaction.reply({
+                    content: "Sorry but you can't use this command.",
+                    ephemeral: true,
+                });
+            }
+        }
 
         if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
             if (subCommand === "create") {
