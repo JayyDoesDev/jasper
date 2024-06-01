@@ -44,7 +44,7 @@ export async function RunShowSubCommand(ctx: Context, interaction: ChatInputComm
                     ephemeral: true
                 })
             } else {
-                return interaction.reply({ content: `> The support tag \`${ tagName }\` doesn't exists!`, ephemeral: true });
+                return interaction.reply({ content: `> The support tag \`${ tagName }\` doesn't exist!`, ephemeral: true });
             }
         },
         autocomplete: async (ctx, interaction) => {
