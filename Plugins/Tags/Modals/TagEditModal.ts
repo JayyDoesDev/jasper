@@ -55,7 +55,7 @@ export const TagEditModal: Event = DefineEvent({
                         ephemeral: true
                     });
                 } else {
-                    return interaction.reply({ content: `> The support tag \`${ tag.name }\` doesn't exists!`, ephemeral: true });
+                    return interaction.reply({ content: `> The support tag \`${ tag.name }\` doesn't exist!`, ephemeral: true });
                 }
             }
         })
