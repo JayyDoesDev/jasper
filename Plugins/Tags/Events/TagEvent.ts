@@ -1,4 +1,4 @@
-import { ChannelType, Message } from "discord.js";
+import { ChannelType, Message, PrivateThreadChannel, ThreadChannel } from "discord.js";
 import { DefineEvent, Event } from "../../../Common/DefineEvent";
 import { Wrap } from "../../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
@@ -12,14 +12,14 @@ export const TagEvent: Event = DefineEvent({
     },
     on: async (message: Message, ctx: Context) => {
         try {
-            if (message.channel.id !== String(process.env.SUPPORT_THREAD)) {
+            if (!message.channel.isThread()) {
+              return;
+            }
+            if (message.channel.parentId !== String(process.env.SUPPORT_THREAD)) {
                 return;
             }
             const prefixes: string[] = [ process.env.PREFIX, "yo", "w", "dude,", "omg", "lookhere", "j" ];
             if (message.author.bot) {
-                return;
-            }
-            if (message.channel.type == ChannelType.DM) {
                 return;
             }
             let prefixUsed: string | null = null;
