@@ -49,6 +49,7 @@ To host your own instance of Jasper, follow these steps:
     - `SUB_COUNT_UPDATE`: Set to `true` to enable automatic subscriber count updates.
     - `REDISHOST`: Set your redis host.
     - `REDISPORT`: Set your redis port.
+    - `SUPPORT_THREAD`: ID of the channel for the tags to be used in.
 
 4. Run the bot using `yarn start`.
 

@@ -12,6 +12,9 @@ export const TagEvent: Event = DefineEvent({
     },
     on: async (message: Message, ctx: Context) => {
         try {
+            if (message.channel.id !== String(process.env.SUPPORT_THREAD)) {
+                return;
+            }
             const prefixes: string[] = [ process.env.PREFIX, "yo", "w", "dude,", "omg", "lookhere", "j" ];
             if (message.author.bot) {
                 return;

@@ -56,18 +56,25 @@ export const TagCommand = DefineCommand<ChatInputCommandInteraction>({
         }
 
         if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
-            if (subCommand === "create") {
-                await RunCreateSubCommand(ctx, interaction);
-            } else if (subCommand === "list") {
-                await RunListSubCommand(ctx, interaction);
-            } else if (subCommand === "edit") {
-                await RunEditSubCommand(ctx, interaction);
-            } else if (subCommand === "show") {
-                await RunShowSubCommand(ctx, interaction);
-            } else if (subCommand === "info") {
-                await RunInfoSubCommand(ctx, interaction);
-            } else if (subCommand === "use") {
-                await RunUseSubCommand(ctx, interaction);
+            switch (subCommand) {
+              case 'create':
+                  await RunCreateSubCommand(ctx, interaction);
+                  break;
+              case 'list':
+                  await RunListSubCommand(ctx, interaction);
+                  break;
+              case 'edit':
+                  await RunEditSubCommand(ctx, interaction);
+                  break;
+              case 'show':
+                  await RunShowSubCommand(ctx, interaction);
+                  break;
+              case 'info':
+                  await RunInfoSubCommand(ctx, interaction);
+                  break;
+              case 'use':
+                  await RunUseSubCommand(ctx, interaction);
+                  break;
             }
         } else {
             return interaction.reply({
