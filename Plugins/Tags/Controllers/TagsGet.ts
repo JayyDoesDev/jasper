@@ -8,14 +8,13 @@ export async function TagsGet(
     guildId: Snowflake,
     ctx: Context
 ): Promise<Tag[]> {
-    let tags: Tag[] = JSON.parse(
-        await ctx.store.get(JSON.stringify({ guild: guildId }))
-    );
+    const key: Record<"guild", Snowflake> = { guild: guildId };
+    let tags: Tag[] = await ctx.store.getGuild(key);
     if (!Array.isArray(tags) || tags.length === 0) {
         const wrappedGuild = await Wrap(TagSchema.findOne({ _id: guildId }));
         if (wrappedGuild.data) {
             tags = wrappedGuild.data.Tags;
-            await ctx.store.set(JSON.stringify({ guild: guildId }), JSON.stringify(tags));
+            await ctx.store.setKey(key, ...tags);
         } else {
             tags = [];
         }

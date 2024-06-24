@@ -21,8 +21,8 @@ export async function TagEdit(
         console.log("Tag not found");
     }
 
-    const key: string = JSON.stringify({ guild: guildId });
-    let cachedTags: TagGetPromise[] = JSON.parse(await ctx.store.get(key));
+    const key: Record<"guild", Snowflake> = { guild: guildId };
+    let cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
     if (!Array.isArray(cachedTags)) {
         cachedTags = [];
     }
@@ -44,7 +44,7 @@ export async function TagEdit(
         console.log("Tag not found in cache");
     }
 
-    await ctx.store.set(key, JSON.stringify(cachedTags));
+    await ctx.store.setKey(key, ...cachedTags);
 
     await TagSchema.findOneAndUpdate(
         {

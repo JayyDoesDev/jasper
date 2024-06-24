@@ -18,9 +18,7 @@ export async function TagGet(
     ctx: Context
 ): Promise<TagGetResponse> {
     if (await TagExists(guildId, name, ctx)) {
-        let tags: TagGetPromise[] = JSON.parse(
-            await ctx.store.get(JSON.stringify({ guild: guildId }))
-        );
+        let tags: TagGetPromise[] = await ctx.store.getGuild({ guild: guildId });
         if (!Array.isArray(tags)) {
             tags = [];
         }

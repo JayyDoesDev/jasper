@@ -8,8 +8,8 @@ export async function TagDelete(
     tagName: string,
     ctx: Context
 ): Promise<void> {
-    const key: string = JSON.stringify({ guild: guildId });
-    const cachedTags: TagGetPromise[] = JSON.parse(await ctx.store.get(key));
+    const key: Record<"guild", Snowflake> = { guild: guildId };
+    const cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
     if (!cachedTags) {
         console.log("Tag not found in cache");
     }
@@ -18,7 +18,7 @@ export async function TagDelete(
         console.log("Tag not found in cache");
     }
     cachedTags.splice(tagIndex, 1);
-    await ctx.store.set(key, JSON.stringify(cachedTags));
+    await ctx.store.setKey(key, ...cachedTags)
     await TagSchema.updateOne(
         { _id: guildId },
         { $pull: { Tags: { TagName: tagName } } }

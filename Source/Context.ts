@@ -4,12 +4,13 @@ import { Command } from "../Common/DefineCommand";
 import { Interactions, Snowflake } from "@antibot/interactions";
 import { Plugin } from "../Common/DefinePlugin";
 import { Redis } from "ioredis";
+import { Store } from "./Store";
 
 export class Context extends Client {
     public plugin: ZillaCollection<string, Plugin>;
     public interactions: ZillaCollection<string, Command<ChatInputCommandInteraction | ContextMenuCommandInteraction>>;
     public interact: Interactions;
-    public store: Redis;
+    public store: Store;
 
     constructor() {
         super({
@@ -37,9 +38,6 @@ export class Context extends Client {
             botToken: process.env.TOKEN as unknown as string,
             debug: true,
         });
-        this.store = new Redis({
-            host: process.env.REDISHOST as string,
-            port: process.env.REDISPORT as unknown as number,
-        });
+        this.store = new Store(this);
     }
 }

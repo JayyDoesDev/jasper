@@ -403,3 +403,4 @@ FodyWeavers.xsd
 
 # MacOS DS_Store file
 .DS_Store
+/nbproject/private/

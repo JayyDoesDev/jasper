@@ -17,10 +17,10 @@ export async function TagCreate(
     options: TagCreateOptions,
     ctx: Context
 ): Promise<void> {
-    const key: string = JSON.stringify({ guild: guildId });
-    const exists: number = await ctx.store.exists(key);
+    const key: Record<"guild", Snowflake> = { guild: guildId };
+    const exists: number = await ctx.store.guildExists(key);
     if (exists) {
-        const cachedTags: TagGetPromise[] = JSON.parse(await ctx.store.get(key));
+        const cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
         cachedTags.push({
             TagName: options.name.trim(),
             TagAuthor: options.author,
@@ -29,8 +29,8 @@ export async function TagCreate(
             TagEmbedFooter: options.footer,
         });
     } else {
-        await ctx.store.set(key, JSON.stringify([]));
-        const cachedTags: TagGetPromise[] = JSON.parse(await ctx.store.get(key));
+        await ctx.store.setKey(key);
+        const cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
         cachedTags.push({
             TagName: options.name.trim(),
             TagAuthor: options.author,

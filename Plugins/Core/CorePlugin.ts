@@ -38,7 +38,7 @@ export = DefinePlugin({
                 });
             },
         }),
-        PingCommand,
+        PingCommand
     ],
     events: [
         DefineEvent({

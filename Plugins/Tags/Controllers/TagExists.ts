@@ -11,19 +11,19 @@ export async function TagExists(
     name: string,
     ctx: Context
 ): Promise<boolean> {
-    const key: string = JSON.stringify({ guild: guildId });
-    const exists: number = await ctx.store.exists(key);
+    const key: Record<"guild", Snowflake> = { guild: guildId };
+    const exists: number = await ctx.store.guildExists(key);
     if (!exists) {
         if (!(await GuildExists(guildId))) {
             return false;
         }
-        await ctx.store.set(key, JSON.stringify([]));
+        await ctx.store.setKey(key);
     }
 
-    let tags: TagGetPromise[] = JSON.parse(await ctx.store.get(key));
+    let tags: TagGetPromise[] = await ctx.store.getGuild(key);
     if (!Array.isArray(tags)) {
         tags = [];
-        await ctx.store.set(key, JSON.stringify(tags));
+        await ctx.store.setKey(key, ...tags);
     }
 
     if (tags.find((tag) => tag.TagName === name)) {
@@ -45,7 +45,7 @@ export async function TagExists(
                 TagEmbedDescription: findTag.TagResponse.TagEmbedDescription,
                 TagEmbedFooter: findTag.TagResponse.TagEmbedFooter,
             });
-            await ctx.store.set(key, JSON.stringify(tags));
+            await ctx.store.setKey(key, ...tags);
             return true;
         }
     } catch (error) {
