@@ -4,7 +4,8 @@ import path from "path";
 
 export default function (ctx: Context): void {
     try {
-        const events: string[] = glob.sync(path.join("./dist/Plugins/**", "**/*.js"));
+        let events: string[] = [];
+        process.platform == "linux" ? events = glob.sync("./Plugins/**/*.js") : events = glob.sync("./dist/Plugins/**/*.js");
         for (let i = 0; i < events.length; i++) {
             try {
                 const filePath = path.resolve(events[i]);
