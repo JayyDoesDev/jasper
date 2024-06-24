@@ -29,7 +29,7 @@ export async function TagCreate(
             TagEmbedFooter: options.footer,
         });
     } else {
-        await ctx.store.setKey(key);
+        ctx.store.setKey(key);
         const cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
         cachedTags.push({
             TagName: options.name.trim(),

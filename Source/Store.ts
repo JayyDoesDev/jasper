@@ -22,15 +22,15 @@ export class Store extends Redis {
         return await this.getGuild(options) ? true : false;
     }
 
-    public async deleteGuild(options: GuildOptions): Promise<void> {
-        await this.del(JSON.stringify(options));
+    public deleteGuild(options: GuildOptions): void{
+        this.del(JSON.stringify(options));
     }
 
-    public async setKey<T>(options: GuildOptions, ...keys: T[] | []): Promise<void> {
-        await this.set(JSON.stringify(options), JSON.stringify(keys || []));
+    public setKey<T>(options: GuildOptions, ...keys: T[] | []): void {
+         this.set(JSON.stringify(options), JSON.stringify(keys || []));
     }
 
-    public async guildExists(options: GuildOptions): Promise<number> {
-        return await this.exists(JSON.stringify(options));
+    public guildExists(options: GuildOptions): Promise<number> {
+        return this.exists(JSON.stringify(options));
     }
 }

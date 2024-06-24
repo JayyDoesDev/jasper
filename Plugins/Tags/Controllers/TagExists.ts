@@ -17,7 +17,7 @@ export async function TagExists(
         if (!(await GuildExists(guildId))) {
             return false;
         }
-        await ctx.store.setKey(key);
+        ctx.store.setKey(key);
     }
 
     let tags: TagGetPromise[] = await ctx.store.getGuild(key);
@@ -45,7 +45,7 @@ export async function TagExists(
                 TagEmbedDescription: findTag.TagResponse.TagEmbedDescription,
                 TagEmbedFooter: findTag.TagResponse.TagEmbedFooter,
             });
-            await ctx.store.setKey(key, ...tags);
+            ctx.store.setKey(key, ...tags);
             return true;
         }
     } catch (error) {

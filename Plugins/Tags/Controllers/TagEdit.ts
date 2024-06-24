@@ -44,7 +44,7 @@ export async function TagEdit(
         console.log("Tag not found in cache");
     }
 
-    await ctx.store.setKey(key, ...cachedTags);
+    ctx.store.setKey(key, ...cachedTags);
 
     await TagSchema.findOneAndUpdate(
         {

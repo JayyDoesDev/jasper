@@ -18,7 +18,7 @@ export async function TagDelete(
         console.log("Tag not found in cache");
     }
     cachedTags.splice(tagIndex, 1);
-    await ctx.store.setKey(key, ...cachedTags)
+    ctx.store.setKey(key, ...cachedTags)
     await TagSchema.updateOne(
         { _id: guildId },
         { $pull: { Tags: { TagName: tagName } } }
