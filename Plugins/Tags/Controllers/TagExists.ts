@@ -23,7 +23,7 @@ export async function TagExists(
     let tags: TagGetPromise[] = await ctx.store.getGuild(key);
     if (!Array.isArray(tags)) {
         tags = [];
-        await ctx.store.setKey(key, ...tags);
+        ctx.store.setKey(key, ...tags);
     }
 
     if (tags.find((tag) => tag.TagName === name)) {

@@ -14,7 +14,7 @@ export async function TagsGet(
         const wrappedGuild = await Wrap(TagSchema.findOne({ _id: guildId }));
         if (wrappedGuild.data) {
             tags = wrappedGuild.data.Tags;
-            await ctx.store.setKey(key, ...tags);
+            ctx.store.setKey(key, ...tags);
         } else {
             tags = [];
         }
