@@ -19,7 +19,7 @@ export async function TagGet(
     ctx: Context
 ): Promise<TagGetResponse> {
     if (await TagExists(guildId, name, ctx)) {
-        let tags: Tag[] = await ctx.store.getGuild({ guild: guildId });
+        let tags: any[] = await ctx.store.getGuild({ guild: guildId });
         if (!Array.isArray(tags)) {
             tags = [];
         }
@@ -27,9 +27,9 @@ export async function TagGet(
         return {
               TagAuthor: findTag.TagAuthor,
               TagName: findTag.TagName,
-              TagEmbedTitle: findTag.TagResponse.TagEmbedTitle,
-              TagEmbedDescription: findTag.TagResponse.TagEmbedDescription,
-              TagEmbedFooter: findTag.TagResponse.TagEmbedFooter
+              TagEmbedTitle: findTag.TagEmbedTitle,
+              TagEmbedDescription: findTag.TagEmbedDescription,
+              TagEmbedFooter: findTag.TagEmbedFooter
             } || null;
     } else {
         return null;
