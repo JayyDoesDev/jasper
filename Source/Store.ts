@@ -3,7 +3,7 @@ import { Redis, RedisOptions } from "ioredis";
 import { TagGetPromise } from "../Plugins/Tags/Controllers/TagGet";
 import { Context } from "./Context";
 
-type GuildOptions = { guild: Snowflake };
+type GuildOptions = Record<"guild", Snowflake>;
 export class Store extends Redis {
     #ctx: Context;
     constructor(protected readonly ctx: Context) {
