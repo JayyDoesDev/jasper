@@ -71,7 +71,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Autocomplete`
 
-## Message Commands
+## Message Commands [Deprecated]
 
 Message Commands are triggered by specific message prefixes and provide various functionalities. Below are the details of the available
 message commands.
