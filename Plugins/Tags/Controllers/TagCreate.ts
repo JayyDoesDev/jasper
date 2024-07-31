@@ -1,26 +1,14 @@
 import { GuildExists } from "../../../Common/GuildExists";
-import { Context } from "../../../Source/Context";
 import TagSchema from "../../../Models/TagSchema";
-import type { Snowflake } from "@antibot/interactions";
-import { TagGetPromise } from "./TagGet";
+import { commonOptions, GuildSnowflake, TagOptions, TagResponse } from "./Types";
+import { Combine } from "../../../Common/Combine";
 
-export interface TagCreateOptions {
-    author: Snowflake;
-    name: string;
-    title: string;
-    description: string | null;
-    footer: string | null;
-}
-
-export async function TagCreate(
-    guildId: Snowflake,
-    options: TagCreateOptions,
-    ctx: Context
-): Promise<void> {
-    const key: Record<"guild", Snowflake> = { guild: guildId };
+export async function TagCreate(tagCreateOptions: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]>): Promise<void> {
+    const { guildId, options, ctx }: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]> = tagCreateOptions;
+    const key: GuildSnowflake = { guild: guildId };
     const exists: number = await ctx.store.guildExists(key);
     if (exists) {
-        const cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
+        const cachedTags: TagResponse[] = await ctx.store.getGuild(key);
         cachedTags.push({
             TagName: options.name.trim(),
             TagAuthor: options.author,
@@ -30,7 +18,7 @@ export async function TagCreate(
         });
     } else {
         ctx.store.setKey(key);
-        const cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
+        const cachedTags: TagResponse[] = await ctx.store.getGuild(key);
         cachedTags.push({
             TagName: options.name.trim(),
             TagAuthor: options.author,

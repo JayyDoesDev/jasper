@@ -29,8 +29,8 @@ export async function RunDeleteSubCommand(ctx: Context, interaction: ChatInputCo
         interaction: interaction,
         callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const tagName: string = interaction.options.getString("tag-name");
-            if (await TagExists(interaction.guild.id, tagName, ctx)) {
-                await TagDelete(interaction.guild.id, tagName, ctx);
+            if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
+                await TagDelete({ guildId: interaction.guild.id, name: tagName, ctx: ctx });
                 return interaction.reply({
                     content: `${ Emojis.CHECK_MARK } Successfully deleted \`${ tagName }\`!`,
                     ephemeral: true

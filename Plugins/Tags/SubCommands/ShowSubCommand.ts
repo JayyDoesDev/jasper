@@ -28,8 +28,8 @@ export async function RunShowSubCommand(ctx: Context, interaction: ChatInputComm
         interaction: interaction,
         callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const tagName: string = interaction.options.getString("tag-name");
-            if (await TagExists(interaction.guild.id, tagName, ctx)) {
-                const getTag: any = await TagGet(tagName, interaction.guild.id, ctx);
+            if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
+                const getTag: any = await TagGet({ name: tagName, guildId: interaction.guild.id, ctx: ctx });
                 return interaction.reply({
                     embeds: [
                         {

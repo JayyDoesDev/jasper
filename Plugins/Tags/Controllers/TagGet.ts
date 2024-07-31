@@ -1,24 +1,9 @@
-import type { Snowflake } from "@antibot/interactions";
 import { TagExists } from "./TagExists";
-import { Context } from "../../../Source/Context";
-import { Tag } from "../../../Models/TagDocument";
+import { commonOptions, TagResponse } from "./Types";
 
-export type TagGetPromise = {
-    TagAuthor: Snowflake;
-    TagName: string;
-    TagEmbedTitle: string | null;
-    TagEmbedDescription: string | null;
-    TagEmbedFooter: string | null;
-};
-
-type TagGetResponse = TagGetPromise | null;
-
-export async function TagGet(
-    name: string,
-    guildId: Snowflake,
-    ctx: Context
-): Promise<TagGetResponse> {
-    if (await TagExists(guildId, name, ctx)) {
+export async function TagGet(options: commonOptions): Promise<TagResponse> {
+    const { guildId, name, ctx } = options;
+    if (await TagExists({ guildId: guildId, name: name, ctx: ctx })) {
         let tags: any[] = await ctx.store.getGuild({ guild: guildId });
         if (!Array.isArray(tags)) {
             tags = [];

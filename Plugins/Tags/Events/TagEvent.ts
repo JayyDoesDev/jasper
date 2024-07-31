@@ -53,7 +53,7 @@ export const TagEvent: Event = DefineEvent({
             }
             if (tagname) {
                 if (CheckForRoles(message, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
-                    const wrappedTag = await Wrap(TagGet(tagname, message.guild.id, ctx));
+                    const wrappedTag = await Wrap(TagGet({ name: tagname, guildId: message.guild.id, ctx: ctx }));
                     if ('TagName' in wrappedTag.data) {
                         const embedObject: any = {};
                         wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });

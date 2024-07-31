@@ -43,7 +43,7 @@ export const TagCommand = DefineCommand<ChatInputCommandInteraction>({
 
         if (subCommand === "delete") {
             const tag = interaction.options.getString("tag-name");
-            const dbTag = await TagGet(tag, interaction.guild.id, ctx);
+            const dbTag = await TagGet({ name: tag, guildId: interaction.guild.id, ctx: ctx });
 
             if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || dbTag.TagAuthor === interaction.user.id) {
                 await RunDeleteSubCommand(ctx, interaction);

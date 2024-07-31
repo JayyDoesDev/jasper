@@ -42,8 +42,9 @@ export async function RunUseSubCommand(
             const tagName: string = interaction.options.getString("tag-name");
             const mention: string = interaction.options.getUser("mention")?.id;
 
-            if (await TagExists(interaction.guild.id, tagName, ctx)) {
-                const getTag = await TagGet(tagName, interaction.guild.id, ctx);
+            if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
+                const getTag = await TagGet({ name: tagName, guildId: interaction.guild.id, ctx: ctx });
+                console.log(getTag)
                 if (getTag) {
                     return interaction.reply({
                         content: mention ? `<@${ mention }>` : undefined,

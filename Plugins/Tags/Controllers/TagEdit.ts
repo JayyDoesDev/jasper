@@ -1,28 +1,17 @@
 import TagSchema from "../../../Models/TagSchema";
-import type { Snowflake } from "@antibot/interactions";
-import { TagGetPromise } from "./TagGet";
-import { Context } from "../../../Source/Context";
 import { TagExists } from "./TagExists";
+import { commonOptions, GuildSnowflake, TagOptions, TagResponse } from "./Types";
+import { Combine } from "../../../Common/Combine";
 
-export interface TagEditOptions {
-    name: string;
-    title: string;
-    description: string | null;
-    footer: string | null;
-}
-
-export async function TagEdit(
-    guildId: Snowflake,
-    options: TagEditOptions,
-    ctx: Context
-): Promise<void> {
-    const tagExists = await TagExists(guildId, options.name, ctx);
+export async function TagEdit(tagEditOptions: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]>): Promise<void> {
+    const { guildId, options, ctx }: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]> = tagEditOptions;
+    const tagExists = await TagExists({ guildId: guildId, name: options.name, ctx: ctx });
     if (!tagExists) {
         console.log("Tag not found");
     }
 
-    const key: Record<"guild", Snowflake> = { guild: guildId };
-    let cachedTags: TagGetPromise[] = await ctx.store.getGuild(key);
+    const key: GuildSnowflake = { guild: guildId };
+    let cachedTags: TagResponse[] = await ctx.store.getGuild(key);
     if (!Array.isArray(cachedTags)) {
         cachedTags = [];
     }

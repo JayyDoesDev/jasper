@@ -1,17 +1,12 @@
 import { GuildExists } from "../../../Common/GuildExists";
 import { Wrap } from "../../../Common/Wrap";
 import { Tag } from "../../../Models/TagDocument";
-import type { Snowflake } from "discord.js";
 import TagSchema from "../../../Models/TagSchema";
-import { Context } from "../../../Source/Context";
-import { TagGetPromise } from "./TagGet";
+import { commonOptions, GuildSnowflake, TagResponse } from "./Types";
 
-export async function TagExists(
-    guildId: Snowflake,
-    name: string,
-    ctx: Context
-): Promise<boolean> {
-    const key: Record<"guild", Snowflake> = { guild: guildId };
+export async function TagExists(options: commonOptions): Promise<boolean> {
+    const { guildId, ctx, name }: commonOptions = options;
+    const key: GuildSnowflake = { guild: guildId };
     const exists: number = await ctx.store.guildExists(key);
     if (!exists) {
         if (!(await GuildExists(guildId))) {
@@ -20,7 +15,7 @@ export async function TagExists(
         ctx.store.setKey(key);
     }
 
-    let tags: TagGetPromise[] = await ctx.store.getGuild(key);
+    let tags: TagResponse[] = await ctx.store.getGuild(key);
     if (!Array.isArray(tags)) {
         tags = [];
         ctx.store.setKey(key, ...tags);
