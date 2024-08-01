@@ -53,14 +53,10 @@ export = DefinePlugin({
                             `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${ process.env.YOUTUBE_CHANNEL_ID }&key=${ process.env.YOUTUBE_KEY }`
                         );
                         data.json().then((x) => {
-                            const subscriberCount: string = numeral(
-                                x.items[0].statistics.subscriberCount
-                            ).format("0.00a");
-                            ctx.channels.cache
-                                .get(process.env.SUB_COUNT_CHANNEL)
-                                //@ts-ignore
-                                .setName(`\u{1F4FA} \u{FF5C} Sub Count: ${ subscriberCount }`);
-                        });
+                          const subscriberCount: string = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
+                          //@ts-ignore
+                          void ctx.channels.cache.get(process.env.SUB_COUNT_CHANNEL).setName(`\u{1F4FA} \u{FF5C} Sub Count: ${ subscriberCount }`);
+                      })
                     })();
                 }
                 console.log(`${ ctx.user.username } has logged in!`);
