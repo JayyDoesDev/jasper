@@ -49,9 +49,7 @@ export = DefinePlugin({
             on: (ctx: Context) => {
                 if (process.env.SUB_COUNT_UPDATE == "1") {
                     (async () => {
-                        const data = await fetch(
-                            `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${ process.env.YOUTUBE_CHANNEL_ID }&key=${ process.env.YOUTUBE_KEY }`
-                        );
+                        const data = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${ process.env.YOUTUBE_CHANNEL_ID }&key=${ process.env.YOUTUBE_KEY }`);
                         data.json().then((x) => {
                           const subscriberCount: string = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
                           //@ts-ignore

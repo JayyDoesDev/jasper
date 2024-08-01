@@ -44,13 +44,12 @@ export async function RunUseSubCommand(
 
             if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
                 const getTag = await TagGet({ name: tagName, guildId: interaction.guild.id, ctx: ctx });
-                console.log(getTag)
                 if (getTag) {
                     return interaction.reply({
                         content: mention ? `<@${ mention }>` : undefined,
                         embeds: [
                             {
-                                color: 0xff9a00,
+                                color: 3092790,
                                 title: getTag.TagEmbedTitle,
                                 description: getTag.TagEmbedDescription,
                                 footer: {

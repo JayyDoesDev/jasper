@@ -81,7 +81,7 @@ export const HelpCommand = DefineCommand<ChatInputCommandInteraction>({
         const embed = {
             title: choice.name.replace('Commands > ', ''),
             description: choice.value,
-            color: 0xff9a00
+            color: 3092790
         };
 
         await interaction.reply({ embeds: [ embed ], ephemeral: true });
