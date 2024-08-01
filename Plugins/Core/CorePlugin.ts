@@ -88,10 +88,8 @@ export = DefinePlugin({
                             if (command.permissions) {
                                 const perms: any[] = [];
                                 if (!interaction.appPermissions.has(command.permissions)) {
-                                    for (let i = 0; i < command.permissions.length; i++) {
-                                        perms.push(
-                                            PermissionsToHuman(PlantPermission(command.permissions[i]))
-                                        );
+                                    for (const permission of command.permissions) {
+                                        perms.push(PermissionsToHuman(PlantPermission(permission)));
                                     }
                                     return interaction.reply({
                                         content: `I'm missing permissions! (${

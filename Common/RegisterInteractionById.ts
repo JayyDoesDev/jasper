@@ -1,6 +1,6 @@
 import { Context } from "../Source/Context";
 
-interface RegisterByIdOptions {
+type RegisterByIdOptions = {
     id: string;
     ctx: Context;
     interaction;
