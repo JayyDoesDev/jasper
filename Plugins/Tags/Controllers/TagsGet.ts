@@ -25,7 +25,7 @@ export async function TagsGet(
                 TagEmbedDescription: tag.TagResponse.TagEmbedDescription,
                 TagEmbedFooter: tag.TagResponse.TagEmbedFooter
               });
-            };
+            }
             ctx.store.setKey(key, ...filteredTags);
         } else {
             tags = [];

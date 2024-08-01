@@ -1,5 +1,7 @@
+import { Nullable } from "../Common/Nullable";
+
 export interface MOResponse {
-    type: StringConstructor | NumberConstructor | BooleanConstructor | null | [];
+    type: Nullable<StringConstructor | NumberConstructor | BooleanConstructor | []>
     d?: string | number | boolean | any[];
     required?: boolean;
 }

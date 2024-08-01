@@ -5,6 +5,7 @@ import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js
 import { TagExists } from "../Controllers/TagExists";
 import { TagGet } from "../Controllers/TagGet";
 import { TagsGet } from "../Controllers/TagsGet";
+import { TagResponse } from "../Controllers/Types";
 
 export const ShowSubCommand: ApplicationCommandOptions = {
     name: "show",
@@ -29,7 +30,7 @@ export async function RunShowSubCommand(ctx: Context, interaction: ChatInputComm
         callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const tagName: string = interaction.options.getString("tag-name");
             if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
-                const getTag: any = await TagGet({ name: tagName, guildId: interaction.guild.id, ctx: ctx });
+                const getTag: TagResponse = await TagGet({ name: tagName, guildId: interaction.guild.id, ctx: ctx });
                 return interaction.reply({
                     embeds: [
                         {

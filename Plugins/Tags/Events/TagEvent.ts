@@ -4,6 +4,7 @@ import { Wrap } from "../../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../../Common/CheckForRoles";
 import { Context } from "../../../Source/Context";
+import { Nullable } from "../../../Common/Nullable";
 
 export const TagEvent: Event = DefineEvent({
     event: {
@@ -59,12 +60,12 @@ export const TagEvent: Event = DefineEvent({
                         wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });
                         wrappedTag.data.TagEmbedFooter ? Object.defineProperty(embedObject, "footer", { value: { text: wrappedTag.data.TagEmbedFooter } }) : Object.defineProperty(embedObject, "footer", { value: null });
                         const reply: {
-                            content?: null | string,
+                            content?: Nullable<string>,
                             embeds:
                                 {
-                                    title: string | null,
+                                    title: Nullable<string>,
                                     color: number,
-                                    description: string | null,
+                                    description: Nullable<string>,
                                     footer: { text: string, value: string }
                                 }[]
                         } = {

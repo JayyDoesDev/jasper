@@ -3,6 +3,7 @@ import { DefineCommand } from "../../../Common/DefineCommand";
 import { ChatInputCommandInteraction } from "discord.js";
 import fs from 'fs';
 import path from 'path';
+import { Nullable } from "../../../Common/Nullable";
 
 type DocumentationItem = {
     name: string;
@@ -17,8 +18,8 @@ type DocumentationItem = {
 function autocomplete(content: string): DocumentationItem[] {
     const lines = content.split('\n');
     const result: DocumentationItem[] = [];
-    let currentTopic: string | null = null;
-    let currentSubtopic: string | null = null;
+    let currentTopic: Nullable<string> = null;
+    let currentSubtopic: Nullable<string> = null;
     let currentContent: string[] = [];
 
     const addCurrentItem = () => {
