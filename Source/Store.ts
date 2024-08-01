@@ -1,7 +1,7 @@
 import type { Snowflake } from "@antibot/interactions";
 import { Redis } from "ioredis";
 import { Context } from "./Context";
-import { GuildSnowflake } from "../Plugins/Tags/Controllers/Types";
+import { GuildSnowflake, UserSnowflake } from "../Plugins/Tags/Controllers/Types";
 
 export class Store extends Redis {
     #ctx: Context;
@@ -17,19 +17,31 @@ export class Store extends Redis {
         return JSON.parse(await this.get(JSON.stringify(options)));
     }
 
+    public async getUser<T>(options: UserSnowflake): Promise<T> {
+      return JSON.parse(await this.get(JSON.stringify(options)));
+  }
+
     public async findGuild(options: GuildSnowflake): Promise<boolean> {
         return await this.getGuild(options) ? true : false;
     }
 
-    public deleteGuild(options: GuildSnowflake): void{
+    public async findUser(options: UserSnowflake): Promise<boolean> {
+      return await this.getUser(options) ? true : false;
+    }
+
+    public deleteGuild(options: GuildSnowflake | UserSnowflake): void{
         this.del(JSON.stringify(options));
     }
 
-    public setKey<T>(options: GuildSnowflake, ...keys: T[] | []): void {
+    public setKey<T>(options: GuildSnowflake | UserSnowflake, ...keys: T[] | []): void {
          this.set(JSON.stringify(options), JSON.stringify(keys || []));
     }
 
-    public guildExists(options: GuildSnowflake): Promise<number> {
+    public async setUserKey<T>(options: UserSnowflake, data: T): Promise<void> {
+      await this.set(JSON.stringify(options), JSON.stringify(data));
+    }
+
+    public guildExists(options: GuildSnowflake | UserSnowflake): Promise<number> {
         return this.exists(JSON.stringify(options));
     }
 }

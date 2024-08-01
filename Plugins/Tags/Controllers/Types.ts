@@ -10,6 +10,8 @@ export type commonOptions = {
 
 export type GuildSnowflake = Record<"guild", Snowflake>;
 
+export type UserSnowflake = Record<"user", Snowflake>;
+
 export type TagOptions = {
     author?: Snowflake;
     name: string;
