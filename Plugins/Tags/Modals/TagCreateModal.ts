@@ -44,7 +44,7 @@ export const TagCreateModal: Event = DefineEvent({
                         embeds: [
                             {
                                 title: tag.title,
-                                color: 3092790,
+                                color: 0x323338,
                                 description: embedObject?.description,
                                 footer: embedObject?.footer
                             }

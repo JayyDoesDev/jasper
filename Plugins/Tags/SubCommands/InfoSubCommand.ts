@@ -35,7 +35,7 @@ export async function RunInfoSubCommand(ctx: Context, interaction: ChatInputComm
                     embeds: [
                         {
                             title: tagName,
-                            color: 3092790,
+                            color: 0x323338,
                             description: `> **Created by ${ getTag.TagAuthor ? `<@${ getTag.TagAuthor }>` : "Unknown" }**`
                         }
                     ],

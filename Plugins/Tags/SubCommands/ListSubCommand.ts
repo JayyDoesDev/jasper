@@ -50,7 +50,7 @@ export async function RunListSubCommand(ctx: Context, interaction: ChatInputComm
                         title: `Server Tag List`,
                         description: userState.tagPages[userState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
                         footer: { text: `Page: ${userState.page + 1}/${userState.tagPages.length} • emojis by AnThOnY & deussa`},
-                        color: 3092790,
+                        color: 0x323338,
                       }
                     ],
                     components: [
@@ -118,7 +118,7 @@ export const ListSubCommandNextButton: Event = DefineEvent({
                 title: `Server Tag List`,
                 description: currentUserState.tagPages[currentUserState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
                 footer: { text: `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length} • emojis by AnThOnY & deussa`},
-                color: 3092790,
+                color: 0x323338,
               }
             ],
           });
@@ -154,7 +154,7 @@ export const ListSubCommandHomeButton: Event = DefineEvent({
               title: `Server Tag List`,
               description: currentUserState.tagPages[currentUserState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
               footer: { text: `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length} • emojis by AnThOnY & deussa`},
-              color: 3092790,
+              color: 0x323338,
             }
           ],
         });
@@ -191,7 +191,7 @@ export const ListSubCommandPreviousButton: Event = DefineEvent({
               title: `Server Tag List`,
               description: currentUserState.tagPages[currentUserState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
               footer: { text: `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length} • emojis by AnThOnY & deussa`},
-              color: 3092790,
+              color: 0x323338,
             }
           ],
         });
