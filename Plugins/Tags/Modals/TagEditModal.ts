@@ -6,7 +6,8 @@ import { RegisterInteractionById } from "../../../Common/RegisterInteractionById
 import { TagEdit } from "../Controllers/TagEdit";
 import { TagExists } from "../Controllers/TagExists";
 import { TagGet } from "../Controllers/TagGet";
-import { TagOptions } from "../Controllers/Types";
+import { TagOptions, TagResponse } from "../Controllers/Types";
+import { Combine } from "../../../Common/Combine";
 
 export const TagEditModal: Event = DefineEvent({
     event: {
@@ -33,9 +34,9 @@ export const TagEditModal: Event = DefineEvent({
                     footer: tagEmbedFooter ? tagEmbedFooter : null
                 };
                 if (await TagExists({ guildId: interaction.guild.id, name: tag.name, ctx: ctx })) {
-                    await TagEdit({ guildId: interaction.guild.id, options: { name: tag.name, title: tag.title, description: tag.description, footer: tag.footer}, ctx: ctx })
-                    const getTag: any = await TagGet({ name: tag.name, guildId: interaction.guild.id, ctx: ctx });
-                    const embedObject: any = {};
+                    await TagEdit({ guildId: interaction.guild.id, options: { name: tag.name, title: tag.title, description: tag.description, footer: tag.footer }, ctx: ctx })
+                    const getTag: TagResponse = await TagGet({ name: tag.name, guildId: interaction.guild.id, ctx: ctx });
+                    const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", Record<"text", string>>]>> = {};
                     tag.description ? embedObject["description"] = tag.description : embedObject["description"] = getTag.TagEmbedDescription;
                     tag.footer ? embedObject["footer"] = { text: tag.footer } : embedObject["footer"] = { text: getTag.TagEmbedFooter };
                     return interaction.reply({
