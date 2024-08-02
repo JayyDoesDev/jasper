@@ -37,15 +37,9 @@ export const ResolveCommand = DefineCommand<ChatInputCommandInteraction>({
             const finalReply: Record<"content", string> = {
                 content: `Post marked as Resolved by <@${ interaction.user.id }>`,
             };
-            const originalQuestion: string =
-                interaction.options.getString("original_question");
-            const summarizedAnswer: string =
-                interaction.options.getString("summarized_answer");
-            const embeds: Array<{
-                title: string;
-                fields: Array<any>;
-                color: number;
-            }> = [ { title: "Overview", fields: [], color: 0xff9a00 } ];
+            const originalQuestion: string = interaction.options.getString("original_question");
+            const summarizedAnswer: string = interaction.options.getString("summarized_answer");
+              const embeds: { title: string, fields: { name: string, value: string }[], color: number }[] = [ { title: "Overview", fields: [], color: 0x323338 }]
             if (interaction.channel.type == ChannelType.PublicThread) {
                 if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
                     await interaction.channel.setAppliedTags([

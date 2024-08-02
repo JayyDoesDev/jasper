@@ -9,7 +9,7 @@ import { TagGet } from "../Controllers/TagGet";
 import { TagOptions, TagResponse } from "../Controllers/Types";
 import { Combine } from "../../../Common/Combine";
 
-export const TagEditModal: Event = DefineEvent({
+export const TagEditModal: Event<ModalSubmitInteraction> = DefineEvent({
     event: {
         name: "interactionCreate",
         once: false
@@ -57,4 +57,4 @@ export const TagEditModal: Event = DefineEvent({
             }
         })
     }
-}) as Event;
+}) as Event<ModalSubmitInteraction>;

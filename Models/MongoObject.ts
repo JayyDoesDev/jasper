@@ -2,18 +2,13 @@ import { Nullable } from "../Common/Nullable";
 
 export interface MOResponse {
     type: Nullable<StringConstructor | NumberConstructor | BooleanConstructor | []>
-    d?: string | number | boolean | any[];
+    d?: Nullable<string | number | Nullable<undefined>[]>,
     required?: boolean;
 }
 
-export function MO(type: StringConstructor, d?: string, required?: boolean): MOResponse;
-export function MO(type: NumberConstructor, d?: number, required?: boolean): MOResponse;
-export function MO(type: BooleanConstructor, d?: boolean, required?: boolean): MOResponse;
-export function MO(type: null, d?: boolean, required?: boolean): MOResponse;
-export function MO(type: [], d?: any[], required?: boolean): MOResponse;
 export function MO(
     type: StringConstructor | NumberConstructor | BooleanConstructor | [],
-    d?: string | number | boolean | null | any[],
+    d?: Nullable<string | number | Nullable<undefined>[]>,
     required?: boolean
 ): MOResponse {
     const obj: MOResponse = { type };

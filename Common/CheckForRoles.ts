@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, Message } from "discord.js";
 import type { Snowflake } from "@antibot/interactions";
 

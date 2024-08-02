@@ -1,4 +1,4 @@
-const gulp = require('gulp');
+import gulp from "gulp";
 
 gulp.task('copy-json', () => {
     return gulp.src('Javascript/**/*')

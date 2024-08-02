@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, PermissionsBitField } from "discord.js";
 import { Context } from "../Source/Context";
 import { ICommand } from "@antibot/interactions";

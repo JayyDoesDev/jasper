@@ -6,8 +6,9 @@ import { RegisterInteractionById } from "../../../Common/RegisterInteractionById
 import { TagCreate } from "../Controllers/TagCreate";
 import { TagExists } from "../Controllers/TagExists";
 import { TagOptions } from "../Controllers/Types";
+import { Combine } from "../../../Common/Combine";
 
-export const TagCreateModal: Event = DefineEvent({
+export const TagCreateModal: Event<ModalSubmitInteraction> = DefineEvent({
     event: {
         name: "interactionCreate",
         once: false
@@ -36,7 +37,7 @@ export const TagCreateModal: Event = DefineEvent({
                     return interaction.reply({ content: `> The support tag \`${ tag.name }\` already exists!`, ephemeral: true });
                 } else {
                     await TagCreate({ guildId: interaction.guild.id, options: { author: tag.author, name: tag.name, title: tag.title, description: tag.description, footer: tag.footer }, ctx: ctx });
-                    const embedObject: any = {};
+                    const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", Record<"text", string>>]>> = {};
                     tag.description ? embedObject["description"] = tag.description : embedObject["description"] = null;
                     tag.footer ? embedObject["footer"] = { text: tag.footer } : embedObject["footer"] = null;
                     return interaction.reply({
@@ -55,4 +56,4 @@ export const TagCreateModal: Event = DefineEvent({
             }
         })
     }
-}) as Event;
+}) as Event<ModalSubmitInteraction>;

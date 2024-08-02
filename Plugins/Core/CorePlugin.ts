@@ -1,11 +1,13 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
 import { DefineEvent } from "../../Common/DefineEvent";
 import { ActivityType, ChatInputCommandInteraction, ContextMenuCommandInteraction, Interaction } from "discord.js";
 import { Command, DefineCommand } from "../../Common/DefineCommand";
-import { ApplicationCommandType, PermissionBitToString, Permissions, PermissionsToHuman, PlantPermission, } from "@antibot/interactions";
-import { PingCommand } from "../../Javascript/CoreCommands";
+import { ApplicationCommandType, PermissionBitToString, PermissionsToHuman, Permissions, PlantPermission, } from "@antibot/interactions";
+import { PingCommand } from "../../Javascript/CoreCommands.cjs";
 import numeral from "numeral";
 import { Context } from "../../Source/Context";
+import { HasProperties } from "../../Common/HasProperties";
 
 export = DefinePlugin({
     name: "Core",
@@ -113,15 +115,19 @@ export = DefinePlugin({
                 }
             },
         }),
-        DefineEvent({
+
+        DefineEvent<{ method: string, url: string }>({
             event: {
                 name: "error",
                 once: false,
             },
             on: (e) => {
-                console.log(`Error: ${ e }\nMethod: ${ e.method }\nUrl: ${ e.url } `);
+                if (HasProperties<{ method: string, url: string }>(e, ['method', 'url'])) {
+                  console.log(`Error: ${ e }\nMethod: ${ e.method }\nUrl: ${ e.url } `);
+                }
             },
         }),
     ],
     public_plugin: true,
 }) as Plugin;
+

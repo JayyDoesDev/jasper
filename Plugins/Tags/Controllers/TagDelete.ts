@@ -1,8 +1,5 @@
-import { Context } from "../../../Source/Context";
 import TagSchema from "../../../Models/TagSchema";
-import type { Snowflake } from "@antibot/interactions";
 import { commonOptions, GuildSnowflake, TagResponse } from "./Types";
-import { Combine } from "../../../Common/Combine";
 
 export async function TagDelete(options: commonOptions): Promise<void> {
     const { guildId, name, ctx } = options;

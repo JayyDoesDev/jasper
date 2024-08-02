@@ -1,4 +1,3 @@
-import type { Snowflake } from "@antibot/interactions";
 import { Redis } from "ioredis";
 import { Context } from "./Context";
 import { GuildSnowflake, UserSnowflake } from "../Plugins/Tags/Controllers/Types";

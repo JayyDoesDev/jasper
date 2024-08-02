@@ -4,6 +4,8 @@ import path from "path";
 import { Command } from "../Common/DefineCommand";
 import { ICommand } from "@antibot/interactions";
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from "discord.js";
+import { Combine } from "../Common/Combine";
+import { Plugin } from "../Common/DefinePlugin";
 
 export default function (ctx: Context): void {
   let commands: string[] = []
@@ -11,7 +13,7 @@ export default function (ctx: Context): void {
 
     for (let i = 0; i < commands.length; i++) {
         const filePath = path.resolve(commands[i]);
-        const file: any = require(filePath);
+        const file: Combine<[NodeRequire, Record<"commands", []>]> | Plugin = require(filePath);
 
         if (!file.name || !file.commands) {
             continue;

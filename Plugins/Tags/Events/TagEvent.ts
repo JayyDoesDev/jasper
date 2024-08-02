@@ -1,12 +1,14 @@
-import { ChannelType, Message, PrivateThreadChannel, ThreadChannel } from "discord.js";
+import { Message } from "discord.js";
 import { DefineEvent, Event } from "../../../Common/DefineEvent";
 import { Wrap } from "../../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../../Common/CheckForRoles";
 import { Context } from "../../../Source/Context";
 import { Nullable } from "../../../Common/Nullable";
+import { Combine } from "../../../Common/Combine";
+import { TagOptions } from "../Controllers/Types";
 
-export const TagEvent: Event = DefineEvent({
+export const TagEvent: Event<Message> = DefineEvent({
     event: {
         name: "messageCreate",
         once: false
@@ -56,7 +58,7 @@ export const TagEvent: Event = DefineEvent({
                 if (CheckForRoles(message, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
                     const wrappedTag = await Wrap(TagGet({ name: tagname, guildId: message.guild.id, ctx: ctx }));
                     if ('TagName' in wrappedTag.data) {
-                        const embedObject: any = {};
+                        const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", { text: string, value: string }>]>> = {};
                         wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });
                         wrappedTag.data.TagEmbedFooter ? Object.defineProperty(embedObject, "footer", { value: { text: wrappedTag.data.TagEmbedFooter } }) : Object.defineProperty(embedObject, "footer", { value: null });
                         const reply: {
@@ -113,4 +115,4 @@ export const TagEvent: Event = DefineEvent({
             return;
         }
     }
-}) as Event;
+}) as Event<Message>;

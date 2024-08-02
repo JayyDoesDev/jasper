@@ -1,5 +1,5 @@
 import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
-import { HelpCommand, ResolveCommand, TagCommand, TagCreateModal, TagEditModal, TagEvent } from ".";
+import { HelpCommand, ResolveCommand, TagCommand, TagCreateModal, TagEditModal } from ".";
 import { ListSubCommandHomeButton, ListSubCommandNextButton, ListSubCommandPreviousButton } from "./SubCommands";
 
 export = DefinePlugin({

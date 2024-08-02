@@ -1,4 +1,4 @@
-import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
+import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import { ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
@@ -90,7 +90,7 @@ export async function RunListSubCommand(ctx: Context, interaction: ChatInputComm
     })
 }
 
-export const ListSubCommandNextButton: Event = DefineEvent({
+export const ListSubCommandNextButton: Event<ButtonInteraction> = DefineEvent({
     event: {
         name: "interactionCreate",
         once: false
@@ -127,7 +127,7 @@ export const ListSubCommandNextButton: Event = DefineEvent({
     }
 });
 
-export const ListSubCommandHomeButton: Event = DefineEvent({
+export const ListSubCommandHomeButton: Event<ButtonInteraction> = DefineEvent({
   event: {
       name: "interactionCreate",
       once: false
@@ -163,7 +163,7 @@ export const ListSubCommandHomeButton: Event = DefineEvent({
   }
 });
 
-export const ListSubCommandPreviousButton: Event = DefineEvent({
+export const ListSubCommandPreviousButton: Event<ButtonInteraction> = DefineEvent({
   event: {
       name: "interactionCreate",
       once: false

@@ -21,4 +21,4 @@ const TagSchema: Schema = new Schema(
         },
     }, { versionKey: false, timestamps: true });
 
-export = model<TagDocument>("support-tags", TagSchema);
+export default model<TagDocument>("support-tags", TagSchema);

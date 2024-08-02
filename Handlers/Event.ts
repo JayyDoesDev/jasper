@@ -1,6 +1,8 @@
 import { Context } from "../Source/Context";
 import glob from "glob";
 import path from "path";
+import { Combine } from "../Common/Combine";
+import { Plugin } from "../Common/DefinePlugin";
 
 export default function (ctx: Context): void {
     try {
@@ -9,7 +11,7 @@ export default function (ctx: Context): void {
         for (let i = 0; i < events.length; i++) {
             try {
                 const filePath = path.resolve(events[i]);
-                const file: any = require(filePath);
+                const file: Combine<[NodeRequire, Record<"events", { event: { name : string, on: (args: [], ctx: Context) => void }}[]>, Record<"commands", []>]> | Plugin = require(filePath);
                 if (file.events || file.commands) {
                     file.events.forEach((x) => {
                         if (x.once !== true) {

@@ -3,7 +3,6 @@ import { ZillaCollection } from "@antibot/zilla";
 import { Command } from "../Common/DefineCommand";
 import { Interactions, Snowflake } from "@antibot/interactions";
 import { Plugin } from "../Common/DefinePlugin";
-import { Redis } from "ioredis";
 import { Store } from "./Store";
 
 export class Context extends Client {

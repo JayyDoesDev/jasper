@@ -1,13 +1,13 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "esnext",
-        "outDir": "dist",
-        "skipLibCheck": false,
-        "pretty": true,
-        "noImplicitAny": false,
-        "esModuleInterop": true,
-        "resolveJsonModule": true,
-    },
-    "exclude": [ "node_modules", "Libraries" ]
-}
+   "compilerOptions": {
+     "module": "CommonJS",
+     "target": "esnext",  // Adjust if needed based on your target environment
+     "outDir": "dist",
+     "skipLibCheck": false,
+     "pretty": true,
+     "noImplicitAny": false,
+     "esModuleInterop": true,
+     "resolveJsonModule": true,
+   },
+   "exclude": [ "node_modules", "Libraries" ]
+ }
