@@ -1,4 +1,4 @@
-import { DefineEvent, Event } from "../../../Common/DefineEvent";
+import { DefineEvent } from "../../../Common/DefineEvent";
 import { ModalSubmitInteraction } from "discord.js";
 import { Context } from "../../../Source/Context";
 import { Emojis } from "../../../Common/Emojis";
@@ -8,7 +8,8 @@ import { TagExists } from "../Controllers/TagExists";
 import { TagOptions } from "../Controllers/Types";
 import { Combine } from "../../../Common/Combine";
 
-export const TagCreateModal: Event<ModalSubmitInteraction> = DefineEvent({
+export = {
+  Event: DefineEvent({
     event: {
         name: "interactionCreate",
         once: false
@@ -56,4 +57,5 @@ export const TagCreateModal: Event<ModalSubmitInteraction> = DefineEvent({
             }
         })
     }
-}) as Event<ModalSubmitInteraction>;
+  })
+}

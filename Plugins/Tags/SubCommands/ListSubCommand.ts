@@ -1,18 +1,12 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
-import { ButtonInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
+import { ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
 import { GuildExists } from "../../../Common/GuildExists";
 import TagSchema from "../../../Models/TagSchema";
 import { Wrap } from "../../../Common/Wrap";
-import { DefineEvent, Event } from "../../../Common/DefineEvent";
-import { RegisterInteractionById } from "../../../Common/RegisterInteractionById";
 import { Tag } from "../../../Models/TagDocument";
-
-type State = {
-  page: number;
-  tagPages: Tag[][];
-}
+import { State } from "../../types";
 
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
@@ -89,113 +83,3 @@ export async function RunListSubCommand(ctx: Context, interaction: ChatInputComm
         }
     })
 }
-
-export const ListSubCommandNextButton: Event<ButtonInteraction> = DefineEvent({
-    event: {
-        name: "interactionCreate",
-        once: false
-    },
-    on: (interaction: ButtonInteraction, ctx: Context) => {
-      RegisterInteractionById({
-        id: `list_subcommand_button_next_${interaction.user.id}`,
-        ctx: ctx,
-        interaction: interaction,
-        typeguards: {
-          negativeTypeGuards: ["isButton"]
-        },
-        callback: async () => {
-          const currentUserState = await ctx.store.getUser<State>({ user: interaction.user.id });
-          if (!currentUserState) return;
-
-          const newPage = (currentUserState.page + 1) % currentUserState.tagPages.length;
-          currentUserState.page = newPage;
-          await ctx.store.setUserKey({ user: interaction.user.id }, currentUserState);
-
-          interaction.update({
-            embeds: [
-              {
-                thumbnail: { url: interaction.guild.iconURL() },
-                title: `Server Tag List`,
-                description: currentUserState.tagPages[currentUserState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
-                footer: { text: `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length} • emojis by AnThOnY & deussa`},
-                color: 0x323338,
-              }
-            ],
-          });
-        }
-      });
-    }
-});
-
-export const ListSubCommandHomeButton: Event<ButtonInteraction> = DefineEvent({
-  event: {
-      name: "interactionCreate",
-      once: false
-  },
-  on: (interaction: ButtonInteraction, ctx: Context) => {
-    RegisterInteractionById({
-      id: `list_subcommand_button_home_${interaction.user.id}`,
-      ctx: ctx,
-      interaction: interaction,
-      typeguards: {
-        negativeTypeGuards: ["isButton"]
-      },
-      callback: async () => {
-        const currentUserState = await ctx.store.getUser<State>({ user: interaction.user.id });
-        if (!currentUserState) return;
-
-        currentUserState.page = 0;
-        await ctx.store.setUserKey({ user: interaction.user.id }, currentUserState);
-
-        interaction.update({
-          embeds: [
-            {
-              thumbnail: { url: interaction.guild.iconURL() },
-              title: `Server Tag List`,
-              description: currentUserState.tagPages[currentUserState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
-              footer: { text: `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length} • emojis by AnThOnY & deussa`},
-              color: 0x323338,
-            }
-          ],
-        });
-      }
-    });
-  }
-});
-
-export const ListSubCommandPreviousButton: Event<ButtonInteraction> = DefineEvent({
-  event: {
-      name: "interactionCreate",
-      once: false
-  },
-  on: (interaction: ButtonInteraction, ctx: Context) => {
-    RegisterInteractionById({
-      id: `list_subcommand_button_previous_${interaction.user.id}`,
-      ctx: ctx,
-      interaction: interaction,
-      typeguards: {
-        negativeTypeGuards: ["isButton"]
-      },
-      callback: async () => {
-        const currentUserState = await ctx.store.getUser<State>({ user: interaction.user.id });
-        if (!currentUserState) return;
-
-        const newPage = (currentUserState.page - 1 + currentUserState.tagPages.length) % currentUserState.tagPages.length;
-        currentUserState.page = newPage;
-        await ctx.store.setUserKey({ user: interaction.user.id }, currentUserState);
-
-        interaction.update({
-          embeds: [
-            {
-              thumbnail: { url: interaction.guild.iconURL() },
-              title: `Server Tag List`,
-              description: currentUserState.tagPages[currentUserState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
-              footer: { text: `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length} • emojis by AnThOnY & deussa`},
-              color: 0x323338,
-            }
-          ],
-        });
-      }
-    });
-  }
-});

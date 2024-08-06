@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { DefineEvent, Event } from "../../../Common/DefineEvent";
+import { DefineEvent } from "../../../Common/DefineEvent";
 import { Wrap } from "../../../Common/Wrap";
 import { TagGet } from "../Controllers/TagGet";
 import { CheckForRoles } from "../../../Common/CheckForRoles";
@@ -8,7 +8,8 @@ import { Nullable } from "../../../Common/Nullable";
 import { Combine } from "../../../Common/Combine";
 import { TagOptions } from "../Controllers/Types";
 
-export const TagEvent: Event<Message> = DefineEvent({
+export = {
+  Event: DefineEvent({
     event: {
         name: "messageCreate",
         once: false
@@ -115,4 +116,5 @@ export const TagEvent: Event<Message> = DefineEvent({
             return;
         }
     }
-}) as Event<Message>;
+  })
+}

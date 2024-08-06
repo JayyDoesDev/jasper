@@ -1,11 +1,13 @@
 import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
-import { HelpCommand, ResolveCommand, TagCommand, TagCreateModal, TagEditModal } from ".";
-import { ListSubCommandHomeButton, ListSubCommandNextButton, ListSubCommandPreviousButton } from "./SubCommands";
+import { MassRegisterCommands } from "../../Common/MassRegisterCommands";
+import { MassRegisterEvents } from "../../Common/MassRegisterEvents";
 
 export = DefinePlugin({
     name: "tags",
     description: "Tags for the No Text To Speech support team!",
-    commands: [ TagCommand, ResolveCommand, HelpCommand ],
-    events: [ TagCreateModal, TagEditModal, ListSubCommandNextButton, ListSubCommandHomeButton, ListSubCommandPreviousButton ],
+    commands: MassRegisterCommands(__dirname, ["Commands"]),
+    events: MassRegisterEvents(__dirname, ["Events", "Modals", "Buttons"]),
     public_plugin: true,
 }) as Plugin;
+
+
