@@ -1,7 +1,7 @@
 const { DefineCommand } = require("../Common/DefineCommand");
 const { ApplicationCommandType } = require("@antibot/interactions");
-module.exports = {
-    PingCommand: DefineCommand({
+
+exports.Command = DefineCommand({
         command: {
             name: "ping",
             type: ApplicationCommandType.CHAT_INPUT,
@@ -15,4 +15,4 @@ module.exports = {
             });
         }
     })
-};
+
