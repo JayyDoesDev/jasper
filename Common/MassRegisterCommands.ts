@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import * as Path from "path";
 import glob from "glob";
 import { Command } from "./DefineCommand";
