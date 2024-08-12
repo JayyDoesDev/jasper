@@ -1,6 +1,7 @@
 import { Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { Nullable } from "../../../Common/Nullable";
+import { Combine } from "../../../Common/Combine";
 
 export type commonOptions = {
     guildId: Snowflake;
@@ -27,3 +28,5 @@ export type TagResponse = {
   TagEmbedDescription: Nullable<string>;
   TagEmbedFooter: Nullable<string>;
 }
+
+export type TagCreateOptions = Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]>;
