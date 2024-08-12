@@ -1,10 +1,10 @@
 import TagSchema from "../../../Models/TagSchema";
 import { TagExists } from "./TagExists";
-import { commonOptions, GuildSnowflake, TagOptions, TagResponse } from "./Types";
+import { commonOptions, GuildSnowflake, TagOptions, TagResponse, TagCreateOptions } from "./Types";
 import { Combine } from "../../../Common/Combine";
 
-export async function TagEdit(tagEditOptions: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]>): Promise<void> {
-    const { guildId, options, ctx }: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]> = tagEditOptions;
+export async function TagEdit(tagEditOptions: TagCreateOptions): Promise<void> {
+    const { guildId, options, ctx }: TagCreateOptions = tagEditOptions;
     const tagExists = await TagExists({ guildId: guildId, name: options.name, ctx: ctx });
     if (!tagExists) {
         console.log("Tag not found");
