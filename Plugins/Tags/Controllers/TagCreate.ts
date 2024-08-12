@@ -3,8 +3,9 @@ import TagSchema from "../../../Models/TagSchema";
 import { commonOptions, GuildSnowflake, TagOptions, TagResponse } from "./Types";
 import { Combine } from "../../../Common/Combine";
 
-export async function TagCreate(tagCreateOptions: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]>): Promise<void> {
-    const { guildId, options, ctx }: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]> = tagCreateOptions;
+type createOptions = Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]>;
+export async function TagCreate(tagCreateOptions: createOptions): Promise<void> {
+    const { guildId, options, ctx }: createOptions = tagCreateOptions;
     const key: GuildSnowflake = { guild: guildId };
     const exists: number = await ctx.store.guildExists(key);
     if (exists) {
