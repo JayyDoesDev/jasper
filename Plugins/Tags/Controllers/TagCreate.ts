@@ -1,10 +1,11 @@
 import { GuildExists } from "../../../Common/GuildExists";
 import TagSchema from "../../../Models/TagSchema";
-import { commonOptions, GuildSnowflake, TagOptions, TagResponse } from "./Types";
+import { commonOptions, GuildSnowflake, TagOptions, TagResponse, TagCreateOptions } from "./Types";
 import { Combine } from "../../../Common/Combine";
 
-export async function TagCreate(tagCreateOptions: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]>): Promise<void> {
-    const { guildId, options, ctx }: Combine<[Omit<commonOptions, "name">, Record<"options", TagOptions>]> = tagCreateOptions;
+
+export async function TagCreate(tagCreateOptions: TagCreateOptions): Promise<void> {
+    const { guildId, options, ctx }: TagCreateOptions = tagCreateOptions;
     const key: GuildSnowflake = { guild: guildId };
     const exists: number = await ctx.store.guildExists(key);
     if (exists) {
