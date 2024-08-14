@@ -19,12 +19,12 @@ export = {
           negativeTypeGuards: ["isButton"]
         },
         callback: async () => {
-          const currentUserState = await ctx.store.getUser<State>({ user: interaction.user.id });
+          const currentUserState: State = ctx.pagination.get(interaction.user.id);
           if (!currentUserState) return;
 
           const newPage = (currentUserState.page - 1 + currentUserState.tagPages.length) % currentUserState.tagPages.length;
           currentUserState.page = newPage;
-          await ctx.store.setUserKey({ user: interaction.user.id }, currentUserState);
+          ctx.pagination.set(interaction.user.id, currentUserState);
 
           interaction.update({
             embeds: [

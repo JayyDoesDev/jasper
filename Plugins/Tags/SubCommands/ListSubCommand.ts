@@ -33,9 +33,9 @@ export async function RunListSubCommand(ctx: Context, interaction: ChatInputComm
                 const dbtags = await Wrap(TagSchema.findOne({ _id: interaction.guild.id }));
                 const tags: Tag[] = dbtags.data.Tags;
                 const tagPages: Tag[][] = chunkArray(tags, 10);
-                const userState: State = { page: 0, tagPages };
 
-                await ctx.store.setUserKey({ user: interaction.user.id }, userState);
+                ctx.pagination.set(interaction.user.id, { page: 0, tagPages });
+                const userState: State = ctx.pagination.get(interaction.user.id);
 
                 return interaction.reply({
                     embeds: [

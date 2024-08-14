@@ -4,12 +4,14 @@ import { Command } from "../Common/DefineCommand";
 import { Interactions, Snowflake } from "@antibot/interactions";
 import { Plugin } from "../Common/DefinePlugin";
 import { Store } from "./Store";
+import { State } from "../Plugins/types";
 
 export class Context extends Client {
     public plugin: ZillaCollection<string, Plugin>;
     public interactions: ZillaCollection<string, Command<ChatInputCommandInteraction | ContextMenuCommandInteraction>>;
     public interact: Interactions;
     public store: Store;
+    public pagination: ZillaCollection<Snowflake, State>;
 
     constructor() {
         super({
@@ -38,5 +40,6 @@ export class Context extends Client {
             debug: true,
         });
         this.store = new Store(this);
+        this.pagination = new ZillaCollection<Snowflake, State>();
     }
 }

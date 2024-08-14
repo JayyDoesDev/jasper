@@ -10,9 +10,11 @@ export function MassRegisterEvents<T>(dir: string, paths: string[]): Event<T>[] 
     const matchedPaths: string[] = glob.sync(Path.join(Path.join(dir, path), "**/**/*.js"));
     for (const folder of matchedPaths) {
       const module = require(Path.resolve(folder));
+
       commands.push(module.Event);
     }
   }
 
   return commands;
 }
+
