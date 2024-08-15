@@ -1,7 +1,6 @@
 import { GuildExists } from "../../../Common/GuildExists";
 import TagSchema from "../../../Models/TagSchema";
-import { commonOptions, GuildSnowflake, TagOptions, TagResponse, TagCreateOptions } from "./Types";
-import { Combine } from "../../../Common/Combine";
+import { GuildSnowflake, TagResponse, TagCreateOptions } from "./Types";
 
 
 export async function TagCreate(tagCreateOptions: TagCreateOptions): Promise<void> {

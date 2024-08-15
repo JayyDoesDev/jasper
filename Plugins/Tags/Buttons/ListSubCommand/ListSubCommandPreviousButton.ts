@@ -18,7 +18,7 @@ export = {
         typeguards: {
           negativeTypeGuards: ["isButton"]
         },
-        callback: async () => {
+        callback: () => {
           const currentUserState: State = ctx.pagination.get(interaction.user.id);
           if (!currentUserState) return;
 
