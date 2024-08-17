@@ -4,10 +4,10 @@ import { GuildSnowflake, UserSnowflake } from "../Plugins/Tags/Controllers/Types
 
 export class Store extends Redis {
     #ctx: Context;
-    constructor(protected readonly ctx: Context) {
+    constructor(protected ctx: Context) {
         super({
-            host: process.env.REDISHOST as string,
-            port: process.env.REDISPORT as unknown as number
+            host: ctx.env.get("redis_host"),
+            port: ctx.env.get("redis_port") as number
         });
         this.#ctx = ctx;
     }

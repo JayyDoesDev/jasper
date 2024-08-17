@@ -10,13 +10,13 @@ export = {
         once: true,
     },
     on: (ctx: Context) => {
-        if (process.env.SUB_COUNT_UPDATE == "1") {
+        if (ctx.env.get("sub_update") == "1") {
             (async () => {
-                const data = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${ process.env.YOUTUBE_CHANNEL_ID }&key=${ process.env.YOUTUBE_KEY }`);
+                const data = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${ ctx.env.get("youtube_id") }&key=${ ctx.env.get("youtube_key_regular") }`);
                 data.json().then((x) => {
                   const subscriberCount: string = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
                   //@ts-ignore
-                  void ctx.channels.cache.get(process.env.SUB_COUNT_CHANNEL).setName(`\u{1F4FA} \u{FF5C} Sub Count: ${ subscriberCount }`);
+                  void ctx.channels.cache.get(ctx.env.get("sub_count_channel")).setName(`\u{1F4FA} \u{FF5C} Sub Count: ${ subscriberCount }`);
               })
             })();
         }

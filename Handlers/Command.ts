@@ -32,5 +32,5 @@ export default function (ctx: Context): void {
 
     const commandArray: ICommand[] = [];
     ctx.interactions.forEach((x) => { commandArray.push(x.command); });
-    process.env.GUILD_ONLY_COMMANDS == "1" ? ctx.interact.overwriteGuildCommands(process.env.GUILD_ONLY_COMMANDS_GUILD_ID, ...commandArray) : ctx.interact.overwriteGlobalCommands(...commandArray);
+    ctx.env.get("guild_only") == "1" ? ctx.interact.overwriteGuildCommands(ctx.env.get("guild_only_commands_id"), ...commandArray) : ctx.interact.overwriteGlobalCommands(...commandArray);
 }

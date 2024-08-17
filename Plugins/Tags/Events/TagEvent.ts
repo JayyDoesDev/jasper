@@ -19,10 +19,10 @@ export = {
             if (!message.channel.isThread()) {
               return;
             }
-            if (message.channel.parentId !== String(process.env.SUPPORT_THREAD)) {
+            if (message.channel.parentId !== String(ctx.env.get("support_thread"))) {
                 return;
             }
-            const prefixes: string[] = [ process.env.PREFIX, "yo", "w", "dude,", "omg", "lookhere", "j" ];
+            const prefixes: string[] = [ ctx.env.get("prefix"), "yo", "w", "dude,", "omg", "lookhere", "j" ];
             if (message.author.bot) {
                 return;
             }
@@ -56,7 +56,7 @@ export = {
                 }
             }
             if (tagname) {
-                if (CheckForRoles(message, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
+                if (CheckForRoles(message, ctx.env.get("admin"), ctx.env.get("staff"), ctx.env.get("support"))) {
                     const wrappedTag = await Wrap(TagGet({ name: tagname, guildId: message.guild.id, ctx: ctx }));
                     if ('TagName' in wrappedTag.data) {
                         const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", { text: string, value: string }>]>> = {};

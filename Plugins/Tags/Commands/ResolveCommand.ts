@@ -26,13 +26,13 @@ export = {
       ],
   },
   permissions: [ PermissionsBitField.ManageThreads ],
-  on: async (_, interaction) => {
+  on: async (ctx, interaction) => {
       if (
           CheckForRoles(
               interaction,
-              process.env.ADMIN_ROLE,
-              process.env.STAFF_ROLE,
-              process.env.SUPPORT_ROLE
+              ctx.env.get("admin"),
+              ctx.env.get("staff"),
+              ctx.env.get("support")
           )
       ) {
           const finalReply: Record<"content", string> = {
