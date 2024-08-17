@@ -52,6 +52,7 @@ function writeToThreadIdFile(threadId: string): void {
 }
 
 async function postNewVideo(): Promise<void> {
+  if (ctx.env.get("youtube_post_update") == "0") return;
   // Ensure the files exist
   if (!fs.existsSync("latestvideo.json")) fs.writeFileSync("latestvideo.json", JSON.stringify({ video: "" }));
   if (!fs.existsSync("latestthread.json")) fs.writeFileSync("latestthread.json", JSON.stringify({ thread: "" }));
