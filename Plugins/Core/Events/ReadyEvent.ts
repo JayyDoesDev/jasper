@@ -1,7 +1,9 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { ActivityType } from "discord.js";
 import { Context } from "../../../Source/Context";
 import numeral from "numeral";
 import { DefineEvent } from "../../../Common/DefineEvent";
+import { getYoutubeChannel } from "../../../Source";
 
 export = {
   Event:  DefineEvent({
@@ -12,7 +14,7 @@ export = {
     on: (ctx: Context) => {
         if (ctx.env.get("sub_update") == "1") {
             (async () => {
-                const data = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${ ctx.env.get("youtube_id") }&key=${ ctx.env.get("youtube_key_regular") }`);
+                const data = await getYoutubeChannel<any>(ctx.env.get("youtube_id"), ctx.env.get("youtube_key_regular"))
                 data.json().then((x) => {
                   const subscriberCount: string = numeral(x.items[0].statistics.subscriberCount).format('0.00a');
                   //@ts-ignore
