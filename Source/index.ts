@@ -86,7 +86,7 @@ async function postNewVideo(): Promise<void> {
               const latestThread: { thread: string } = require(latestThreadPath);
               try {
                   const previousThread = channel.threads.resolve(latestThread.thread);
-                  await previousThread.edit({ locked: true, name: `[Closed] ${previousThread.name}`, archived: true }).catch((e) => { return; });
+                  await previousThread.edit({ locked: true, name: `[Closed] ${previousThread.name}`, archived: true });
               } catch (error) {
                   console.error('Error fetching or editing previous thread:', error);
               }
@@ -118,7 +118,7 @@ async function main() {
   await Promise.all(handlers);
 
   SetupMongo({ uri: ctx.env.get("db") });
-  setInterval(postNewVideo, 10000);
+  setInterval(postNewVideo, ctx.env.get("youtube_post_timer"));
 }
 
 if (ctx.env.get("sub_update") == "1") setInterval(updateSubCountChannel, ctx.env.get("sub_timer"));
