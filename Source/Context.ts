@@ -58,6 +58,7 @@ export class Context extends Client {
           { env: "YOUTUBE_KEY_TWO", aliases: ["youtube_key_two"] },
           { env: "YOUTUBE_KEY_THREE", aliases: ["youtube_key_three"] },
           { env: "YOUTUBE_VIDEO_POST_CHANNEL_ID", aliases: ["youtube_video_post_channel_id", "youtube_post_channel", "youtube_video_post_channel"] },
+          { env: "YOUTUBE_VIDEO_POST_TIMER", aliases: ["youtube_video_post_timer", "youtube_post_timer"] },
           { env: "SUB_COUNT_CHANNEL", aliases: ["sub_count_channel"] },
           { env: "SUB_COUNT_TIMER", aliases: ["sub_count_time", "sub_timer", "sub_count_time"] },
           { env: "SUB_COUNT_UPDATE", aliases: ["sub_count_update", "sub_update"] },
