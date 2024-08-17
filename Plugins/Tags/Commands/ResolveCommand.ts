@@ -27,17 +27,8 @@ export = {
   },
   permissions: [ PermissionsBitField.ManageThreads ],
   on: async (ctx, interaction) => {
-      if (
-          CheckForRoles(
-              interaction,
-              ctx.env.get("admin"),
-              ctx.env.get("staff"),
-              ctx.env.get("support")
-          )
-      ) {
-          const finalReply: Record<"content", string> = {
-              content: `Post marked as Resolved by <@${ interaction.user.id }>`,
-          };
+      if (CheckForRoles(interaction, ctx.env.get("admin"), ctx.env.get("staff"), ctx.env.get("support"))) {
+          const finalReply: Record<"content", string> = { content: `Post marked as Resolved by <@${ interaction.user.id }>`, };
           const originalQuestion: string = interaction.options.getString("original_question");
           const summarizedAnswer: string = interaction.options.getString("summarized_answer");
             const embeds: { title: string, fields: { name: string, value: string }[], color: number }[] = [ { title: "Overview", fields: [], color: 0x323338 }]
