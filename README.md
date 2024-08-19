@@ -44,9 +44,14 @@ To host your own instance of Jasper, follow these steps:
     - `GUILD_ONLY_COMMANDS_GUILD_ID`: ID of the guild for guild-only commands.
     - `YOUTUBE_CHANNEL_ID`: YouTube channel ID for subscriber count tracking.
     - `YOUTUBE_KEY`: API key for YouTube Data API.
+    - `YOUTUBE_KEY_TWO`: A second API key Youtube Data API (use a second account).
+    - `YOUTUBE_KEY_THREE`: A third API key Youtube Data API (use a third account).
+    - `YOUTUBE_VIDEO_POST_CHANNEL_ID`: Youtube channel ID
+    - `YOUTUBE_VIDEO_POST_TIMER`: Interval in milliseconds for checking YouTube Data API.
+    - `YOUTUBE_VIDEO_POST_UPDATE`: Set to `1` to enable automatic posting for video discussions.
     - `SUB_COUNT_CHANNEL`: ID of the channel where subscriber count updates will be posted.
     - `SUB_COUNT_TIMER`: Interval in milliseconds for subscriber count updates.
-    - `SUB_COUNT_UPDATE`: Set to `true` to enable automatic subscriber count updates.
+    - `SUB_COUNT_UPDATE`: Set to `1` to enable automatic subscriber count updates.
     - `REDISHOST`: Set your redis host.
     - `REDISPORT`: Set your redis port.
     - `SUPPORT_THREAD`: ID of the channel for the tags to be used in.
