@@ -60,6 +60,7 @@ export class Context extends Client {
           { env: "YOUTUBE_VIDEO_POST_CHANNEL_ID", aliases: ["youtube_video_post_channel_id", "youtube_post_channel", "youtube_video_post_channel"] },
           { env: "YOUTUBE_VIDEO_POST_TIMER", aliases: ["youtube_video_post_timer", "youtube_post_timer"] },
           { env: "YOUTUBE_VIDEO_POST_UPDATE", aliases: ["youtube_video_post_update", "youtube_post_update"] },
+          { env: "YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID", aliases: ["youtube_video_discussions_role_id", "youtube_video_discussions_role", "youtube_video_disscussions"] },
           { env: "SUB_COUNT_CHANNEL", aliases: ["sub_count_channel"] },
           { env: "SUB_COUNT_TIMER", aliases: ["sub_count_time", "sub_timer", "sub_count_time"] },
           { env: "SUB_COUNT_UPDATE", aliases: ["sub_count_update", "sub_update"] },
