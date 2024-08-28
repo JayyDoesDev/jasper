@@ -1,6 +1,6 @@
 {
     "name": "jasper",
-    "version": "1.0.0",
+    "version": "2.4.1",
     "scripts": {
         "build": "gulp js && tsc",
         "start": "node dist/Source/index.js",
@@ -13,7 +13,7 @@
         "docker-compose-stop": "docker-compose down"
     },
     "main": "dist/Source/index.js",
-    "author": "J_DDev <69683068+jayydoesdev@users.noreply.github.com>",
+    "author": "JayyDoesDev",
     "contributors": [
         "Proman4713 <85965528+proman4713@users.noreply.github.com>",
         "zueripat <66902977+zueripat@users.noreply.github.com>"
