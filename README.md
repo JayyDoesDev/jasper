@@ -49,6 +49,7 @@ To host your own instance of Jasper, follow these steps:
     - `YOUTUBE_VIDEO_POST_CHANNEL_ID`: Youtube channel ID
     - `YOUTUBE_VIDEO_POST_TIMER`: Interval in milliseconds for checking YouTube Data API.
     - `YOUTUBE_VIDEO_POST_UPDATE`: Set to `1` to enable automatic posting for video discussions.
+    - `YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID`: The ping role id for video discussions. 
     - `SUB_COUNT_CHANNEL`: ID of the channel where subscriber count updates will be posted.
     - `SUB_COUNT_TIMER`: Interval in milliseconds for subscriber count updates.
     - `SUB_COUNT_UPDATE`: Set to `1` to enable automatic subscriber count updates.
