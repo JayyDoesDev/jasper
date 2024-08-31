@@ -79,7 +79,7 @@ async function postNewVideo(): Promise<void> {
           const messages = await channel.messages.fetch({ limit: 100 });
 
           if (!messages.some((message) => message.content.includes(latest.id))) {
-              const message = await channel.send({ content: `<@&${ctx.env.get("youtube_video_discussions_role")}>\n# ${latest.title}\n${latest.description}\nhttps://www.youtube.com/watch?v=${latest.id}` });
+              const message = await channel.send({ content: `<@&${ctx.env.get("youtube_video_discussions_role")}>\n# ${latest.title}\n${latest.description}\nhttps://www.youtube.com/watch?v=${latest.id}`, allowedMentions: { roles: [ctx.env.get("youtube_video_discussions_role")] } });
 
               const thread = await message.startThread({ name: latest.title, autoArchiveDuration: 1440 });
               await thread.send("# Reminder to follow the rules and to stay on topic!");
