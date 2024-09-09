@@ -27,7 +27,7 @@
         "glob": "^7.2.0",
         "gulp": "^5.0.0",
         "ioredis": "^5.4.1",
-        "mongoose": "^8.4.0",
+        "mongoose": "^8.6.1",
         "numeral": "^2.0.6"
     },
     "devDependencies": {
