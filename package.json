@@ -1,6 +1,6 @@
 {
     "name": "jasper",
-    "version": "2.4.1",
+    "version": "2.4.2",
     "scripts": {
         "build": "gulp js && tsc",
         "start": "node dist/Source/index.js",
@@ -22,7 +22,7 @@
     "dependencies": {
         "@antibot/interactions": "^1.4.3",
         "@antibot/zilla": "^1.0.2",
-        "discord.js": "^14.15.2",
+        "discord.js": "^14.15.3",
         "dotenv": "^16.4.5",
         "glob": "^7.2.0",
         "gulp": "^5.0.0",
@@ -36,7 +36,7 @@
         "@typescript-eslint/eslint-plugin": "^7.10.0",
         "@typescript-eslint/parser": "^7.10.0",
         "eslint": "8.57.0",
-        "eslint-plugin-json": "^4.0.0",
+        "eslint-plugin-json": "^4.0.1",
         "typescript": "^5.4.5",
         "typescript-eslint": "^7.10.0"
     }
