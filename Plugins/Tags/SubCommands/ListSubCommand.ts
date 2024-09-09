@@ -5,7 +5,7 @@ import { ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord
 import { GuildExists } from "../../../Common/GuildExists";
 import TagSchema from "../../../Models/TagSchema";
 import { Wrap } from "../../../Common/Wrap";
-import { Tag } from "../../../Models/TagDocument";
+import { Tag } from "../../../Models/GuildDocument";
 import { State } from "../../types";
 
 function chunkArray<T>(array: T[], size: number): T[][] {

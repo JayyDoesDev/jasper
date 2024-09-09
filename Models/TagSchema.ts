@@ -1,10 +1,11 @@
 import { model, Schema } from "mongoose";
-import { TagDocument } from "./TagDocument";
+import { GuildDocument } from "./GuildDocument";
 import { MO } from "./MongoObject";
 
-export default model<TagDocument>("support-tags", new Schema(
+export default model<GuildDocument>("support-tags", new Schema(
   {
       _id: String,
+      SupportRoles: { type: [String], default: [] },
       Tags: {
           type: [
               {

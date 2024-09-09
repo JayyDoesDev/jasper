@@ -2,7 +2,7 @@ import { Wrap } from "../../../Common/Wrap";
 import TagSchema from "../../../Models/TagSchema";
 import type { Snowflake } from "discord.js";
 import type { Context } from "../../../Source/Context";
-import type { Tag } from "../../../Models/TagDocument";
+import type { Tag } from "../../../Models/GuildDocument";
 import { GuildSnowflake, TagResponse } from "./Types";
 
 export async function TagsGet(

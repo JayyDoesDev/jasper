@@ -22,7 +22,7 @@ export async function getLatestYoutubeVideo(youtubeId: string, apiKey: string): 
 }
 
 export async function updateSubCountChannel(): Promise<void> {
-    const data = await getYoutubeChannel<any>(ctx.env.get("youtube_id"), getRandomYoutubeAPIKey());
+    const data = await getYoutubeChannel<{ [key: string]: any }>(ctx.env.get("youtube_id"), getRandomYoutubeAPIKey());
     const json = await data.json();
     const subscriberCount: string = numeral(json.items[0].statistics.subscriberCount).format('0.00a');
     // @ts-ignore
@@ -30,12 +30,12 @@ export async function updateSubCountChannel(): Promise<void> {
 }
 
 // Not random
-function getRandomYoutubeAPIKey(): string {
+export function getRandomYoutubeAPIKey(): string {
   const array: string[] = [ctx.env.get("youtube_key_one"), ctx.env.get("youtube_key_two"), ctx.env.get("youtube_key_three")];
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function writeToVideoIdFile(videoId: string): void {
+export function writeToVideoIdFile(videoId: string): void {
     try {
       fs.writeFileSync("latestvideo.json", JSON.stringify({ video: videoId }));
     } catch (err) {
@@ -43,7 +43,7 @@ function writeToVideoIdFile(videoId: string): void {
     }
 }
 
-function writeToThreadIdFile(threadId: string): void {
+export function writeToThreadIdFile(threadId: string): void {
   try {
     fs.writeFileSync("latestthread.json", JSON.stringify({ thread: threadId }));
   } catch (err) {

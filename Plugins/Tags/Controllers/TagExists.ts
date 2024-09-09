@@ -1,6 +1,6 @@
 import { GuildExists } from "../../../Common/GuildExists";
 import { Wrap } from "../../../Common/Wrap";
-import { Tag } from "../../../Models/TagDocument";
+import { Tag } from "../../../Models/GuildDocument";
 import TagSchema from "../../../Models/TagSchema";
 import { commonOptions, GuildSnowflake, TagResponse } from "./Types";
 
