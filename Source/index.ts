@@ -31,8 +31,7 @@ export async function updateSubCountChannel(): Promise<void> {
 
 // Not random
 export function getRandomYoutubeAPIKey(): string {
-  const array: string[] = [ctx.env.get("youtube_key_one"), ctx.env.get("youtube_key_two"), ctx.env.get("youtube_key_three")];
-  return array[Math.floor(Math.random() * array.length)];
+  return [ctx.env.get("youtube_key_one"), ctx.env.get("youtube_key_two"), ctx.env.get("youtube_key_three")][Math.floor(Math.random() * 3)];
 }
 
 export function writeToVideoIdFile(videoId: string): void {
@@ -110,21 +109,18 @@ async function postNewVideo(): Promise<void> {
 
 
 async function main() {
-
   const handlers = ["Command", "Event"].map(async (x) => {
     const handlerModule = await import(`../Handlers/${x}`);
     await handlerModule.default(ctx);
   });
 
   await Promise.all(handlers);
-
+  
   SetupMongo({ uri: ctx.env.get("db") });
   setInterval(postNewVideo, ctx.env.get("youtube_post_timer"));
 }
 
 if (ctx.env.get("sub_update") == "1") setInterval(updateSubCountChannel, ctx.env.get("sub_timer"));
-
-
 
 main().catch(console.error);
 

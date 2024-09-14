@@ -1,6 +1,6 @@
 {
     "name": "jasper",
-    "version": "2.4.2",
+    "version": "2.4.5",
     "scripts": {
         "build": "gulp js && tsc",
         "start": "node dist/Source/index.js",
@@ -22,7 +22,7 @@
     "dependencies": {
         "@antibot/interactions": "^1.4.3",
         "@antibot/zilla": "^1.0.2",
-        "discord.js": "^14.15.3",
+        "discord.js": "^14.16.1",
         "dotenv": "^16.4.5",
         "glob": "^7.2.0",
         "gulp": "^5.0.0",
