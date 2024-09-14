@@ -1,4 +1,4 @@
-import TagSchema from "../../../Models/TagSchema";
+import TagSchema from "../../../Models/GuildSchema";
 import { commonOptions, GuildSnowflake, TagResponse } from "./Types";
 
 export async function TagDelete(options: commonOptions): Promise<void> {

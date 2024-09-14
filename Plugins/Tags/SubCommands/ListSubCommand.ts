@@ -3,7 +3,7 @@ import { Context } from "../../../Source/Context";
 import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
 import { GuildExists } from "../../../Common/GuildExists";
-import TagSchema from "../../../Models/TagSchema";
+import TagSchema from "../../../Models/GuildSchema";
 import { Wrap } from "../../../Common/Wrap";
 import { Tag } from "../../../Models/GuildDocument";
 import { State } from "../../types";

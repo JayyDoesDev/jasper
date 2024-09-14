@@ -1,4 +1,4 @@
-import GuildSchema from "../Models/TagSchema";
+import GuildSchema from "../Models/GuildSchema";
 import type { Snowflake } from "@antibot/interactions";
 
 export async function GuildExists(guildId: Snowflake): Promise<boolean> {

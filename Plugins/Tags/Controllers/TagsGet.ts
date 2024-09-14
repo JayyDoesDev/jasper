@@ -1,5 +1,5 @@
 import { Wrap } from "../../../Common/Wrap";
-import TagSchema from "../../../Models/TagSchema";
+import TagSchema from "../../../Models/GuildSchema";
 import type { Snowflake } from "discord.js";
 import type { Context } from "../../../Source/Context";
 import type { Tag } from "../../../Models/GuildDocument";

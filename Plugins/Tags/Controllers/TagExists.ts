@@ -1,7 +1,7 @@
 import { GuildExists } from "../../../Common/GuildExists";
 import { Wrap } from "../../../Common/Wrap";
 import { Tag } from "../../../Models/GuildDocument";
-import TagSchema from "../../../Models/TagSchema";
+import TagSchema from "../../../Models/GuildSchema";
 import { commonOptions, GuildSnowflake, TagResponse } from "./Types";
 
 export async function TagExists(options: commonOptions): Promise<boolean> {
