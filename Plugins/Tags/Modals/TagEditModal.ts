@@ -24,15 +24,11 @@ export = {
                 negativeTypeGuards: [ "isModalSubmit" ]
             },
             callback: async (ctx: Context, interaction: ModalSubmitInteraction) => {
-                const tagEmbedName: string = interaction.fields.getTextInputValue("tag_edit_embed_name");
-                const tagEmbedTitle: string = interaction.fields.getTextInputValue("tag_edit_embed_title");
-                const TagEmbedDescription: string = interaction.fields.getTextInputValue("tag_edit_embed_description");
-                const tagEmbedFooter: string = interaction.fields.getTextInputValue("tag_edit_embed_footer");
                 const tag: TagOptions = {
-                    name: tagEmbedName,
-                    title: tagEmbedTitle,
-                    description: TagEmbedDescription ? TagEmbedDescription : null,
-                    footer: tagEmbedFooter ? tagEmbedFooter : null
+                    name: interaction.fields.getTextInputValue("tag_edit_embed_name"),
+                    title: interaction.fields.getTextInputValue("tag_edit_embed_title"),
+                    description: interaction.fields.getTextInputValue("tag_edit_embed_description") ? interaction.fields.getTextInputValue("tag_edit_embed_description") : null,
+                    footer: interaction.fields.getTextInputValue("tag_edit_embed_footer") ? interaction.fields.getTextInputValue("tag_edit_embed_footer") : null
                 };
                 if (await TagExists({ guildId: interaction.guild.id, name: tag.name, ctx: ctx })) {
                     await TagEdit({ guildId: interaction.guild.id, options: { name: tag.name, title: tag.title, description: tag.description, footer: tag.footer }, ctx: ctx })
