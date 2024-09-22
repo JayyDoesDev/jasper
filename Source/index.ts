@@ -31,7 +31,7 @@ export async function updateSubCountChannel(): Promise<void> {
 
 // Not random
 export function getRandomYoutubeAPIKey(): string {
-  return [ctx.env.get("youtube_key_one"), ctx.env.get("youtube_key_two"), ctx.env.get("youtube_key_three")][Math.floor(Math.random() * 3)];
+  return [ctx.env.get("youtube_key_one"), ctx.env.get("youtube_key_two"), ctx.env.get("youtube_key_three")][Math.floor(Math.random() * 3)] as string;
 }
 
 export function writeToVideoIdFile(videoId: string): void {
