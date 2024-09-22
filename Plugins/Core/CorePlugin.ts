@@ -9,5 +9,5 @@ export = DefinePlugin({
     commands: [...MassRegisterCommands(__dirname, ["Commands"]), ...[PingCommand.Command]],
     events: MassRegisterEvents(__dirname, ["Events"]),
     public_plugin: true,
-}) as Plugin;
+}) satisfies Plugin;
 
