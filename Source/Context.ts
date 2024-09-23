@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, ContextMenuCommandInteraction, IntentsBitField, Partials } from "discord.js";
+import { ActivityType, ChatInputCommandInteraction, Client, ContextMenuCommandInteraction, IntentsBitField, Partials } from "discord.js";
 import { ZillaCollection } from "@antibot/zilla";
 import { Command } from "../Common/DefineCommand";
 import { Interactions, Snowflake } from "@antibot/interactions";
@@ -6,6 +6,7 @@ import { Plugin } from "../Common/DefinePlugin";
 import { Store } from "./Store";
 import { State } from "../Plugins/types";
 import { Env } from "./Env";
+import path from "path";
 
 export class Context extends Client {
     public plugin: ZillaCollection<string, Plugin>;
@@ -32,6 +33,16 @@ export class Context extends Client {
             allowedMentions: {
                 parse: [ "users" ],
             },
+            presence: {
+                activities: [
+                    {
+                        name: "Latest Video",
+                        state: "subscrib 4 a kis",
+                        url: `https://www.youtube.com/watch?v=${require(path.join(process.cwd(), "latestvideo.json")).video}`,
+                        type: ActivityType.Streaming
+                    }
+                ]
+            }
         });
         this.plugin = new ZillaCollection<string, Plugin>();
         this.interactions = new ZillaCollection<string, Command<ChatInputCommandInteraction | ContextMenuCommandInteraction>>();
