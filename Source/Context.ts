@@ -66,7 +66,13 @@ export class Context extends Client {
           { env: "SUB_COUNT_UPDATE", aliases: ["sub_count_update", "sub_update"] },
           { env: "REDISHOST", aliases: ["redis_host", "redishost"] },
           { env: "REDISPORT", aliases: ["redis_port", "redisport"] },
-          { env: "SUPPORT_THREAD", aliases: ["support_thread", "supporthread"] }
+          { env: "SUPPORT_THREAD", aliases: ["support_thread", "supporthread"] },
+          { env: "SLOWMODE", aliases: ["slowmode"] },
+          { env: "SLOWMODE_CHANNEL_ID", aliases: ["slowmode_channel"] },
+          { env: "SLOWMODE_COOLDOWN", aliases: ["slowmode_cooldown"] },
+          { env: "SLOWMODE_MESSAGE_TIME", aliases: ["slowmode_msg_time", "slowmode_message_time"] },
+          { env: "SLOWMODE_MESSAGE_THRESHOLD", aliases: ["slowmode_msg_threshold"] },
+          { env: "SLOWMODE_RESET_TIME", aliases: ["slowmode_reset_time"] }
       );
       this.store = new Store(this);
     }

@@ -8,6 +8,6 @@ export = DefinePlugin({
     commands: MassRegisterCommands(__dirname, ["Commands"]),
     events: MassRegisterEvents(__dirname, ["Events", "Modals", "Buttons"]),
     public_plugin: true,
-}) as Plugin;
+}) satisfies Plugin;
 
 

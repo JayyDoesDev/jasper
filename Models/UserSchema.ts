@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
 import { UserDocument } from "./UserDocument";
-import { MO } from "./MongoObject";
 
 export default model<UserDocument>("support-helpers", new Schema(
     {

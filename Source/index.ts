@@ -11,6 +11,11 @@ config();
 const ctx: Context = new Context();
 ctx.env.validate();
 
+// slowmode plugin configuration
+global.slowmodeCooldown = ctx.env.get("slowmode_cooldown");
+global.messageTimeWindow = ctx.env.get("slowmode_msg_time");
+global.messageThreshold = ctx.env.get("slowmode_msg_threshold");
+
 async function getYoutubeChannel<T>(youtubeId: string, apiKey: string): Promise<T> {
     return await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${youtubeId}&key=${apiKey}`) as T;
 }
@@ -106,8 +111,6 @@ async function postNewVideo(): Promise<void> {
   }
 }
 
-
-
 async function main() {
   const handlers = ["Command", "Event"].map(async (x) => {
     const handlerModule = await import(`../Handlers/${x}`);
@@ -134,4 +137,3 @@ process
   });
 
 void ctx.login(ctx.env.get("botToken"));
-
