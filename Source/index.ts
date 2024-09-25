@@ -29,7 +29,7 @@ export async function getLatestYoutubeVideo(youtubeId: string, apiKey: string): 
 export async function updateSubCountChannel(): Promise<void> {
     const data = await getYoutubeChannel<{ [key: string]: any }>(ctx.env.get("youtube_id"), getRandomYoutubeAPIKey());
     const json = await data.json();
-    const subscriberCount: string = numeral(json.items[0].statistics.subscriberCount).format('0.00a');
+    const subscriberCount: string = String(numeral(json.items[0].statistics.subscriberCount).format('0.00a')).toUpperCase();
     // @ts-ignore
     void ctx.channels.cache.get(ctx.env.get("sub_count_channel")).setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
 }
