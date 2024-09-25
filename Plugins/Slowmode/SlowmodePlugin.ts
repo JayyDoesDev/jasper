@@ -1,7 +1,6 @@
 import { Context } from "../../Source/Context";
 import { Message, TextChannel } from "discord.js";
 import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
-import { PermissionsBitField } from "@antibot/interactions";
 
 let active: boolean = false;
 let messageCount: number = 0;
@@ -24,8 +23,6 @@ export = DefinePlugin({
                 const channel: TextChannel = ctx.channels.resolve(ctx.env.get("slowmode_channel"));
 
                 if (message.channel.id !== channel.id) return;
-                if (message.author.bot) return;
-                if (message.member.permissions.has(PermissionsBitField.KickMembers)) return;
                 if (Date.now() - messageWindowStart > global.messageTimeWindow) {
                     messageCount = 1;
                     messageWindowStart = Date.now();
