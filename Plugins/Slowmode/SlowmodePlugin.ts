@@ -42,7 +42,7 @@ export = DefinePlugin({
                             active = true;
 
                             setTimeout(async () => {
-                                await channel.setRateLimitPerUser(0).catch(() => { return; });
+                                await channel.setRateLimitPerUser(ctx.env.get("slowmode_reset_slowmode")).catch(() => { return; });
                                 active = false;
                             }, ctx.env.get("slowmode_reset_time"));
                         }

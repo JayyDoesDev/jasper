@@ -83,6 +83,7 @@ export class Context extends Client {
           { env: "SLOWMODE_COOLDOWN", aliases: ["slowmode_cooldown"] },
           { env: "SLOWMODE_MESSAGE_TIME", aliases: ["slowmode_msg_time", "slowmode_message_time"] },
           { env: "SLOWMODE_MESSAGE_THRESHOLD", aliases: ["slowmode_msg_threshold"] },
+          { env: "SLOWMODE_RESET_SLOWMODE", aliases: ["slowmode_reset_slowmode"] },
           { env: "SLOWMODE_RESET_TIME", aliases: ["slowmode_reset_time"] }
       );
       this.store = new Store(this);
