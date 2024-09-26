@@ -11,10 +11,13 @@ config();
 const ctx: Context = new Context();
 ctx.env.validate();
 
-// slowmode plugin configuration
+// Slowmode plugin configuration
 global.slowmodeCooldown = ctx.env.get("slowmode_cooldown");
 global.messageTimeWindow = ctx.env.get("slowmode_msg_time");
 global.messageThreshold = ctx.env.get("slowmode_msg_threshold");
+
+// The color used in all embeds
+global.embedColor = 0x323338;
 
 async function getYoutubeChannel<T>(youtubeId: string, apiKey: string): Promise<T> {
     return await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${youtubeId}&key=${apiKey}`) as T;

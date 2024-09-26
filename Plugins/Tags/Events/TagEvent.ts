@@ -76,7 +76,7 @@ export = {
                             embeds: [
                                 {
                                     title: wrappedTag.data.TagEmbedTitle,
-                                    color: 0xff9a00,
+                                    color: global.embedColor,
                                     description: embedObject?.description,
                                     footer: embedObject?.footer
                                 }

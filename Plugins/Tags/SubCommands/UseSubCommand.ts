@@ -49,7 +49,7 @@ export async function RunUseSubCommand(
                         content: mention ? `<@${ mention }>` : undefined,
                         embeds: [
                             {
-                                color: 0x323338,
+                                color: global.embedColor,
                                 title: getTag.TagEmbedTitle,
                                 description: getTag.TagEmbedDescription,
                                 footer: {

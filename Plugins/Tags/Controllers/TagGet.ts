@@ -15,7 +15,7 @@ export async function TagGet(options: commonOptions): Promise<TagResponse> {
               TagEmbedTitle: findTag.TagEmbedTitle,
               TagEmbedDescription: findTag.TagEmbedDescription,
               TagEmbedFooter: findTag.TagEmbedFooter
-            } || null;
+            };
     } else {
         return null;
     }

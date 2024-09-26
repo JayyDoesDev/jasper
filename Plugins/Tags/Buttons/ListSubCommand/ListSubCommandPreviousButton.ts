@@ -33,7 +33,7 @@ export = {
                 title: `Server Tag List`,
                 description: currentUserState.tagPages[currentUserState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
                 footer: { text: `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length} • emojis by AnThOnY & deussa`},
-                color: 0x323338,
+                color: global.embedColor,
               }
             ],
           });

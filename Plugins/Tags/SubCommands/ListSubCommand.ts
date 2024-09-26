@@ -44,7 +44,7 @@ export async function RunListSubCommand(ctx: Context, interaction: ChatInputComm
                         title: `Server Tag List`,
                         description: userState.tagPages[userState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
                         footer: { text: `Page: ${userState.page + 1}/${userState.tagPages.length} • emojis by AnThOnY & deussa`},
-                        color: 0x323338,
+                        color: global.embedColor,
                       }
                     ],
                     components: [
