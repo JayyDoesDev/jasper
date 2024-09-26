@@ -28,19 +28,19 @@ export = {
         on: async (ctx: Context, interaction) => {
             const section = interaction.options.getString("section", true);
             const choices = documentationAutocomplete(documentationContent);
-      
+
             const choice = choices.find(c => c.name === section);
             const embed = {
                 title: choice.name,
                 description: choice.value,
                 color: global.embedColor
             };
-      
-            await interaction.reply({ embeds: [ embed ], ephemeral: true });
+
+            await interaction.reply({ embeds: [embed], ephemeral: true });
         },
         autocomplete: async (_, interaction) => {
             const choices = documentationAutocomplete(documentationContent);
-      
+
             // Send the choices as an autocomplete response
             await interaction.respond(
                 choices.map(choice => ({
@@ -48,6 +48,6 @@ export = {
                     value: choice.name
                 })).slice(0, 20)
             );
-          }
+        }
     })
 }
