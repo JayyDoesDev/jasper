@@ -31,12 +31,18 @@ export = {
           const finalReply: Record<"content", string> = { content: `Post marked as Resolved by <@${ interaction.user.id }>`, };
           const originalQuestion: string = interaction.options.getString("original_question");
           const summarizedAnswer: string = interaction.options.getString("summarized_answer");
-            const embeds: { title: string, fields: { name: string, value: string }[], color: number }[] = [ { title: "Overview", fields: [], color: global.embedColor }];
+          const embeds: { title: string, fields: { name: string, value: string }[], color: number }[] = [ { title: "Overview", fields: [], color: global.embedColor }];
+          
+          const appliedTags = (interaction.channel as any).appliedTags;
           if (interaction.channel.type == ChannelType.PublicThread) {
-              if (!interaction.channel.appliedTags.includes("1144008960966402149")) {
+              if (!appliedTags.includes("1144008960966402149")) {
+                  const tagIndex = appliedTags.indexOf("1284733312501420145");
+                  if (tagIndex !== -1) {
+                      appliedTags.splice(tagIndex, 1);
+                  }
                   await interaction.channel.setAppliedTags([
                       "1144008960966402149",
-                      ...interaction.channel.appliedTags,
+                      ...appliedTags,
                   ]);
               }
               if (originalQuestion) {
