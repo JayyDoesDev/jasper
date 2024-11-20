@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { ApplicationCommandOptionType, ApplicationCommandType, PermissionsBitField } from "@antibot/interactions";
 import { DefineCommand } from "../../../Common/DefineCommand";
 import { ChannelType, ChatInputCommandInteraction } from "discord.js";

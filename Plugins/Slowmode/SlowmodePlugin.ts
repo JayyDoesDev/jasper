@@ -41,7 +41,7 @@ export = DefinePlugin({
                         if (!active) {
                             active = true;
 
-                            setTimeout(async () => {
+                            setTimeout(() => {
                                 active = false;
                             }, ctx.env.get("slowmode_reset_time"));
                         }
