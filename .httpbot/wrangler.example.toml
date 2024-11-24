@@ -1,0 +1,14 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "jasper"
+main = "Source/index.ts"
+compatibility_date = "2024-11-12"
+compatibility_flags = ["nodejs_compat"]
+
+routes = [
+  { pattern = "example.com", custom_domain = true }
+]
+
+[secrets]
+PUBLIC_KEY = ""
+BOT_TOKEN = ""
+GUILD_ID = 
