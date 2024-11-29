@@ -2,6 +2,7 @@
   "name": "httpbot",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
@@ -17,6 +18,8 @@
     "wrangler": "^3.60.3"
   },
   "dependencies": {
+    "@antibot/interactions": "^1.4.3",
+    "discord-api-types": "^0.37.107",
     "discord-interactions": "^4.1.0",
     "dotenv": "^16.4.5",
     "itty-router": "^5.0.18"

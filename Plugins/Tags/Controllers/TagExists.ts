@@ -7,8 +7,8 @@ import { commonOptions, GuildSnowflake, TagResponse } from "./Types";
 export async function TagExists(options: commonOptions): Promise<boolean> {
     const { guildId, ctx, name }: commonOptions = options;
     const key: GuildSnowflake = { guild: guildId };
-    const exists: number = await ctx.store.guildExists(key);
-    if (!exists) {
+
+    if (!(await ctx.store.guildExists(key))) {
         if (!(await GuildExists(guildId))) {
             return false;
         }
@@ -24,27 +24,30 @@ export async function TagExists(options: commonOptions): Promise<boolean> {
     if (tags.find((tag) => tag.TagName === name)) {
         return true;
     }
+
     try {
         const wrappedGuild = await Wrap(TagSchema.findOne({ _id: guildId }));
         if (!wrappedGuild.data) {
             return false;
         }
+
         const findTag: Tag = wrappedGuild.data.Tags.find(
             (tag: Tag) => tag.TagName === name
         );
         if (findTag) {
-            tags.push({
+            const newTag: TagResponse = {
                 TagAuthor: findTag.TagAuthor,
                 TagName: findTag.TagName,
                 TagEmbedTitle: findTag.TagResponse.TagEmbedTitle,
                 TagEmbedDescription: findTag.TagResponse.TagEmbedDescription,
                 TagEmbedFooter: findTag.TagResponse.TagEmbedFooter,
-            });
+            };
+            tags.push(newTag);
             ctx.store.setKey(key, ...tags);
             return true;
         }
     } catch (error) {
-        console.log("Error fetching tags from the database:", error);
+        console.error("Error fetching tags from the database:", error);
         return false;
     }
 
