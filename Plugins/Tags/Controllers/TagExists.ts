@@ -16,6 +16,7 @@ export async function TagExists(options: commonOptions): Promise<boolean> {
     }
 
     let tags: TagResponse[] = await ctx.store.getGuild(key);
+    
     if (!Array.isArray(tags)) {
         tags = [];
         ctx.store.setKey(key, ...tags);
@@ -42,6 +43,7 @@ export async function TagExists(options: commonOptions): Promise<boolean> {
                 TagEmbedDescription: findTag.TagResponse.TagEmbedDescription,
                 TagEmbedFooter: findTag.TagResponse.TagEmbedFooter,
             };
+            
             tags.push(newTag);
             ctx.store.setKey(key, ...tags);
             return true;
