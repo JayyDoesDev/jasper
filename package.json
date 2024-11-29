@@ -1,6 +1,6 @@
 {
     "name": "jasper",
-    "version": "2.5.4",
+    "version": "2.5.7",
     "scripts": {
         "build": "gulp js && tsc",
         "start": "node dist/Source/index.js",
