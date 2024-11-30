@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
 import { GuildDocument } from "./GuildDocument";
-import { MO } from "./MongoObject";
 
 export default model<GuildDocument>("support-tags", new Schema(
   {
@@ -12,9 +11,9 @@ export default model<GuildDocument>("support-tags", new Schema(
                   TagName: String,
                   TagAuthor: String,
                   TagResponse: {
-                      TagEmbedTitle: MO(String, undefined, true),
-                      TagEmbedDescription: MO(String, null, false),
-                      TagEmbedFooter: MO(String, null, false)
+                      TagEmbedTitle: { type: String, default: undefined, required: true },
+                      TagEmbedDescription: { type: String, default: null },
+                      TagEmbedFooter: { type: String, default: null }
                   }
               }
           ],

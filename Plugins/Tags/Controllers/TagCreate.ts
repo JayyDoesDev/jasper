@@ -1,4 +1,3 @@
-import { GuildExists } from "../../../Common/GuildExists";
 import TagSchema from "../../../Models/GuildSchema";
 import { GuildSnowflake, TagResponse, TagCreateOptions } from "./Types";
 

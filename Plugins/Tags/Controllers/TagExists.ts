@@ -32,9 +32,8 @@ export async function TagExists(options: commonOptions): Promise<boolean> {
             return false;
         }
 
-        const findTag: Tag = wrappedGuild.data.Tags.find(
-            (tag: Tag) => tag.TagName === name
-        );
+        const findTag: Tag = wrappedGuild.data.Tags.find((tag: Tag) => tag.TagName === name);
+        
         if (findTag) {
             const newTag: TagResponse = {
                 TagAuthor: findTag.TagAuthor,
