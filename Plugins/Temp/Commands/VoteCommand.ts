@@ -1,4 +1,4 @@
-import { ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
+import { ChatInputCommandInteraction, ComponentType, TextInputStyle } from "discord.js";
 import { DefineCommand } from "../../../Common/DefineCommand";
 import { ApplicationCommandType, PermissionBitToString, Permissions } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
@@ -14,23 +14,29 @@ export = {
             ),
             options: []
         },
-        on: (ctx: Context, interaction) => {
-            return interaction.reply({
-                content: "> Click this button to vote!",
-                components: [
-                    {
-                        type: ComponentType.ActionRow,
-                        components: [
-                            {
-                                type: ComponentType.Button,
-                                label: 'Vote Today!',
-                                customId: `vote_button`,
-                                style: ButtonStyle.Primary
-                            }
-                        ]
-                    }
-                ]
-            })
+        on: async (ctx: Context, interaction) => {
+            await interaction.showModal(
+                {
+                    customId: `vote_form_${interaction.user.id}`,
+                    title: "Vote!",
+                    components: [
+                        {
+                            type: ComponentType.ActionRow,
+                            components: [
+                                {
+                                    type: ComponentType.TextInput,
+                                    customId: "vote_candidate",
+                                    label: "Candidate",
+                                    placeholder: "Provide the user id of the user!",
+                                    maxLength: 80,
+                                    style: TextInputStyle.Short,
+                                    required: true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            )
         }
     })
 }

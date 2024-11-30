@@ -22,8 +22,10 @@ export = {
                 callback: async (ctx: Context, interaction: ModalSubmitInteraction) => {
                     const candidate = interaction.fields.getTextInputValue("vote_candidate");
                     const message: { content: string, ephemeral: boolean } = { content: "This is not a valid user!", ephemeral: true };
+                    const user = await ctx.users.fetch(candidate);
 
-                    if (!ctx.users.fetch(candidate)) return interaction.reply(message);
+                    if (!user) return interaction.reply(message);
+                    if (user.bot) return interaction.reply(message);
                     
                     if (candidate === interaction.user.id) {
                         return interaction.reply({ content: "You can't vote for yourself!", ephemeral: true })
