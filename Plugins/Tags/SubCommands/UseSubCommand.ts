@@ -52,6 +52,7 @@ export async function RunUseSubCommand(
                                 color: global.embedColor,
                                 title: getTag.TagEmbedTitle,
                                 description: getTag.TagEmbedDescription,
+                                image: getTag.TagEmbedImageURL ? { url: getTag.TagEmbedImageURL } : undefined,
                                 footer: {
                                     text: getTag.TagEmbedFooter,
                                 },

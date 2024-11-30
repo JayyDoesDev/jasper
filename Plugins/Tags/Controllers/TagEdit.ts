@@ -28,6 +28,7 @@ export async function TagEdit(tagEditOptions: TagCreateOptions): Promise<void> {
             TagEmbedTitle: options.title ?? originalTag.TagEmbedTitle,
             TagEmbedDescription:
                 options.description ?? originalTag.TagEmbedDescription,
+            TagEmbedImageURL: options.image_url ?? originalTag.TagEmbedImageURL,
             TagEmbedFooter: options.footer ?? originalTag.TagEmbedFooter,
         };
     } else {
@@ -47,6 +48,8 @@ export async function TagEdit(tagEditOptions: TagCreateOptions): Promise<void> {
                     options.title ?? cachedTags[tagIndex].TagEmbedTitle,
                 "Tags.$.TagResponse.TagEmbedDescription":
                     options.description ?? cachedTags[tagIndex].TagEmbedDescription,
+                "Tags.$.TagResponse.TagEmbedImageURL":
+                    options.image_url ?? cachedTags[tagIndex].TagEmbedImageURL,
                 "Tags.$.TagResponse.TagEmbedFooter":
                     options.footer ?? cachedTags[tagIndex].TagEmbedFooter,
             },

@@ -17,6 +17,7 @@ export async function TagGet(options: commonOptions): Promise<TagResponse> {
               TagName: findTag.TagName,
               TagEmbedTitle: findTag.TagEmbedTitle,
               TagEmbedDescription: findTag.TagEmbedDescription,
+              TagEmbedImageURL: findTag.TagEmbedImageURL,
               TagEmbedFooter: findTag.TagEmbedFooter
             };
     } else {
