@@ -14,6 +14,7 @@ export type Tag = {
     TagResponse: {
         TagEmbedTitle: string;
         TagEmbedDescription: Nullable<string>;
+        TagEmbedImageURL: Nullable<string>;
         TagEmbedFooter: Nullable<string>;
     }
 }

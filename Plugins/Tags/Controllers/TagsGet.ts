@@ -21,6 +21,7 @@ export async function TagsGet(guildId: Snowflake, ctx: Context): Promise<Tag[]> 
                 TagName: tag.TagName,
                 TagEmbedTitle: tag.TagResponse.TagEmbedTitle,
                 TagEmbedDescription: tag.TagResponse.TagEmbedDescription,
+                TagEmbedImageURL: tag.TagResponse.TagEmbedImageURL,
                 TagEmbedFooter: tag.TagResponse.TagEmbedFooter
               });
             }

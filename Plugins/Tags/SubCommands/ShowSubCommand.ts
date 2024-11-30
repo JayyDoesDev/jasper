@@ -37,6 +37,7 @@ export async function RunShowSubCommand(ctx: Context, interaction: ChatInputComm
                             title: getTag.TagEmbedTitle,
                             color: global.embedColor,
                             description: getTag.TagEmbedDescription ? getTag.TagEmbedDescription : '',
+                            image: getTag.TagEmbedImageURL ? { url: getTag.TagEmbedImageURL } : undefined,
                             footer: {
                                 text: getTag.TagEmbedFooter ? getTag.TagEmbedFooter : ''
                             }

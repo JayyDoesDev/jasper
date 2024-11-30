@@ -18,6 +18,7 @@ export type TagOptions = {
     name: string;
     title: string;
     description: Nullable<string>;
+    image_url : Nullable<string>;
     footer: Nullable<string>;
 }
 
@@ -26,6 +27,7 @@ export type TagResponse = {
   TagName: string;
   TagEmbedTitle: Nullable<string>;
   TagEmbedDescription: Nullable<string>;
+  TagEmbedImageURL: Nullable<string>;
   TagEmbedFooter: Nullable<string>;
 }
 

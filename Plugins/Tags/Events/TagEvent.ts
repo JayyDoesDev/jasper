@@ -69,6 +69,7 @@ export = {
                                     title: Nullable<string>,
                                     color: number,
                                     description: Nullable<string>,
+                                    image?: { url: string }
                                     footer: { text: string, value: string }
                                 }[]
                         } = {
@@ -78,6 +79,7 @@ export = {
                                     title: wrappedTag.data.TagEmbedTitle,
                                     color: global.embedColor,
                                     description: embedObject?.description,
+                                    image: { url: wrappedTag.data.TagEmbedImageURL },
                                     footer: embedObject?.footer
                                 }
                             ]

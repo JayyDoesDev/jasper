@@ -15,6 +15,7 @@ export async function TagCreate(tagCreateOptions: TagCreateOptions): Promise<voi
         TagAuthor: options.author,
         TagEmbedTitle: options.title,
         TagEmbedDescription: options.description,
+        TagEmbedImageURL: options.image_url,
         TagEmbedFooter: options.footer,
     });
 
@@ -29,6 +30,7 @@ export async function TagCreate(tagCreateOptions: TagCreateOptions): Promise<voi
                     TagResponse: {
                         TagEmbedTitle: options.title,
                         TagEmbedDescription: options.description || null,
+                        TagEmbedImageURL: options.image_url || null,
                         TagEmbedFooter: options.footer || null,
                     },
                 },

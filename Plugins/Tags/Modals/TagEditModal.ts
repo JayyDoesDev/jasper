@@ -28,10 +28,14 @@ export = {
                     name: interaction.fields.getTextInputValue("tag_edit_embed_name"),
                     title: interaction.fields.getTextInputValue("tag_edit_embed_title"),
                     description: interaction.fields.getTextInputValue("tag_edit_embed_description") ? interaction.fields.getTextInputValue("tag_edit_embed_description") : null,
+                    image_url: interaction.fields.getTextInputValue("tag_edit_embed_image_url") ? interaction.fields.getTextInputValue("tag_edit_embed_image_url") : null,
                     footer: interaction.fields.getTextInputValue("tag_edit_embed_footer") ? interaction.fields.getTextInputValue("tag_edit_embed_footer") : null
                 };
+                if (!/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tag.image_url)) {
+                    return interaction.reply({ content: `> The provided image link is not a valid image URL!`, ephemeral: true });
+                }     
                 if (await TagExists({ guildId: interaction.guild.id, name: tag.name, ctx: ctx })) {
-                    await TagEdit({ guildId: interaction.guild.id, options: { name: tag.name, title: tag.title, description: tag.description, footer: tag.footer }, ctx: ctx })
+                    await TagEdit({ guildId: interaction.guild.id, options: { name: tag.name, title: tag.title, description: tag.description, image_url: tag.image_url, footer: tag.footer }, ctx: ctx })
                     const getTag: TagResponse = await TagGet({ name: tag.name, guildId: interaction.guild.id, ctx: ctx });
                     const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", Record<"text", string>>]>> = {};
                     tag.description ? embedObject["description"] = tag.description : embedObject["description"] = getTag.TagEmbedDescription;
@@ -43,6 +47,7 @@ export = {
                                 title: tag.title || getTag.TagEmbedTitle,
                                 color: 0x323338,
                                 description: embedObject?.description,
+                                image: tag.image_url ? { url: tag.image_url } : undefined,
                                 footer: embedObject?.footer
                             }
                         ],
