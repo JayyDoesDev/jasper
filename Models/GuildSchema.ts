@@ -13,6 +13,7 @@ export default model<GuildDocument>("support-tags", new Schema(
                   TagResponse: {
                       TagEmbedTitle: { type: String, default: undefined, required: true },
                       TagEmbedDescription: { type: String, default: null },
+                      TagEmbedImageURL: { type: String, default: null },
                       TagEmbedFooter: { type: String, default: null }
                   }
               }

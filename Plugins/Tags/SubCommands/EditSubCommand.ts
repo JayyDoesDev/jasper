@@ -68,6 +68,20 @@ export async function RunEditSubCommand(ctx: Context, interaction: ChatInputComm
                     components: [
                       {
                         type: ComponentType.TextInput,
+                        customId: "tag_edit_embed_image_url",
+                        label: "Embed Image URL",
+                        placeholder: "https://i.pinimg.com/originals/ba/92/7f/ba927ff34cd961ce2c184d47e8ead9f6.jpg",
+                        maxLength: 500,
+                        style: TextInputStyle.Short,
+                        required: false
+                      }
+                    ]
+                  },
+                  {
+                    type: ComponentType.ActionRow,
+                    components: [
+                      {
+                        type: ComponentType.TextInput,
                         customId: "tag_edit_embed_footer",
                         label: "Embed Footer",
                         placeholder: "Make sure to be patient!",
