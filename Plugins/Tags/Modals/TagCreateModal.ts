@@ -31,17 +31,20 @@ export = {
                     image_url: interaction.fields.getTextInputValue("tag_create_embed_image_url") ? interaction.fields.getTextInputValue("tag_create_embed_image_url") : null,
                     footer: interaction.fields.getTextInputValue("tag_create_embed_footer") ? interaction.fields.getTextInputValue("tag_create_embed_footer") : null
                 };
+                
                 if (await TagExists({ guildId: interaction.guild.id, name: tag.name, ctx: ctx })) {
                     return interaction.reply({ content: `> The support tag \`${ tag.name }\` already exists!`, ephemeral: true });
                 }
+                
                 if (tag.image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tag.image_url)) {
                     return interaction.reply({ content: `> The provided image link is not a valid image URL!`, ephemeral: true });
-                }                                               
-                else {
+                } else {
                     await TagCreate({ guildId: interaction.guild.id, options: { author: tag.author, name: tag.name, title: tag.title, description: tag.description, image_url: tag.image_url, footer: tag.footer }, ctx: ctx });
                     const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", Record<"text", string>>]>> = {};
+                    
                     tag.description ? embedObject["description"] = tag.description : embedObject["description"] = null;
                     tag.footer ? embedObject["footer"] = { text: tag.footer } : embedObject["footer"] = null;
+                    
                     return interaction.reply({
                         content: `${ Emojis.CHECK_MARK } Successfully created \`${ tag.name }\`!`,
                         embeds: [
