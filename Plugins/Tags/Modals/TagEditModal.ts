@@ -31,9 +31,9 @@ export = {
                     image_url: interaction.fields.getTextInputValue("tag_edit_embed_image_url") ? interaction.fields.getTextInputValue("tag_edit_embed_image_url") : null,
                     footer: interaction.fields.getTextInputValue("tag_edit_embed_footer") ? interaction.fields.getTextInputValue("tag_edit_embed_footer") : null
                 };
-                if (!/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tag.image_url)) {
+                if (tag.image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tag.image_url)) {
                     return interaction.reply({ content: `> The provided image link is not a valid image URL!`, ephemeral: true });
-                }     
+                }                
                 if (await TagExists({ guildId: interaction.guild.id, name: tag.name, ctx: ctx })) {
                     await TagEdit({ guildId: interaction.guild.id, options: { name: tag.name, title: tag.title, description: tag.description, image_url: tag.image_url, footer: tag.footer }, ctx: ctx })
                     const getTag: TagResponse = await TagGet({ name: tag.name, guildId: interaction.guild.id, ctx: ctx });

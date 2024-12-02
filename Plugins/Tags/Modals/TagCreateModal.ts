@@ -34,9 +34,9 @@ export = {
                 if (await TagExists({ guildId: interaction.guild.id, name: tag.name, ctx: ctx })) {
                     return interaction.reply({ content: `> The support tag \`${ tag.name }\` already exists!`, ephemeral: true });
                 }
-                if (!/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tag.image_url)) {
+                if (tag.image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tag.image_url)) {
                     return interaction.reply({ content: `> The provided image link is not a valid image URL!`, ephemeral: true });
-                }                                         
+                }                                               
                 else {
                     await TagCreate({ guildId: interaction.guild.id, options: { author: tag.author, name: tag.name, title: tag.title, description: tag.description, image_url: tag.image_url, footer: tag.footer }, ctx: ctx });
                     const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", Record<"text", string>>]>> = {};
