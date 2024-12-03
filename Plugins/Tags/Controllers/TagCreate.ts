@@ -13,6 +13,7 @@ export async function TagCreate(tagCreateOptions: TagCreateOptions): Promise<voi
     cachedTags.push({
         TagName: options.name.trim(),
         TagAuthor: options.author,
+        TagEditedBy: options.editedBy,
         TagEmbedTitle: options.title,
         TagEmbedDescription: options.description,
         TagEmbedImageURL: options.image_url,
@@ -27,6 +28,7 @@ export async function TagCreate(tagCreateOptions: TagCreateOptions): Promise<voi
                 Tags: {
                     TagName: options.name.trim(),
                     TagAuthor: options.author,
+                    TagEditedBy: options.editedBy,
                     TagResponse: {
                         TagEmbedTitle: options.title,
                         TagEmbedDescription: options.description || null,

@@ -18,6 +18,7 @@ export async function TagsGet(guildId: Snowflake, ctx: Context): Promise<Tag[]> 
             for (const tag of tags) {
               filteredTags.push({
                 TagAuthor: tag.TagAuthor,
+                TagEditedBy: tag.TagEditedBy,
                 TagName: tag.TagName,
                 TagEmbedTitle: tag.TagResponse.TagEmbedTitle,
                 TagEmbedDescription: tag.TagResponse.TagEmbedDescription,

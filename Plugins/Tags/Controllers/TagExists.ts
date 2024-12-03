@@ -37,6 +37,7 @@ export async function TagExists(options: commonOptions): Promise<boolean> {
         if (findTag) {
             const newTag: TagResponse = {
                 TagAuthor: findTag.TagAuthor,
+                TagEditedBy: findTag.TagEditedBy,
                 TagName: findTag.TagName,
                 TagEmbedTitle: findTag.TagResponse.TagEmbedTitle,
                 TagEmbedDescription: findTag.TagResponse.TagEmbedDescription,

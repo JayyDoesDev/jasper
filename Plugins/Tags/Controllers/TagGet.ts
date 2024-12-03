@@ -14,6 +14,7 @@ export async function TagGet(options: commonOptions): Promise<TagResponse> {
         
         return {
               TagAuthor: findTag.TagAuthor,
+              TagEditedBy: findTag.TagEditedBy,
               TagName: findTag.TagName,
               TagEmbedTitle: findTag.TagEmbedTitle,
               TagEmbedDescription: findTag.TagEmbedDescription,

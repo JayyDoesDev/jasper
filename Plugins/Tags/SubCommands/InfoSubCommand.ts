@@ -29,14 +29,14 @@ export async function RunInfoSubCommand(ctx: Context, interaction: ChatInputComm
         interaction: interaction,
         callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const tagName: string = interaction.options.getString("tag-name");
-            if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx})) {
+            if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
                 const getTag: TagResponse = await TagGet({ name: tagName, guildId: interaction.guild.id, ctx: ctx });
                 return interaction.reply({
                     embeds: [
                         {
                             title: tagName,
                             color: global.embedColor,
-                            description: `> **Created by ${ getTag.TagAuthor ? `<@${ getTag.TagAuthor }>` : "Unknown" }**`
+                            description: `> **Created by ${getTag.TagAuthor ? `<@${getTag.TagAuthor}>` : "Unknown"}**\n**> Edited By ${getTag.TagEditedBy ? `<@${getTag.TagEditedBy}>` : "None"}**`
                         }
                     ],
                     ephemeral: true
@@ -54,9 +54,9 @@ export async function RunInfoSubCommand(ctx: Context, interaction: ChatInputComm
 
             const filteredTags = focus.length > 0 ? tags.filter((x) => x.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
             await interaction.respond(filteredTags.map((x) => ({
-                    name: x.TagName,
-                    value: x.TagName,
-                })
+                name: x.TagName,
+                value: x.TagName,
+            })
             ).slice(0, 20));
         }
     });

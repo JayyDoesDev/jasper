@@ -10,6 +10,7 @@ export default model<GuildDocument>("support-tags", new Schema(
               {
                   TagName: String,
                   TagAuthor: String,
+                  TagEditedBy: { type: String, default: null },
                   TagResponse: {
                       TagEmbedTitle: { type: String, default: undefined, required: true },
                       TagEmbedDescription: { type: String, default: null },

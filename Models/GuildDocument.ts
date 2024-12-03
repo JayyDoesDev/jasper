@@ -11,6 +11,7 @@ export interface GuildDocument extends Document {
 export type Tag = {
     TagName: string;
     TagAuthor: Snowflake;
+    TagEditedBy: Nullable<Snowflake>;
     TagResponse: {
         TagEmbedTitle: string;
         TagEmbedDescription: Nullable<string>;

@@ -25,6 +25,7 @@ export async function TagEdit(tagEditOptions: TagCreateOptions): Promise<void> {
         cachedTags[tagIndex] = {
             TagAuthor: originalTag.TagAuthor,
             TagName: options.name,
+            TagEditedBy: options.editedBy,
             TagEmbedTitle: options.title ?? originalTag.TagEmbedTitle,
             TagEmbedDescription:
                 options.description ?? originalTag.TagEmbedDescription,
@@ -44,6 +45,7 @@ export async function TagEdit(tagEditOptions: TagCreateOptions): Promise<void> {
         },
         {
             $set: {
+                "Tags.$.TagEditedBy": options.editedBy,
                 "Tags.$.TagResponse.TagEmbedTitle":
                     options.title ?? cachedTags[tagIndex].TagEmbedTitle,
                 "Tags.$.TagResponse.TagEmbedDescription":

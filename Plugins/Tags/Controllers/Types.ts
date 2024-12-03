@@ -15,6 +15,7 @@ export type UserSnowflake = Record<"user", Snowflake>;
 
 export type TagOptions = {
     author?: Snowflake;
+    editedBy?: Nullable<Snowflake>;
     name: string;
     title: string;
     description: Nullable<string>;
@@ -25,6 +26,7 @@ export type TagOptions = {
 export type TagResponse = {
   TagAuthor: Snowflake;
   TagName: string;
+  TagEditedBy: Nullable<Snowflake>;
   TagEmbedTitle: Nullable<string>;
   TagEmbedDescription: Nullable<string>;
   TagEmbedImageURL: Nullable<string>;
