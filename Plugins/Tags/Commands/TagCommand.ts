@@ -15,8 +15,10 @@ import {
   RunListSubCommand,
   RunShowSubCommand,
   RunUseSubCommand,
+  RunRawSubCommand,
   ShowSubCommand,
-  UseSubCommand
+  UseSubCommand,
+  RawSubCommand,
 } from "../SubCommands";
 import { CheckForRoles } from "../../../Common/CheckForRoles";
 import { TagGet } from "../Controllers/TagGet";
@@ -29,6 +31,7 @@ const subCommands: ApplicationCommandOptions[] = [
   ShowSubCommand,
   InfoSubCommand,
   UseSubCommand,
+  RawSubCommand,
 ];
 
 export = {
@@ -76,6 +79,9 @@ export = {
           case 'use':
             await RunUseSubCommand(ctx, interaction);
             break;
+          case 'raw':
+            await RunRawSubCommand(ctx, interaction);
+            break;
         }
       } else {
         return interaction.reply({
@@ -104,6 +110,9 @@ export = {
           break;
         case 'info':
           await RunInfoSubCommand(ctx, interaction);
+          break;
+        case 'raw':
+          await RunRawSubCommand(ctx, interaction);
           break;
         default:
           return interaction.respond([]);
