@@ -5,3 +5,4 @@ export * from "./EditSubCommand";
 export * from "./ShowSubCommand";
 export * from "./InfoSubCommand";
 export * from "./UseSubCommand";
+export * from "./RawSubCommand";
