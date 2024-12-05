@@ -36,7 +36,7 @@ export async function RunInfoSubCommand(ctx: Context, interaction: ChatInputComm
                         {
                             title: tagName,
                             color: global.embedColor,
-                            description: `> **Created by ${getTag.TagAuthor ? `<@${getTag.TagAuthor}>` : "Unknown"}**\n**> Edited By ${getTag.TagEditedBy ? `<@${getTag.TagEditedBy}>` : "None"}**`
+                            description: `> **Created by ${getTag.TagAuthor ? `<@${getTag.TagAuthor}>` : "Unknown"}**\n**> Edited by ${getTag.TagEditedBy ? `<@${getTag.TagEditedBy}>` : "None"}**`
                         }
                     ],
                     ephemeral: true
