@@ -1,2 +1,1 @@
-export type Nullable<T> = T | null;
-
+export type Nullable<T> = T extends null ? T : T | null;

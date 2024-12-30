@@ -7,6 +7,11 @@ import { Store } from "./Store";
 import { State } from "../Plugins/types";
 import { Env } from "./Env";
 import path from "path";
+import TagController from "../Controllers/TagController";
+
+type Controllers = {
+    tags: TagController;
+}
 
 export class Context extends Client {
     public plugin: ZillaCollection<string, Plugin>;
@@ -15,6 +20,7 @@ export class Context extends Client {
     public pagination: ZillaCollection<Snowflake, State>;
     public env: Env;
     public store: Store;
+    public controllers: Controllers;
 
     constructor() {
         super({
@@ -87,5 +93,6 @@ export class Context extends Client {
           { env: "SLOWMODE_RESET_TIME", aliases: ["slowmode_reset_time"] }
       );
       this.store = new Store(this);
+      this.controllers = { tags: new TagController(this) }
     }
 }
