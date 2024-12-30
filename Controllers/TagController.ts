@@ -106,7 +106,14 @@ class TagController extends Controller {
     }
 
     public async getValues<T, R>(get: T extends Options ? Options : null): Promise<CommonCondition<R extends TagResponse ? TagResponse : null>> {
-        const { guildId, name } = { ...get };
+        let guildId = this.guildId;
+        let name = this.name;
+
+        if (!this.#checkConfig() && get) {
+            guildId = get.guildId;
+            name = get.name;
+        }
+
         const key = this.#makeGuildKey(guildId);
 
         if (!(await this.ctx.controllers.tags.itemExists<Options>({ guildId, name }))) return null;
@@ -168,7 +175,51 @@ class TagController extends Controller {
         return <CommonCondition<R>>undefined;
     }
 
-    public modify<R>(): CommonCondition<R> | Promise<CommonCondition<R>> {
+    public async modify<T, R>(mod?: T extends Options ? Options & { tag?: Tag } : null): Promise<CommonCondition<R>> {
+        let guildId = this.guildId;
+        let name = this.name;
+        let tag = this.tag;
+
+        if (!this.#checkConfig() && mod) {
+            guildId = mod.guildId;
+            name = mod.name;
+            tag = mod.tag ?? { author: "", editedBy: null, name: "", title: "", description: null, image_url: null, footer: null };
+        }
+
+        const key = this.#makeGuildKey(guildId);
+
+        if (!(await this.ctx.controllers.tags.itemExists<Options>({ guildId, name }))) console.log("Tag not found");
+
+        let tags = await this.ctx.store.getGuild<TagResponse[]>(key);
+
+        if (!Array.isArray(tags)) tags = [];
+
+        const index = tags.findIndex((tag) => tag.TagName === name);
+
+        if (index !== -1) {
+            const { TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = tags[index];
+            tags[index] = { TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter };
+        } else {
+            console.log("Tag not found in cache");
+        }
+
+        this.ctx.store.setKey(key, ...tags);
+
+        const { TagName, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = tags[index];
+
+        await TagSchema.findOneAndUpdate(
+            { _id: guildId, "Tags.TagName": TagName },
+            {
+                $set: {
+                    "Tags.$.TagEditedBy": TagEditedBy,
+                    "Tags.$.TagResponse.TagEmbedTitle": TagEmbedTitle,
+                    "Tags.$.TagResponse.TagEmbedDescription": TagEmbedDescription,
+                    "Tags.$.TagResponse.TagEmbedImageURL": TagEmbedImageURL,
+                    "Tags.$.TagResponse.TagEmbedFooter": TagEmbedFooter
+                }
+            }
+        )
+
         return <CommonCondition<R>>null;
     }
 
