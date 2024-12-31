@@ -31,7 +31,7 @@ export = DefinePlugin({
                 }
 
                 if (messageCount >= ctx.env.get<number>("slowmode_msg_threshold")) {
-                    const multiplier: number = Math.max(Math.floor(messageCount / 3.5), 1);
+                    const multiplier: number = Math.max(Math.floor(messageCount / 3.5), 2);
 
                     const currentTime = Date.now();
                     if (currentTime - lastSlowmodeChange > ctx.env.get<number>("slowmode_cooldown")) {
