@@ -13,7 +13,7 @@ export type Options = {
 export type Tag = {
     author?: Snowflake;
     editedBy?: Nullable<Snowflake>;
-    name: string;
+    name?: string;
     title: string;
     description: Nullable<string>;
     image_url: Nullable<string>;
@@ -196,16 +196,22 @@ class TagController extends Controller {
 
         const index = tags.findIndex((tag) => tag.TagName === name);
 
+        const TagName = tag.name;
+        const TagEditedBy = tag.editedBy;
+        const TagEmbedTitle = tag.title;
+        const TagEmbedDescription = tag.description;
+        const TagEmbedImageURL = tag.image_url;
+        const TagEmbedFooter = tag.footer;
+
         if (index !== -1) {
-            const { TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = tags[index];
+            const { TagAuthor } = tags[index];
+
             tags[index] = { TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter };
         } else {
             console.log("Tag not found in cache");
         }
 
         this.ctx.store.setKey(key, ...tags);
-
-        const { TagName, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = tags[index];
 
         await TagSchema.findOneAndUpdate(
             { _id: guildId, "Tags.TagName": TagName },

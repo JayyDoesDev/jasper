@@ -22,6 +22,7 @@ export = {
                 const description = interaction.fields.getTextInputValue("tag_create_embed_description") ?? null;
                 const image_url = interaction.fields.getTextInputValue("tag_create_embed_image_url") ?? null;
                 const footer = interaction.fields.getTextInputValue("tag_create_embed_footer") ?? null;
+                
                 ctx.controllers.tags.configure<Options>({ guildId: interaction.guild.id, name, tag: { name, title, author, description, image_url, footer } });
 
                 if (await ctx.controllers.tags.itemExists<Options>()) {

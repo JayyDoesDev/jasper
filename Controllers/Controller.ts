@@ -31,5 +31,5 @@ export abstract class Controller extends Store implements IController {
     public abstract create<T, R>(create?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
     public abstract modify<T, R>(mod?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
     public abstract delete<T, R>(d?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
-    public abstract getMultiValues<T, R extends Array<T>>(getMultiValues?: T): Promise<CommonCondition<R>> | CommonCondition<R>;;
+    public abstract getMultiValues<T, R extends Array<T>>(getMultiValues?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
 }
