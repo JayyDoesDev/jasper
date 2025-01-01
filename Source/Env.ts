@@ -1,37 +1,39 @@
-/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Nullable } from "../Common/Nullable";
 
 export class Env {
-    #tokens: { env: string, aliases: string[], }[];
-    constructor(...tokens: { env: string, aliases: string[], }[]) {
-      this.#tokens = tokens;
+  #tokens: { env: string, aliases: string[] }[];
+
+  constructor(...tokens: { env: string, aliases: string[] }[]) {
+    this.#tokens = tokens;
   }
 
-  public get<T>(env: string): T {
-    let token: Nullable<any> = null;
+  public get<T extends string, R = string>(env: T): Nullable<R> {
+    let token: Nullable<R> = null;
 
-    const matchingToken: { env: string, aliases: string[] } = this.#tokens.find(t => t.env === env);
+    const matchingToken = this.#tokens.find(t => t.env === env);
+
     if (matchingToken) {
-        token = process.env[env] || null;
+      token = process.env[env] as Nullable<R>;
     } else {
-        for (const tokenObj of this.#tokens) {
-            if (tokenObj.aliases.includes(env)) {
-                token = process.env[tokenObj.env] || null;
-                break;
-            }
-          }
+      for (const tokenObj of this.#tokens) {
+        if (tokenObj.aliases.includes(env)) {
+          token = <Nullable<R>>process.env[tokenObj.env];
+          break;
+        }
       }
-
-      return token;
     }
 
-    public validate(): void {
-      const tableData: { Status: string, Env: string }[] = [];
+    return token;
+  }
 
-      for (const token of this.#tokens) {
-          const checkToken = this.get(token.env);
-          tableData.push({ Status: checkToken === null ? "Invalid" : "Valid", Env: token.env });
-      }
-      console.table(tableData);
+  public validate(): void {
+    const tableData: { Status: string, Env: string }[] = [];
+
+    for (const token of this.#tokens) {
+      const checkToken = this.get<string, string>(token.env);
+      tableData.push({ Status: checkToken === null ? "Invalid" : "Valid", Env: token.env });
     }
+
+    console.table(tableData);
+  }
 }

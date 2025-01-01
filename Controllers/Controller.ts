@@ -11,10 +11,10 @@ export type CommonCondition<R> =
 
 interface IController {
     configure<T>(config: T): ThisParameterType<this>;
-    itemExists<T>(exists: T): CommonCondition<boolean> | Promise<CommonCondition<boolean>>;
-    getValues<T, R>(get: T): CommonCondition<R> | Promise<CommonCondition<R>>;
-    create<T, R>(create: T): Promise<CommonCondition<R>> | CommonCondition<R>;
-    modify<T, R>(mod: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    itemExists<T>(exists?: T): CommonCondition<boolean> | Promise<CommonCondition<boolean>>;
+    getValues<T, R>(get?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
+    create<T, R>(create?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    modify<T, R>(mod?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
     getMultiValues<T, R>(getMultiValues?: T):
         CommonCondition<
             R extends R[] ? R[] :

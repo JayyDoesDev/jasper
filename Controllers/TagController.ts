@@ -106,7 +106,7 @@ class TagController extends Controller {
         return false;
     }
 
-    public async getValues<T, R>(get: T extends Options ? Options : null): Promise<CommonCondition<R extends TagResponse ? TagResponse : null>> {
+    public async getValues<T, R>(get?: T extends Options ? Options : null): Promise<CommonCondition<R extends TagResponse ? TagResponse : null>> {
         let guildId = this.guildId;
         let name = this.name;
 

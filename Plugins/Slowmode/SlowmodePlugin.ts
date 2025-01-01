@@ -23,18 +23,18 @@ export = DefinePlugin({
                 const channel: TextChannel = ctx.channels.resolve(ctx.env.get("slowmode_channel"));
 
                 if (message.channel.id !== channel.id) return;
-                if (Date.now() - messageWindowStart > ctx.env.get<number>("slowmode_msg_time")) {
+                if (Date.now() - messageWindowStart > ctx.env.get<string, number>("slowmode_msg_time")) {
                     messageCount = 1;
                     messageWindowStart = Date.now();
                 } else {
                     messageCount += 1;
                 }
 
-                if (messageCount >= ctx.env.get<number>("slowmode_msg_threshold")) {
+                if (messageCount >= ctx.env.get<string, number>("slowmode_msg_threshold")) {
                     const multiplier: number = Math.max(Math.floor(messageCount / 3.5), 2);
 
                     const currentTime = Date.now();
-                    if (currentTime - lastSlowmodeChange > ctx.env.get<number>("slowmode_cooldown")) {
+                    if (currentTime - lastSlowmodeChange > ctx.env.get<string, number>("slowmode_cooldown")) {
                         lastSlowmodeChange = currentTime;
                         await channel.setRateLimitPerUser(multiplier).catch(() => { return; });
 
