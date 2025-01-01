@@ -4,6 +4,7 @@ import { Context } from "../Source/Context";
 import { CommonCondition, Controller } from "./Controller";
 import TagSchema from "../Models/GuildSchema";
 import GuildSchema from "../Models/GuildSchema";
+import { Tag as ExtTag } from "../Models/GuildDocument";
 
 export type Options = {
     guildId: Snowflake;
@@ -229,11 +230,40 @@ class TagController extends Controller {
         return <CommonCondition<R>>null;
     }
 
-    public delete<R>(): CommonCondition<R> | Promise<CommonCondition<R>> {
-        return <CommonCondition<R>>null;
+    public async getMultiValues<T, R>(getMultiValues?: T): Promise<CommonCondition<R>> {
+        let guildId = this.guildId;
+
+        if (!this.#checkConfig() && getMultiValues) {
+            guildId = guildId;
+        }
+
+        const key = this.#makeGuildKey(guildId);
+
+        let tags = await this.ctx.store.getGuild<ExtTag[]>(key);
+
+        if (!Array.isArray(tags) || tags.length === 0) {
+            const guild = await TagSchema.findOne({ _id: guildId });
+
+            if (guild) {
+                tags = guild.Tags;
+
+                const filteredTags = [];
+
+                for (const tag of tags) {
+                    const { TagAuthor, TagEditedBy, TagName, TagResponse } = tag;
+                    const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = TagResponse;
+                    filteredTags.push({ TagAuthor, TagEditedBy, TagName, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter });
+                }
+            } else {
+                tags = [];
+            }
+
+        }
+
+        return <CommonCondition<R>>tags;
     }
 
-    public getMultiValues<T, R extends Array<T>>(): CommonCondition<R> | Promise<CommonCondition<R>> {
+    public delete<R>(): CommonCondition<R> | Promise<CommonCondition<R>> {
         return <CommonCondition<R>>null;
     }
 }
