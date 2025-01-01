@@ -230,11 +230,11 @@ class TagController extends Controller {
         return <CommonCondition<R>>null;
     }
 
-    public async getMultiValues<T, R>(getMultiValues?: T): Promise<CommonCondition<R>> {
+    public async getMultiValues<T, R>(getMultiValues?: T extends Snowflake ? Snowflake : null): Promise<CommonCondition<R>> {
         let guildId = this.guildId;
 
         if (!this.#checkConfig() && getMultiValues) {
-            guildId = guildId;
+            guildId = getMultiValues;
         }
 
         const key = this.#makeGuildKey(guildId);
@@ -257,14 +257,36 @@ class TagController extends Controller {
             } else {
                 tags = [];
             }
-
         }
-
         return <CommonCondition<R>>tags;
     }
 
-    public delete<R>(): CommonCondition<R> | Promise<CommonCondition<R>> {
-        return <CommonCondition<R>>null;
+    public async delete<T, R>(d?: T extends Options ? Options : null): Promise<CommonCondition<R>> {
+        let guildId = this.guildId;
+        let name = this.name;
+
+        if (!this.#checkConfig() && d) {
+            guildId = d.guildId;
+            name = d.name;
+        }
+
+        const key = this.#makeGuildKey(guildId);
+
+        const tag = await this.itemExists<Options>({ guildId, name });
+
+        if (tag) {
+            const tags = await this.ctx.store.getGuild<TagResponse[]>(key);
+            const index = tags.findIndex((tag) => tag.TagName === name);
+
+            tags.splice(index, 1);
+            this.ctx.store.setKey(key, ...tags);
+
+            await TagSchema.updateOne({ _id: guildId }, { $pull: { Tags: { TagName: name } } } );
+
+            return <CommonCondition<R>>true;
+        } 
+        
+        return <CommonCondition<R>>false;
     }
 }
 

@@ -1,11 +1,8 @@
 import { Context } from "../../../Source/Context";
-import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
-import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
+import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
-import { TagExists } from "../Controllers/TagExists";
-import { TagDelete } from "../Controllers/TagDelete";
 import { Emojis } from "../../../Common/Emojis";
-import { TagsGet } from "../Controllers/TagsGet";
+import { Options, TagResponse } from "../../../Controllers/TagController";
 
 export const DeleteSubCommand: ApplicationCommandOptions = {
     name: "delete",
@@ -23,35 +20,29 @@ export const DeleteSubCommand: ApplicationCommandOptions = {
 } as ApplicationCommandOptions;
 
 export async function RunDeleteSubCommand(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
-    await RegisterSubCommand({
-        subCommand: "delete",
-        ctx: ctx,
-        interaction: interaction,
-        callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
-            const tagName: string = interaction.options.getString("tag-name");
-            if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
-                await TagDelete({ guildId: interaction.guild.id, name: tagName, ctx: ctx });
-                return interaction.reply({
-                    content: `${ Emojis.CHECK_MARK } Successfully deleted \`${ tagName }\`!`,
-                    ephemeral: true
-                })
-            } else {
-                return interaction.reply({
-                    content: `Tag not found!`,
-                    ephemeral: true
-                })
-            }
-        },
-        autocomplete: async (ctx, interaction) => {
-            const focus = interaction.options.getFocused();
-            const tags = await TagsGet(interaction.guild.id, ctx);
+    if (interaction.isChatInputCommand()) {
+        if (interaction.options.getSubcommand() === DeleteSubCommand.name) {
+            const guildId = interaction.guild.id;
+            const name = interaction.options.getString('tag-name');
 
-            const filteredTags = focus.length > 0 ? tags.filter((x) => x.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
-            await interaction.respond(filteredTags.map((x) => ({
-                    name: x.TagName,
-                    value: x.TagName,
-                })
-            ).slice(0, 20));
+            await ctx.controllers.tags.configure<Options>({ guildId, name });
+
+            const isDeleted = await ctx.controllers.tags.delete<Options, boolean>();
+
+            if (isDeleted) return interaction.reply({ content: `${Emojis.CHECK_MARK} Successfully deleted \`${name}\`!`, ephemeral: true });
+
+            return interaction.reply({ content: 'Tag not found!', ephemeral: true });
         }
-    });
+    }
+
+    if (interaction.isAutocomplete()) {
+        if (interaction.options.getSubcommand() === DeleteSubCommand.name) {
+            const focus = interaction.options.getFocused();
+            
+            const tags = await ctx.controllers.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
+            const filteredTags = focus.length > 0 ? tags.filter((tag) => tag.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
+
+            await interaction.respond(filteredTags.map((tag) => ({ name: tag.TagName, value: tag.TagName })).slice(0, 20));
+        }
+    }
 }

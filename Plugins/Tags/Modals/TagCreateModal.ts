@@ -12,9 +12,7 @@ export = {
         },
         on: async (interaction: ModalSubmitInteraction, ctx: Context) => {
             if (interaction.customId === `tag_create_${interaction.user.id}`) {
-                if (!interaction.isModalSubmit()) {
-                    return;
-                }
+                if (!interaction.isModalSubmit()) return;
 
                 const name = interaction.fields.getTextInputValue("tag_create_embed_name");
                 const title = interaction.fields.getTextInputValue("tag_create_embed_title");
