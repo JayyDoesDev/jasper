@@ -157,6 +157,8 @@ class TagController extends Controller {
         const TagEmbedFooter = tag.footer ?? null;
 
         cache.push({ TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter });
+        
+        this.ctx.store.setKey(key, ...cache);
         await TagSchema.updateOne(
             { _id: guildId },
             {
@@ -199,10 +201,10 @@ class TagController extends Controller {
 
         const TagName = tag.name;
         const TagEditedBy = tag.editedBy;
-        const TagEmbedTitle = tag.title;
-        const TagEmbedDescription = tag.description;
-        const TagEmbedImageURL = tag.image_url;
-        const TagEmbedFooter = tag.footer;
+        const TagEmbedTitle = tag.title ?? tags[index].TagEmbedTitle;
+        const TagEmbedDescription = tag.description ?? tags[index].TagEmbedDescription;
+        const TagEmbedImageURL = tag.image_url ?? tags[index].TagEmbedImageURL;
+        const TagEmbedFooter = tag.footer ?? tags[index].TagEmbedFooter;
 
         if (index !== -1) {
             const { TagAuthor } = tags[index];

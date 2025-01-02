@@ -1,12 +1,7 @@
-import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
+import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
-import { GuildExists } from "../../../Common/GuildExists";
-import TagSchema from "../../../Models/GuildSchema";
-import { Wrap } from "../../../Common/Wrap";
 import { Tag } from "../../../Models/GuildDocument";
-import { State } from "../../types";
 
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
@@ -24,62 +19,58 @@ export const ListSubCommand: ApplicationCommandOptions = {
 } as ApplicationCommandOptions;
 
 export async function RunListSubCommand(ctx: Context, interaction: ChatInputCommandInteraction) {
-    await RegisterSubCommand({
-        subCommand: "list",
-        ctx: ctx,
-        interaction: interaction,
-        callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
-            if (await GuildExists(interaction.guild.id)) {
-                const dbtags = await Wrap(TagSchema.findOne({ _id: interaction.guild.id }));
-                const tags: Tag[] = dbtags.data.Tags;
-                const tagPages: Tag[][] = chunkArray(tags, 10);
+    if (interaction.isChatInputCommand()) {
+      if (interaction.options.getSubcommand() === ListSubCommand.name) {
+        const guildId = interaction.guild.id;
 
-                ctx.pagination.set(interaction.user.id, { page: 0, tagPages });
-                const userState: State = ctx.pagination.get(interaction.user.id);
+        const tags = await ctx.controllers.tags.getMultiValues<Snowflake, Tag[]>(guildId);
 
-                return interaction.reply({
-                    embeds: [
-                      {
-                        thumbnail: { url: interaction.guild.iconURL() },
-                        title: `Server Tag List`,
-                        description: userState.tagPages[userState.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
-                        footer: { text: `Page: ${userState.page + 1}/${userState.tagPages.length} • emojis by AnThOnY & deussa`},
-                        color: global.embedColor,
-                      }
-                    ],
-                    components: [
-                      {
-                        type: ComponentType.ActionRow,
-                        components: [
-                          {
-                            type: ComponentType.Button,
-                            customId: `list_subcommand_button_previous_${interaction.user.id}`,
-                            style: ButtonStyle.Primary,
-                            emoji: "1268419004691779624",
-                          },
-                          {
-                            type: ComponentType.Button,
-                            customId: `list_subcommand_button_home_${interaction.user.id}`,
-                            style: ButtonStyle.Secondary,
-                            emoji: "1268421558066479214",
-                          },
-                          {
-                            type: ComponentType.Button,
-                            customId: `list_subcommand_button_next_${interaction.user.id}`,
-                            style: ButtonStyle.Primary,
-                            emoji: "1268418951407468556",
-                          },
-                        ]
-                      }
-                    ],
-                    ephemeral: true
-                });
-            } else {
-                return interaction.reply({
-                    content: "Couldn't find any tags for this guild!",
-                    ephemeral: true
-                });
+        if (!tags || tags.length === 0) return interaction.reply({ content: 'Couldn\'t find any tags for this guild!', ephemeral: true });
+
+        const tagPages = chunkArray(tags, 10);
+
+        ctx.pagination.set(interaction.user.id, { page: 0, tagPages });
+
+        const state = ctx.pagination.get(interaction.user.id);
+
+        return interaction.reply({
+          embeds: [
+            {
+              thumbnail: { url: interaction.guild.iconURL() },
+              title: `Server Tag List`,
+              description: state.tagPages[state.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
+              footer: { text: `Page: ${state.page + 1}/${state.tagPages.length} • emojis by AnThOnY & deussa`},
+              color: global.embedColor,
             }
-        }
-    })
+          ],
+          components: [
+            {
+              type: ComponentType.ActionRow,
+              components: [
+                {
+                  type: ComponentType.Button,
+                  customId: `list_subcommand_button_previous_${interaction.user.id}`,
+                  style: ButtonStyle.Primary,
+                  emoji: "1268419004691779624",
+                },
+                {
+                  type: ComponentType.Button,
+                  customId: `list_subcommand_button_home_${interaction.user.id}`,
+                  style: ButtonStyle.Secondary,
+                  emoji: "1268421558066479214",
+                },
+                {
+                  type: ComponentType.Button,
+                  customId: `list_subcommand_button_next_${interaction.user.id}`,
+                  style: ButtonStyle.Primary,
+                  emoji: "1268418951407468556",
+                },
+              ]
+            }
+          ],
+          ephemeral: true
+      });
+
+      }
+    }
 }
