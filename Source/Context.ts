@@ -6,7 +6,6 @@ import { Plugin } from "../Common/DefinePlugin";
 import { Store } from "./Store";
 import { State } from "../Plugins/types";
 import { Env } from "./Env";
-import path from "path";
 import TagController from "../Controllers/TagController";
 
 
@@ -46,9 +45,9 @@ export class Context extends Client {
             presence: {
                 activities: [
                     {
-                        name: "Latest Video",
-                        state: "subscrib 4 a kis",
-                        url: `https://www.youtube.com/watch?v=${require(path.join(process.cwd(), "latestvideo.json")).video}`,
+                        name: "Jasper",
+                        state: "Working with support and handling slowmode",
+                        url: `https://www.youtube.com/watch?v=avideothatdoesntexist`,
                         type: ActivityType.Streaming
                     }
                 ]
