@@ -63,6 +63,14 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Autocomplete`
 
+### `/` `tags` `raw` <_tag_name_>
+
+> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
+
+> **Description**: Get the raw content of a tag and sent it as an ephemeral text attachment file.
+
+> **Feature Flags**: `Autocomplete`
+
 ### `/` `tags` `use` <_tag_name_>
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
