@@ -1,10 +1,7 @@
-import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
+import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import { AttachmentBuilder, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
-import { TagExists } from "../Controllers/TagExists";
-import { TagGet } from "../Controllers/TagGet";
-import { TagsGet } from "../Controllers/TagsGet";
+import { Options, Tag, TagResponse } from "../../../Controllers/TagController";
 
 export const RawSubCommand: ApplicationCommandOptions = {
     name: "raw",
@@ -22,65 +19,59 @@ export const RawSubCommand: ApplicationCommandOptions = {
 } as ApplicationCommandOptions;
 
 export async function RunRawSubCommand(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
-    await RegisterSubCommand({
-        subCommand: "raw",
-        ctx: ctx,
-        interaction: interaction,
-        callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
-            try {
-                const tagName: string = interaction.options.getString("tag-name");
+    if (interaction.isChatInputCommand()) {
+        if (interaction.options.getSubcommand() === RawSubCommand.name) {
+            const guildId = interaction.guild.id;
+            const name = interaction.options.getString('tag-name');
 
-                if (await TagExists({ guildId: interaction.guild.id, name: tagName, ctx: ctx })) {
-                    const getTag = await TagGet({ name: tagName, guildId: interaction.guild.id, ctx: ctx });
+            await ctx.controllers.tags.configure<Options & { tag: Tag }>({ guildId, name });
 
-                    const separator = "—————————————————————————————————————————";
-                    const fileContent = [
-                        separator.repeat(2),
-                        "TAG NAME:",
-                        getTag.TagName || "None",
-                        separator.repeat(2),
-                        "TAG TITLE:",
-                        getTag.TagEmbedTitle || "None",
-                        separator.repeat(2),
-                        "TAG DESCRIPTION:",
-                        getTag.TagEmbedDescription || "None",
-                        separator.repeat(2),
-                        "TAG IMAGE URL:",
-                        getTag.TagEmbedImageURL || "None",
-                        separator.repeat(2),
-                        "TAG FOOTER:",
-                        getTag.TagEmbedFooter || "None",
-                        separator.repeat(2),
-                    ].join("\n");
+            const exists = await ctx.controllers.tags.itemExists<Options>();
 
-                    const attachment = new AttachmentBuilder(Buffer.from(fileContent, "utf-8"), {
-                        name: `${getTag.TagName}.txt`,
-                    });
+            if (!exists) return interaction.reply({ content: 'Tag not found!', ephemeral: true });
 
-                    return interaction.reply({
-                        content: `Here is the raw content of the tag \`${tagName}\`:`,
-                        files: [attachment],
-                        ephemeral: true,
-                    });
-                } else {
-                    return interaction.reply({ content: `> The tag \`${tagName}\` doesn't exist!`, ephemeral: true, });
-                }
-            }
-            catch (error) {
-                console.error(error.stack);
-            }
-        },
-        autocomplete: async (ctx, interaction) => {
+            const { TagAuthor, TagName, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter, TagEditedBy } = await ctx.controllers.tags.getValues<Options, TagResponse>();
+
+            const clean = (text) => { return text || "None" };
+
+            const separator = "—————————————————————————————————————————";
+            const fileContent = [
+                "Tag Author", 
+                clean(TagAuthor),
+                separator.repeat(2),
+                "Tag Name:",
+                clean(TagName),
+                separator.repeat(2),
+                "Tag Title:",
+                clean(TagEmbedTitle),
+                separator.repeat(2),
+                "Tag Description:",
+                clean(TagEmbedDescription),
+                separator.repeat(2),
+                "Tag Image Url:",
+                clean(TagEmbedImageURL),
+                separator.repeat(2),
+                "Tag Footer:",
+                clean(TagEmbedFooter),
+                separator.repeat(2),
+                "Last Edited By:",
+                clean(TagEditedBy)
+            ].join('\n');
+
+            const attachment = new AttachmentBuilder(Buffer.from(fileContent, "utf-8"), { name: `${TagName}.txt` });
+
+            return interaction.reply({ content: `Here is the raw content of the tag \`${TagName}\`:`, files: [attachment], ephemeral: true });
+        }
+    }
+
+    if (interaction.isAutocomplete()) {
+        if (interaction.options.getSubcommand() === RawSubCommand.name) {
             const focus = interaction.options.getFocused();
-            const tags = await TagsGet(interaction.guild.id, ctx);
 
-            const filteredTags = focus.length > 0 ? tags.filter((x) => x.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
-            await interaction.respond(
-                filteredTags.map((x) => ({
-                    name: x.TagName,
-                    value: x.TagName,
-                })).slice(0, 20)
-            );
-        },
-    });
+            const tags = await ctx.controllers.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
+            const filteredTags = focus.length > 0 ? tags.filter((tag) => tag.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
+
+            await interaction.respond(filteredTags.map((tag) => ({ name: tag.TagName, value: tag.TagName })).slice(0, 20));
+        }
+    }
 }

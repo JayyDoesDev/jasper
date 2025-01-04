@@ -43,6 +43,7 @@ export class Context extends Client {
                 parse: ["users"],
             },
             presence: {
+                status: 'dnd',
                 activities: [
                     {
                         name: "Jasper",
