@@ -1,5 +1,5 @@
 import { ApplicationCommandOptions, ApplicationCommandType, } from "@antibot/interactions";
-import { DefineCommand } from "../../../Common/DefineCommand";
+import { defineCommand } from "../../../Common/define";
 import { Context } from "../../../Source/Context";
 import { ChatInputCommandInteraction } from "discord.js";
 import {
@@ -20,7 +20,7 @@ import {
   UseSubCommand,
   RawSubCommand,
 } from "../SubCommands";
-import { CheckForRoles } from "../../../Common/CheckForRoles";
+import { checkForRoles } from "../../../Common/roles";
 import { TagGet } from "../Controllers/TagGet";
 
 const subCommands: ApplicationCommandOptions[] = [
@@ -35,7 +35,7 @@ const subCommands: ApplicationCommandOptions[] = [
 ];
 
 export = {
-  Command: DefineCommand<ChatInputCommandInteraction>({
+  Command: defineCommand<ChatInputCommandInteraction>({
     command: {
       name: "tag",
       type: ApplicationCommandType.CHAT_INPUT,
@@ -49,7 +49,7 @@ export = {
         const tag = interaction.options.getString("tag-name");
         const dbTag = await TagGet({ name: tag, guildId: interaction.guild.id, ctx: ctx });
 
-        if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || dbTag.TagAuthor === interaction.user.id) {
+        if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || dbTag.TagAuthor === interaction.user.id) {
           await RunDeleteSubCommand(ctx, interaction);
         } else {
           return interaction.reply({
@@ -59,7 +59,7 @@ export = {
         }
       }
 
-      if (CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
+      if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
         switch (subCommand) {
           case 'create':
             await RunCreateSubCommand(ctx, interaction);
@@ -94,7 +94,7 @@ export = {
     autocomplete: async (ctx: Context, interaction) => {
       const subCommand = interaction.options.getSubcommand();
 
-      if (!CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
+      if (!checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
         return interaction.respond([]);
       }
 

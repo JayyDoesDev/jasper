@@ -1,7 +1,7 @@
 import { Snowflake } from "@antibot/interactions";
-import { Nullable } from "../Common/Nullable";
+import { Nullable } from "../Common/types";
 import { Context } from "../Source/Context";
-import { CommonCondition, Controller } from "./Controller";
+import { CommonCondition, Service } from "./Service";
 import TagSchema from "../Models/GuildSchema";
 import GuildSchema from "../Models/GuildSchema";
 import { Tag as ExtTag } from "../Models/GuildDocument";
@@ -31,7 +31,7 @@ export type TagResponse = {
     TagEmbedFooter: Nullable<string>;
 };
 
-class TagController extends Controller {
+class TagService extends Service {
     public guildId: Snowflake;
     public name: string;
     public tag: Tag;
@@ -117,7 +117,7 @@ class TagController extends Controller {
 
         const key = this.#makeGuildKey(guildId);
 
-        if (!(await this.ctx.controllers.tags.itemExists<Options>({ guildId, name }))) return null;
+        if (!(await this.ctx.services.tags.itemExists<Options>({ guildId, name }))) return null;
 
         let tags = await this.ctx.store.getGuild<TagResponse[]>(key);
 
@@ -191,7 +191,7 @@ class TagController extends Controller {
 
         const key = this.#makeGuildKey(guildId);
 
-        if (!(await this.ctx.controllers.tags.itemExists<Options>({ guildId, name }))) console.log("Tag not found");
+        if (!(await this.ctx.services.tags.itemExists<Options>({ guildId, name }))) console.log("Tag not found");
 
         let tags = await this.ctx.store.getGuild<TagResponse[]>(key);
 
@@ -292,4 +292,4 @@ class TagController extends Controller {
     }
 }
 
-export default TagController;
+export default TagService;

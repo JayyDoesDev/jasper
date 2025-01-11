@@ -1,7 +1,7 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { AttachmentBuilder, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
-import { Options, Tag, TagResponse } from "../../../Controllers/TagController";
+import { Options, Tag, TagResponse } from "../../../Services/TagService";
 
 export const RawSubCommand: ApplicationCommandOptions = {
     name: "raw",
@@ -24,15 +24,15 @@ export async function RunRawSubCommand(ctx: Context, interaction: ChatInputComma
             const guildId = interaction.guild.id;
             const name = interaction.options.getString('tag-name');
 
-            await ctx.controllers.tags.configure<Options & { tag: Tag }>({ guildId, name });
+            await ctx.services.tags.configure<Options & { tag: Tag }>({ guildId, name });
 
-            const exists = await ctx.controllers.tags.itemExists<Options>();
+            const exists = await ctx.services.tags.itemExists<Options>();
 
             if (!exists) return interaction.reply({ content: 'Tag not found!', ephemeral: true });
 
-            const { TagAuthor, TagName, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter, TagEditedBy } = await ctx.controllers.tags.getValues<Options, TagResponse>();
+            const { TagAuthor, TagName, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter, TagEditedBy } = await ctx.services.tags.getValues<Options, TagResponse>();
 
-            const clean = (text) => { return text || "None" };
+            const clean = (text: string) => { return text || "None" };
 
             const separator = "—————————————————————————————————————————";
             const fileContent = [
@@ -44,7 +44,7 @@ export async function RunRawSubCommand(ctx: Context, interaction: ChatInputComma
                 separator.repeat(2),
                 "Tag Title:",
                 clean(TagEmbedTitle),
-                separator.repeat(2),
+                separator.repeat(2), 
                 "Tag Description:",
                 clean(TagEmbedDescription),
                 separator.repeat(2),
@@ -68,7 +68,7 @@ export async function RunRawSubCommand(ctx: Context, interaction: ChatInputComma
         if (interaction.options.getSubcommand() === RawSubCommand.name) {
             const focus = interaction.options.getFocused();
 
-            const tags = await ctx.controllers.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
+            const tags = await ctx.services.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
             const filteredTags = focus.length > 0 ? tags.filter((tag) => tag.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
 
             await interaction.respond(filteredTags.map((tag) => ({ name: tag.TagName, value: tag.TagName })).slice(0, 20));

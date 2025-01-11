@@ -1,11 +1,11 @@
-import { DefineEvent } from "../../../Common/DefineEvent";
+import { defineEvent } from "../../../Common/define";
 import { ModalSubmitInteraction } from "discord.js";
 import { Context } from "../../../Source/Context";
-import { Emojis } from "../../../Common/Emojis";
-import { Options, Tag } from "../../../Controllers/TagController";
+import { Emojis } from "../../../Common/enums";
+import { Options, Tag } from "../../../Services/TagService";
 
 export = {
-    Event: DefineEvent({
+    Event: defineEvent({
         event: {
             name: "interactionCreate",
             once: false
@@ -21,16 +21,16 @@ export = {
                 const image_url = interaction.fields.getTextInputValue("tag_create_embed_image_url") ?? null;
                 const footer = interaction.fields.getTextInputValue("tag_create_embed_footer") ?? null;
                 
-                ctx.controllers.tags.configure<Options>({ guildId: interaction.guild.id, name, tag: { name, title, author, description, image_url, footer } });
+                ctx.services.tags.configure<Options>({ guildId: interaction.guild.id, name, tag: { name, title, author, description, image_url, footer } });
 
-                if (await ctx.controllers.tags.itemExists<Options>()) {
+                if (await ctx.services.tags.itemExists<Options>()) {
                     return interaction.reply({ content: `> The support tag \`${name}\` already exists!`, ephemeral: true });
                 }
 
                 if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
                     return interaction.reply({ content: `> The provided image link is not a valid image URL!`, ephemeral: true });
                 } else {
-                    await ctx.controllers.tags.create<Options & { tag: Tag }, void>();
+                    await ctx.services.tags.create<Options & { tag: Tag }, void>();
 
                     return interaction.reply({
                         content: `${Emojis.CHECK_MARK} Successfully created \`${name}\`!`,

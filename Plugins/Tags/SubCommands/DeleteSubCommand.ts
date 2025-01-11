@@ -1,8 +1,8 @@
 import { Context } from "../../../Source/Context";
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
-import { Emojis } from "../../../Common/Emojis";
-import { Options, TagResponse } from "../../../Controllers/TagController";
+import { Emojis } from "../../../Common/enums";
+import { Options, TagResponse } from "../../../Services/TagService";
 
 export const DeleteSubCommand: ApplicationCommandOptions = {
     name: "delete",
@@ -25,9 +25,9 @@ export async function RunDeleteSubCommand(ctx: Context, interaction: ChatInputCo
             const guildId = interaction.guild.id;
             const name = interaction.options.getString('tag-name');
 
-            await ctx.controllers.tags.configure<Options>({ guildId, name });
+            await ctx.services.tags.configure<Options>({ guildId, name });
 
-            const isDeleted = await ctx.controllers.tags.delete<Options, boolean>();
+            const isDeleted = await ctx.services.tags.delete<Options, boolean>();
 
             if (isDeleted) return interaction.reply({ content: `${Emojis.CHECK_MARK} Successfully deleted \`${name}\`!`, ephemeral: true });
 
@@ -39,7 +39,7 @@ export async function RunDeleteSubCommand(ctx: Context, interaction: ChatInputCo
         if (interaction.options.getSubcommand() === DeleteSubCommand.name) {
             const focus = interaction.options.getFocused();
             
-            const tags = await ctx.controllers.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
+            const tags = await ctx.services.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
             const filteredTags = focus.length > 0 ? tags.filter((tag) => tag.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
 
             await interaction.respond(filteredTags.map((tag) => ({ name: tag.TagName, value: tag.TagName })).slice(0, 20));

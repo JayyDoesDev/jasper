@@ -1,4 +1,4 @@
-import { Wrap } from "../../../Common/Wrap";
+import { wrap } from "../../../Common/wrap";
 import TagSchema from "../../../Models/GuildSchema";
 import type { Snowflake } from "discord.js";
 import type { Context } from "../../../Source/Context";
@@ -10,7 +10,7 @@ export async function TagsGet(guildId: Snowflake, ctx: Context): Promise<Tag[]> 
     let tags = await ctx.store.getGuild<Tag[]>(key);
     
     if (!Array.isArray(tags) || tags.length === 0) {
-        const wrappedGuild = await Wrap(TagSchema.findOne({ _id: guildId }));
+        const wrappedGuild = await wrap(TagSchema.findOne({ _id: guildId }));
         
         if (wrappedGuild.data) {
             tags = wrappedGuild.data.Tags;

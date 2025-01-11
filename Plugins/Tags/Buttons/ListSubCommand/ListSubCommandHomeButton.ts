@@ -1,11 +1,11 @@
 import { ButtonInteraction } from "discord.js";
-import { DefineEvent } from "../../../../Common/DefineEvent";
+import { defineEvent } from "../../../../Common/define";
 import { Context } from "../../../../Source/Context";
 import { RegisterInteractionById } from "../../../../Common/RegisterInteractionById";
 import { State } from "../../../types";
 
 export = {
-  Event: DefineEvent({
+  Event: defineEvent({
     event: {
         name: "interactionCreate",
         once: false

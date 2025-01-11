@@ -23,7 +23,7 @@ export async function RunListSubCommand(ctx: Context, interaction: ChatInputComm
       if (interaction.options.getSubcommand() === ListSubCommand.name) {
         const guildId = interaction.guild.id;
 
-        const tags = await ctx.controllers.tags.getMultiValues<Snowflake, Tag[]>(guildId);
+        const tags = await ctx.services.tags.getMultiValues<Snowflake, Tag[]>(guildId);
 
         if (!tags || tags.length === 0) return interaction.reply({ content: 'Couldn\'t find any tags for this guild!', ephemeral: true });
 

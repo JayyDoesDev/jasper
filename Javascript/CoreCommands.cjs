@@ -1,7 +1,7 @@
-const { DefineCommand } = require("../Common/DefineCommand");
+const { defineCommand } = require("../Common/define");
 const { ApplicationCommandType } = require("@antibot/interactions");
 
-exports.Command = DefineCommand({
+exports.Command = defineCommand({
         command: {
             name: "ping",
             type: ApplicationCommandType.CHAT_INPUT,

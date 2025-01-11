@@ -4,12 +4,8 @@ import { ChatInputCommandInteraction, TextChannel } from "discord.js";
 import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import fs from "fs";
 import path from "path";
-import {
-    getLatestYoutubeVideo,
-    getRandomYoutubeAPIKey,
-    writeToThreadIdFile,
-    writeToVideoIdFile
-} from "../../../Source";
+import { writeToThreadIdFile, writeToVideoIdFile } from "../../../Source";
+import { getLatestYoutubeVideo, getRandomYoutubeAPIKey } from "../../../Common/youtube";
 
 export const NotifyVideoDiscussionsSubCommand: ApplicationCommandOptions = {
     name: "notify_video_discussions",
@@ -34,7 +30,7 @@ export async function RunNotifyVideoDiscussionsSubCommand(ctx: Context, interact
             delete require.cache[require.resolve(latestThreadPath)];
 
             const latestVideoFile: { video: string } = require(latestVideoPath);
-            const latest = await getLatestYoutubeVideo(ctx.env.get("youtube_id"), getRandomYoutubeAPIKey());
+            const latest = await getLatestYoutubeVideo(ctx.env.get("youtube_id"), getRandomYoutubeAPIKey(ctx));
 
             if (latestVideoFile.video !== latest.id) {
                 //@ts-ignore

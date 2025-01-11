@@ -1,15 +1,15 @@
 import { ApplicationCommandOptionType, ApplicationCommandType } from "@antibot/interactions";
-import { DefineCommand } from "../../../Common/DefineCommand";
 import { ChatInputCommandInteraction } from "discord.js";
 import fs from 'fs';
 import path from 'path';
 import { documentationAutocomplete } from "../Controllers/documentationAutocomplete";
+import { defineCommand } from "../../../Common/define";
 
 const documentationPath = path.join(__dirname, '..', '..', '..', '..', 'DOCUMENTATION.md');
 const documentationContent = fs.readFileSync(documentationPath, 'utf-8');
 
 export = {
-    Command: DefineCommand<ChatInputCommandInteraction>({
+    Command: defineCommand<ChatInputCommandInteraction>({
         command: {
             name: "help",
             type: ApplicationCommandType.CHAT_INPUT,

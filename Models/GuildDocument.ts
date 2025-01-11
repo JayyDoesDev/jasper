@@ -1,6 +1,6 @@
 import type { Snowflake } from "@antibot/interactions";
 import { Document } from "mongoose";
-import { Nullable } from "../Common/Nullable";
+import { Nullable } from "../Common/types";
 
 export interface GuildDocument extends Document {
     _id: Snowflake;

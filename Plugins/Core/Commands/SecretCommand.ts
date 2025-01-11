@@ -1,10 +1,10 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { DefineCommand } from "../../../Common/DefineCommand";
 import { ApplicationCommandType, PermissionBitToString, Permissions, PermissionsToHuman } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
+import { defineCommand } from "../../../Common/define";
 
 export = {
-  Command: DefineCommand<ChatInputCommandInteraction>({
+  Command: defineCommand<ChatInputCommandInteraction>({
     command: {
         name: "secret",
         type: ApplicationCommandType.CHAT_INPUT,
@@ -24,7 +24,7 @@ export = {
                         .join(", ") }\n**• Permissions:** ${ PermissionsToHuman(
                         interaction.appPermissions.bitfield
                     ).join(", ") } `,
-                    color: 0xff9a00,
+                    color: global.embedColor,
                 },
             ],
             ephemeral: true,

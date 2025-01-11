@@ -1,5 +1,5 @@
-import { GuildExists } from "../../../Common/GuildExists";
-import { Wrap } from "../../../Common/Wrap";
+import { guildExists } from "../../../Common/db";
+import { wrap } from "../../../Common/wrap";
 import { Tag } from "../../../Models/GuildDocument";
 import TagSchema from "../../../Models/GuildSchema";
 import { commonOptions, GuildSnowflake, TagResponse } from "./Types";
@@ -9,7 +9,7 @@ export async function TagExists(options: commonOptions): Promise<boolean> {
     const key: GuildSnowflake = { guild: guildId };
 
     if (!(await ctx.store.guildExists(key))) {
-        if (!(await GuildExists(guildId))) {
+        if (!(await guildExists(guildId))) {
             return false;
         }
         ctx.store.setKey(key);
@@ -27,7 +27,7 @@ export async function TagExists(options: commonOptions): Promise<boolean> {
     }
 
     try {
-        const wrappedGuild = await Wrap(TagSchema.findOne({ _id: guildId }));
+        const wrappedGuild = await wrap(TagSchema.findOne({ _id: guildId }));
         if (!wrappedGuild.data) {
             return false;
         }

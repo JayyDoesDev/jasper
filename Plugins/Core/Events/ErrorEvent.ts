@@ -1,16 +1,16 @@
-import { DefineEvent } from "../../../Common/DefineEvent";
-import { HasProperties } from "../../../Common/HasProperties";
+import { defineEvent } from "../../../Common/define";
+import { hasProperties } from "../../../Common/types";
 
 export = {
-  Event: DefineEvent({
+  Event: defineEvent({
     event: {
       name: "error",
       once: false
     },
-    on: (e) => {
-      if (HasProperties<{ method: string, url: string }>(e, ['method', 'url'])) {
-        console.log(`Error: ${ e }\nMethod: ${ e.method }\nUrl: ${ e.url } `);
+    on: (e: { method: string, url: string }) => {
+      if (hasProperties(e, ['method', 'url'])) {
+        console.log(`Error: ${e}\nMethod: ${e.method}\nUrl: ${e.url}`);
       }
     }
   })
-}
+};

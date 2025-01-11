@@ -4,7 +4,7 @@ import type { Snowflake } from "@antibot/interactions";
 
 type Interaction = ChatInputCommandInteraction | ContextMenuCommandInteraction | AutocompleteInteraction | Message;
 
-export function CheckForRoles(interaction: Interaction, ...roles: Snowflake[]): boolean {
+export function checkForRoles(interaction: Interaction, ...roles: Snowflake[]): boolean {
     const rroles = <Collection<string, Role>>interaction.member.roles.valueOf();
     const convertToArray: string[] = Array.from<any>(rroles);
     let response: boolean = false;

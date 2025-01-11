@@ -1,13 +1,13 @@
 import { Context } from "../../Source/Context";
 import { Message, TextChannel } from "discord.js";
-import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
+import { definePlugin, Plugin } from "../../Common/define";
 
 let active: boolean = false;
 let messageCount: number = 0;
 let messageWindowStart: number = Date.now();
 let lastSlowmodeChange: number = 0;
 
-export = DefinePlugin({
+export = definePlugin({
     name: "slowmode",
     description: "Automatically change slowmode based on chat activity!",
     events: [

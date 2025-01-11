@@ -1,11 +1,10 @@
-import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
-import { MassRegisterCommands } from "../../Common/MassRegisterCommands";
-import { MassRegisterEvents } from "../../Common/MassRegisterEvents";
+import { definePlugin, Plugin } from "../../Common/define";
+import { massRegisterCommands, massRegisterEvents } from "../../Common/register";
 
-export = DefinePlugin({
+export = definePlugin({
     name: "User Settings",
     description: "Settings for users to configure!",
-    commands: MassRegisterCommands(__dirname, ["Commands"]),
-    events: MassRegisterEvents(__dirname, ["Events"]),
+    commands: massRegisterCommands(__dirname, ["Commands"]),
+    events: massRegisterEvents(__dirname, ["Events"]),
     public_plugin: true
 }) satisfies Plugin;

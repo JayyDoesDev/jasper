@@ -1,7 +1,6 @@
 import { Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { Nullable } from "../../../Common/Nullable";
-import { Combine } from "../../../Common/Combine";
+import { Nullable, Combine } from "../../../Common/types";
 
 export type commonOptions = {
     guildId: Snowflake;

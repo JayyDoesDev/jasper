@@ -1,15 +1,14 @@
 import { Message } from "discord.js";
-import { DefineEvent } from "../../../Common/DefineEvent";
-import { Wrap } from "../../../Common/Wrap";
+import { defineEvent } from "../../../Common/define";
+import { wrap } from "../../../Common/wrap";
 import { TagGet } from "../Controllers/TagGet";
-import { CheckForRoles } from "../../../Common/CheckForRoles";
+import { checkForRoles } from "../../../Common/roles";
 import { Context } from "../../../Source/Context";
-import { Nullable } from "../../../Common/Nullable";
-import { Combine } from "../../../Common/Combine";
+import { Combine, Nullable }   from "../../../Common/types";
 import { TagOptions } from "../Controllers/Types";
 
 export = {
-  Event: DefineEvent({
+  Event: defineEvent({
     event: {
         name: "messageCreate",
         once: false
@@ -56,8 +55,8 @@ export = {
                 }
             }
             if (tagname) {
-                if (CheckForRoles(message, ctx.env.get("admin"), ctx.env.get("staff"), ctx.env.get("support"))) {
-                    const wrappedTag = await Wrap(TagGet({ name: tagname, guildId: message.guild.id, ctx: ctx }));
+                if (checkForRoles(message, ctx.env.get("admin"), ctx.env.get("staff"), ctx.env.get("support"))) {
+                    const wrappedTag = await wrap(TagGet({ name: tagname, guildId: message.guild.id, ctx: ctx }));
                     if ('TagName' in wrappedTag.data) {
                         const embedObject: Partial<Combine<[Omit<TagOptions, "footer">, Record<"footer", { text: string, value: string }>]>> = {};
                         wrappedTag.data.TagEmbedDescription ? Object.defineProperty(embedObject, "description", { value: wrappedTag.data.TagEmbedDescription }) : Object.defineProperty(embedObject, "description", { value: null });

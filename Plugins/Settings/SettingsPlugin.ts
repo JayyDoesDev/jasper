@@ -1,9 +1,9 @@
-import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
-import { MassRegisterCommands } from "../../Common/MassRegisterCommands";
+import { definePlugin, Plugin } from "../../Common/define";
+import { massRegisterCommands } from "../../Common/register";
 
-export = DefinePlugin({
+export = definePlugin({
     name: "settings",
     description: "Settings you can change in Jasper for your liking.",
-    commands: MassRegisterCommands(__dirname, ["Commands"]),
+    commands: massRegisterCommands(__dirname, ["Commands"]),
     public_plugin: true
 }) satisfies Plugin;

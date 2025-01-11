@@ -1,4 +1,4 @@
-import { Nullable } from "../Common/Nullable";
+import { Nullable } from "../Common/types";
 import { Context } from "../Source/Context";
 import { Store } from "../Source/Store";
 
@@ -9,7 +9,7 @@ export type CommonCondition<R> =
     ? Nullable<R>
     : void;
 
-interface IController {
+interface IService {
     configure<T>(config: T): ThisParameterType<this>;
     itemExists<T>(exists?: T): CommonCondition<boolean> | Promise<CommonCondition<boolean>>;
     getValues<T, R>(get?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
@@ -23,7 +23,7 @@ interface IController {
     delete<T, R>(d: T): Promise<CommonCondition<R>> | CommonCondition<R>;
 }
 
-export abstract class Controller extends Store implements IController {
+export abstract class Service extends Store implements IService {
     constructor(public readonly ctx: Context) {
         super(ctx);
     }

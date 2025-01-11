@@ -1,13 +1,13 @@
-import { DefineEvent } from "../../../Common/DefineEvent";
+import { defineEvent } from "../../../Common/define";
 import { ModalSubmitInteraction } from "discord.js";
 import { Context } from "../../../Source/Context";
-import { Emojis } from "../../../Common/Emojis";
+import { Emojis } from "../../../Common/enums";
 import { TagResponse } from "../Controllers/Types";
-import { Options } from "../../../Controllers/TagController";
+import { Options } from "../../../Services/TagService";
 import { Tag } from "../../../Models/GuildDocument";
 
 export = {
-    Event: DefineEvent({
+    Event: defineEvent({
         event: {
             name: "interactionCreate",
             once: false
@@ -28,7 +28,7 @@ export = {
 
             const guildId = interaction.guild.id;
 
-            if (!(await ctx.controllers.tags.itemExists<Options>({ guildId, name }))) {
+            if (!(await ctx.services.tags.itemExists<Options>({ guildId, name }))) {
                 return interaction.reply({ content: `> The support tag \`${name}\` doesn't exist!`, ephemeral: true });
             }
 
@@ -36,9 +36,9 @@ export = {
                 return interaction.reply({ content: `> The provided image link is not a valid image URL!`, ephemeral: true })
             }
 
-            await ctx.controllers.tags.modify<Options & { tag?: Tag }, void>({ guildId, name, tag: { name, title, editedBy, description, image_url, footer } });
+            await ctx.services.tags.modify<Options & { tag?: Tag }, void>({ guildId, name, tag: { name, title, editedBy, description, image_url, footer } });
 
-            const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = await ctx.controllers.tags.getValues<Options, TagResponse>({ guildId, name });
+            const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = await ctx.services.tags.getValues<Options, TagResponse>({ guildId, name });
 
             return interaction.reply({ 
                 content: `${Emojis.CHECK_MARK} Successfully edited \`${name}\`!` ,

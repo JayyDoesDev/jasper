@@ -1,4 +1,4 @@
-import { Nullable } from "../../../Common/Nullable";
+import { Nullable } from "../../../Common/types";
 
 type DocumentationItem = {
     name: string;

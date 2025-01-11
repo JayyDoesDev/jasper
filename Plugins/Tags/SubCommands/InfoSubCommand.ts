@@ -3,8 +3,8 @@ import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } fr
 import { Context } from "../../../Source/Context";
 import { AutocompleteInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
 import { TagResponse } from "../Controllers/Types";
-import { CheckForRoles } from "../../../Common/CheckForRoles";
-import { Options } from "../../../Controllers/TagController";
+import { checkForRoles } from "../../../Common/roles";
+import { Options } from "../../../Services/TagService";
 
 export const InfoSubCommand: ApplicationCommandOptions = {
     name: "info",
@@ -28,13 +28,13 @@ export async function RunInfoSubCommand(ctx: Context, interaction: ChatInputComm
             const name = interaction.options.getString('tag-name');
             const author = interaction.user.id;
 
-            await ctx.controllers.tags.configure<Options>({ guildId, name });
+            await ctx.services.tags.configure<Options>({ guildId, name });
 
-            const exists = await ctx.controllers.tags.itemExists<Options>();
+            const exists = await ctx.services.tags.itemExists<Options>();
 
             if (!exists) return interaction.reply({ content: 'Tag not found!', ephemeral: true });
 
-            const { TagName, TagAuthor, TagEditedBy } = await ctx.controllers.tags.getValues<Options, TagResponse>();
+            const { TagName, TagAuthor, TagEditedBy } = await ctx.services.tags.getValues<Options, TagResponse>();
 
             const buttons = [
                 {
@@ -60,7 +60,7 @@ export async function RunInfoSubCommand(ctx: Context, interaction: ChatInputComm
                 }
             ];
 
-            if (!CheckForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
+            if (!checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
                 for (const button of buttons) {
                     if (button.label == 'Delete') {
                         button.disabled = true;
@@ -92,7 +92,7 @@ export async function RunInfoSubCommand(ctx: Context, interaction: ChatInputComm
         if (interaction.options.getSubcommand() === InfoSubCommand.name) {
             const focus = interaction.options.getFocused();
 
-            const tags = await ctx.controllers.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
+            const tags = await ctx.services.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
             const filteredTags = focus.length > 0 ? tags.filter((tag) => tag.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
 
             await interaction.respond(filteredTags.map((tag) => ({ name: tag.TagName, value: tag.TagName })).slice(0, 20));

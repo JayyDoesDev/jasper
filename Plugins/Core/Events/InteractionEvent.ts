@@ -1,11 +1,10 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction, Interaction } from "discord.js";
-import { Command } from "../../../Common/DefineCommand";
+import { Command, defineEvent } from "../../../Common/define";
 import { PermissionsToHuman, PlantPermission } from "@antibot/interactions";
-import { DefineEvent } from "../../../Common/DefineEvent";
 
 export = {
-  Event: DefineEvent({
+  Event: defineEvent({
     event: {
         name: "interactionCreate",
         once: false,

@@ -1,4 +1,4 @@
-import { Nullable } from "../Common/Nullable";
+import { Nullable } from "../Common/types";
 
 export class Env {
   #tokens: { env: string, aliases: string[] }[];

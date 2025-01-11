@@ -1,13 +1,13 @@
 import { ChatInputCommandInteraction } from "discord.js";
-import { DefineCommand } from "../../../Common/DefineCommand";
 import { ApplicationCommandOptions, ApplicationCommandType, PermissionBitToString, Permissions } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { NotifyVideoDiscussionsSubCommand, RunNotifyVideoDiscussionsSubCommand } from "../SubCommands/NotifyVideoDiscussionsSubCommand";
+import { defineCommand } from "../../../Common/define";
 
 const subCommands: ApplicationCommandOptions[] = [NotifyVideoDiscussionsSubCommand];
 
 export = {
-    Command: DefineCommand<ChatInputCommandInteraction>({
+    Command: defineCommand<ChatInputCommandInteraction>({
         command: {
             name: "bruteforce",
             type: ApplicationCommandType.CHAT_INPUT,

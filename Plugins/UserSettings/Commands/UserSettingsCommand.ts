@@ -1,11 +1,11 @@
 import { ApplicationCommandOptions, ApplicationCommandType } from "@antibot/interactions";
-import { DefineCommand } from "../../../Common/DefineCommand";
+import { defineCommand } from "../../../Common/define";
 import { ChatInputCommandInteraction } from "discord.js";
 
 const subCommands: ApplicationCommandOptions[] = [];
 
 export = {
-    Command: DefineCommand<ChatInputCommandInteraction>({
+    Command: defineCommand<ChatInputCommandInteraction>({
         command: {
             name: "user_settings",
             type: ApplicationCommandType.CHAT_INPUT,

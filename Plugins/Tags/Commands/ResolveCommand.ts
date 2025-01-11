@@ -1,11 +1,11 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { ApplicationCommandOptionType, ApplicationCommandType, PermissionsBitField } from "@antibot/interactions";
-import { DefineCommand } from "../../../Common/DefineCommand";
+import { defineCommand } from "../../../Common/define";
 import { ChannelType, ChatInputCommandInteraction } from "discord.js";
-import { CheckForRoles } from "../../../Common/CheckForRoles";
+import { checkForRoles } from "../../../Common/roles";
 
 export = {
-    Command: DefineCommand<ChatInputCommandInteraction>({
+    Command: defineCommand<ChatInputCommandInteraction>({
         command: {
             name: "resolve",
             type: ApplicationCommandType.CHAT_INPUT,
@@ -28,7 +28,7 @@ export = {
         },
         permissions: [PermissionsBitField.ManageThreads],
         on: async (ctx, interaction) => {
-            if (CheckForRoles(interaction, ctx.env.get("admin"), ctx.env.get("staff"), ctx.env.get("support"))) {
+            if (checkForRoles(interaction, ctx.env.get("admin"), ctx.env.get("staff"), ctx.env.get("support"))) {
                 const finalReply: Record<"content", string> = { content: `Post marked as Resolved by <@${interaction.user.id}>`, };
                 const originalQuestion: string = interaction.options.getString("original_question");
                 const summarizedAnswer: string = interaction.options.getString("summarized_answer");

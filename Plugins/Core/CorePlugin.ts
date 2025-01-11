@@ -1,13 +1,12 @@
-import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
+import { definePlugin, Plugin } from "../../Common/define";
 import PingCommand from "../../Javascript/CoreCommands.cjs";
-import { MassRegisterCommands } from "../../Common/MassRegisterCommands";
-import { MassRegisterEvents } from "../../Common/MassRegisterEvents";
+import { massRegisterCommands, massRegisterEvents } from "../../Common/register";
 
-export = DefinePlugin({
+export = definePlugin({
     name: "Core",
     description: "Core process.",
-    commands: [...MassRegisterCommands(__dirname, ["Commands"]), ...[PingCommand.Command]],
-    events: MassRegisterEvents(__dirname, ["Events"]),
+    commands: [...massRegisterCommands(__dirname, ["Commands"]), ...[PingCommand.Command]],
+    events: massRegisterEvents(__dirname, ["Events"]),
     public_plugin: true,
 }) satisfies Plugin;
 

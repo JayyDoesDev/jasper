@@ -1,18 +1,17 @@
 import { ActivityType, ChatInputCommandInteraction, Client, ContextMenuCommandInteraction, IntentsBitField, Partials } from "discord.js";
 import { ZillaCollection } from "@antibot/zilla";
-import { Command } from "../Common/DefineCommand";
 import { Interactions, Snowflake } from "@antibot/interactions";
-import { Plugin } from "../Common/DefinePlugin";
+import { Plugin, Command } from "../Common/define";
 import { Store } from "./Store";
 import { State } from "../Plugins/types";
 import { Env } from "./Env";
-import TagController from "../Controllers/TagController";
+import TagService from "../Services/TagService";
 
 
-class Controllers {
-    public readonly tags: TagController;
+class Services {
+    public readonly tags: TagService;
     constructor(public ctx: Context) {
-        this.tags = new TagController(ctx);
+        this.tags = new TagService(ctx);
     }
 }
 
@@ -23,7 +22,7 @@ export class Context extends Client {
     public readonly pagination!: ZillaCollection<Snowflake, State>;
     public readonly env!: Env;
     public readonly store!: Store;
-    public readonly controllers!: Controllers;
+    public readonly services!: Services;
 
     constructor() {
         super({
@@ -46,7 +45,7 @@ export class Context extends Client {
                 status: 'dnd',
                 activities: [
                     {
-                        name: "Jasper",
+                        name: "/tag create",
                         state: "Working with support and handling slowmode",
                         url: `https://www.youtube.com/watch?v=avideothatdoesntexist`,
                         type: ActivityType.Streaming
@@ -97,6 +96,6 @@ export class Context extends Client {
             { env: "SLOWMODE_RESET_TIME", aliases: ["slowmode_reset_time"] }
         );
         this.store = new Store(this);
-        this.controllers = new Controllers(this);
+        this.services = new Services(this);
     }
 }

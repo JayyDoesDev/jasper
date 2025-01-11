@@ -1,15 +1,15 @@
 import { Context } from "../../../Source/Context";
-import { DefineEvent } from "../../../Common/DefineEvent";
-import { updateSubCountChannel } from "../../../Source";
+import { defineEvent } from "../../../Common/define";
+import { updateSubCountChannel } from "../../../Common/youtube";
 
 export = {
-  Event:  DefineEvent({
+  Event:  defineEvent({
     event: {
         name: "ready",
         once: true,
     },
     on: (ctx: Context) => {
-        if (ctx.env.get("sub_update") == "1") updateSubCountChannel();
+        if (ctx.env.get("sub_update") == "1") updateSubCountChannel(ctx);
         console.log(`${ ctx.user.username } has logged in!`);
       },
   })

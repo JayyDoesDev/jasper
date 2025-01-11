@@ -1,12 +1,11 @@
-import { DefinePlugin, Plugin } from "../../Common/DefinePlugin";
-import { MassRegisterCommands } from "../../Common/MassRegisterCommands";
-import { MassRegisterEvents } from "../../Common/MassRegisterEvents";
+import { definePlugin, Plugin } from "../../Common/define";
+import { massRegisterCommands, massRegisterEvents } from "../../Common/register";
 
-export = DefinePlugin({
+export = definePlugin({
     name: "tags",
     description: "Tags for the No Text To Speech support team!",
-    commands: MassRegisterCommands(__dirname, ["Commands"]),
-    events: MassRegisterEvents(__dirname, ["Events", "Modals", "Buttons"]),
+    commands: massRegisterCommands(__dirname, ["Commands"]),
+    events: massRegisterEvents(__dirname, ["Events", "Modals", "Buttons"]),
     public_plugin: true,
 }) satisfies Plugin;
 
