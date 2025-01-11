@@ -1,7 +1,6 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { ChatInputCommandInteraction, TextChannel } from "discord.js";
-import { RegisterSubCommand } from "../../../Common/RegisterSubCommand";
 import fs from "fs";
 import path from "path";
 import { writeToThreadIdFile, writeToVideoIdFile } from "../../../Source";
@@ -15,11 +14,8 @@ export const NotifyVideoDiscussionsSubCommand: ApplicationCommandOptions = {
 } as ApplicationCommandOptions;
 
 export async function RunNotifyVideoDiscussionsSubCommand(ctx: Context, interaction: ChatInputCommandInteraction) {
-    await RegisterSubCommand({
-        subCommand: "notify_video_discussions",
-        ctx: ctx,
-        interaction: interaction,
-        callback: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
+    if (interaction.isChatInputCommand()) {
+        if (interaction.options.getSubcommand() === NotifyVideoDiscussionsSubCommand.name) {
             if (!fs.existsSync("latestvideo.json")) fs.writeFileSync("latestvideo.json", JSON.stringify({ video: "" }));
             if (!fs.existsSync("latestthread.json")) fs.writeFileSync("latestthread.json", JSON.stringify({ thread: "" }));
 
@@ -72,5 +68,5 @@ export async function RunNotifyVideoDiscussionsSubCommand(ctx: Context, interact
                 return interaction.reply({ content: "It looks like the most recent video has already been posted.", ephemeral: true });
             }
         }
-    })
+    }
 }
