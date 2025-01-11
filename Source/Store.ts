@@ -1,6 +1,10 @@
 import { Redis } from "ioredis";
 import { Context } from "./Context";
-import { GuildSnowflake, UserSnowflake } from "../Plugins/Tags/Controllers/Types";
+import { Snowflake } from "@antibot/interactions";
+
+type GuildSnowflake = Record<"guild", Snowflake>;
+
+type UserSnowflake = Record<"user", Snowflake>;
 
 export class Store extends Redis {
     #ctx: Context;

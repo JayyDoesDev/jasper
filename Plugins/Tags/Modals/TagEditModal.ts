@@ -2,8 +2,7 @@ import { defineEvent } from "../../../Common/define";
 import { ModalSubmitInteraction } from "discord.js";
 import { Context } from "../../../Source/Context";
 import { Emojis } from "../../../Common/enums";
-import { TagResponse } from "../Controllers/Types";
-import { Options } from "../../../Services/TagService";
+import { Options, TagResponse } from "../../../Services/TagService";
 import { Tag } from "../../../Models/GuildDocument";
 
 export = {

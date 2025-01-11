@@ -2,9 +2,8 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { AutocompleteInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
-import { TagResponse } from "../Controllers/Types";
 import { checkForRoles } from "../../../Common/roles";
-import { Options } from "../../../Services/TagService";
+import { Options, TagResponse } from "../../../Services/TagService";
 
 export const InfoSubCommand: ApplicationCommandOptions = {
     name: "info",

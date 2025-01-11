@@ -21,7 +21,7 @@ import {
   RawSubCommand,
 } from "../SubCommands";
 import { checkForRoles } from "../../../Common/roles";
-import { TagGet } from "../Controllers/TagGet";
+import { Options, TagResponse } from "../../../Services/TagService";
 
 const subCommands: ApplicationCommandOptions[] = [
   CreateSubCommand,
@@ -46,10 +46,14 @@ export = {
       const subCommand = interaction.options.getSubcommand();
 
       if (subCommand === "delete") {
-        const tag = interaction.options.getString("tag-name");
-        const dbTag = await TagGet({ name: tag, guildId: interaction.guild.id, ctx: ctx });
+        const guildId = interaction.user.id;
+        const name = interaction.options.getString("tag-name");
+        
+        await ctx.services.tags.configure<Options>({ guildId, name });
+        
+        const { TagAuthor } = await ctx.services.tags.getValues<Options, TagResponse>();
 
-        if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || dbTag.TagAuthor === interaction.user.id) {
+        if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || TagAuthor === interaction.user.id) {
           await RunDeleteSubCommand(ctx, interaction);
         } else {
           return interaction.reply({

@@ -15,7 +15,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `-`
 
-### `/` `tags` `create`
+### `/` `tag` `create`
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
@@ -23,7 +23,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Modal`
 
-### `/` `tags` `list`
+### `/` `tag` `list`
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
@@ -31,7 +31,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `-`
 
-### `/` `tags` `delete` <_tag_name_>
+### `/` `tag` `delete` <_tag_name_>
 
 > **Permissions**: `STAFF_ROLE`, `ADMIN_ROLE`
 
@@ -39,7 +39,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Autocomplete`
 
-### `/` `tags` `edit`
+### `/` `tag` `edit`
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
@@ -47,7 +47,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Modal`
 
-### `/` `tags` `info` <_tag_name_>
+### `/` `tag` `info` <_tag_name_>
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
@@ -55,7 +55,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Autocomplete`
 
-### `/` `tags` `show` <_tag_name_>
+### `/` `tag` `show` <_tag_name_>
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
@@ -63,7 +63,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Autocomplete`
 
-### `/` `tags` `raw` <_tag_name_>
+### `/` `tag` `raw` <_tag_name_>
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
@@ -71,7 +71,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Autocomplete`
 
-### `/` `tags` `use` <_tag_name_>
+### `/` `tag` `use` <_tag_name_>
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
