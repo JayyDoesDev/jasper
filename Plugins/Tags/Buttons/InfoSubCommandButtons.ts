@@ -1,4 +1,4 @@
-import { defineEvent } from "../../../../Common/define"
+import { defineEvent } from "../../../Common/define"
 
 export = {
     Event: defineEvent({
