@@ -18,7 +18,7 @@ export const ListSubCommand: ApplicationCommandOptions = {
     options: []
 } as ApplicationCommandOptions;
 
-export async function RunListSubCommand(ctx: Context, interaction: ChatInputCommandInteraction) {
+export async function list(ctx: Context, interaction: ChatInputCommandInteraction) {
     if (interaction.isChatInputCommand()) {
       if (interaction.options.getSubcommand() === ListSubCommand.name) {
         const guildId = interaction.guild.id;

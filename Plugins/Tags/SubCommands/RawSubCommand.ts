@@ -18,7 +18,7 @@ export const RawSubCommand: ApplicationCommandOptions = {
     ]
 } as ApplicationCommandOptions;
 
-export async function RunRawSubCommand(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
+export async function raw(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
     if (interaction.isChatInputCommand()) {
         if (interaction.options.getSubcommand() === RawSubCommand.name) {
             const guildId = interaction.guild.id;

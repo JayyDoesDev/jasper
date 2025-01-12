@@ -8,17 +8,17 @@ import {
   EditSubCommand,
   InfoSubCommand,
   ListSubCommand,
-  RunCreateSubCommand,
-  RunDeleteSubCommand,
-  RunEditSubCommand,
-  RunInfoSubCommand,
-  RunListSubCommand,
-  RunShowSubCommand,
-  RunUseSubCommand,
-  RunRawSubCommand,
   ShowSubCommand,
   UseSubCommand,
   RawSubCommand,
+  create,
+  del,
+  edit,
+  info,
+  list,
+  show,
+  use,
+  raw
 } from "../SubCommands";
 import { checkForRoles } from "../../../Common/roles";
 import { Options, TagResponse } from "../../../Services/TagService";
@@ -54,7 +54,7 @@ export = {
         const { TagAuthor } = await ctx.services.tags.getValues<Options, TagResponse>();
 
         if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || TagAuthor === interaction.user.id) {
-          await RunDeleteSubCommand(ctx, interaction);
+          await del(ctx, interaction);
         } else {
           return interaction.reply({
             content: "Sorry but you can't use this command.",
@@ -66,25 +66,25 @@ export = {
       if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE)) {
         switch (subCommand) {
           case 'create':
-            await RunCreateSubCommand(ctx, interaction);
+            await create(ctx, interaction);
             break;
           case 'list':
-            await RunListSubCommand(ctx, interaction);
+            await list(ctx, interaction);
             break;
           case 'edit':
-            await RunEditSubCommand(ctx, interaction);
+            await edit(ctx, interaction);
             break;
           case 'show':
-            await RunShowSubCommand(ctx, interaction);
+            await show(ctx, interaction);
             break;
           case 'info':
-            await RunInfoSubCommand(ctx, interaction);
+            await info(ctx, interaction);
             break;
           case 'use':
-            await RunUseSubCommand(ctx, interaction);
+            await use(ctx, interaction);
             break;
           case 'raw':
-            await RunRawSubCommand(ctx, interaction);
+            await raw(ctx, interaction);
             break;
         }
       } else {
@@ -104,19 +104,19 @@ export = {
 
       switch (subCommand) {
         case 'use':
-          await RunUseSubCommand(ctx, interaction);
+          await use(ctx, interaction);
           break;
         case 'show':
-          await RunShowSubCommand(ctx, interaction);
+          await show(ctx, interaction);
           break;
         case 'delete':
-          await RunDeleteSubCommand(ctx, interaction);
+          await del(ctx, interaction);
           break;
         case 'info':
-          await RunInfoSubCommand(ctx, interaction);
+          await info(ctx, interaction);
           break;
         case 'raw':
-          await RunRawSubCommand(ctx, interaction);
+          await raw(ctx, interaction);
           break;
         default:
           return interaction.respond([]);

@@ -9,7 +9,7 @@ export const CreateSubCommand: ApplicationCommandOptions = {
   options: []
 } as ApplicationCommandOptions;
 
-export async function RunCreateSubCommand(ctx: Context, interaction: ChatInputCommandInteraction) {
+export async function create(ctx: Context, interaction: ChatInputCommandInteraction) {
   if (interaction.options.getSubcommand() === CreateSubCommand.name) {
     await interaction.showModal(
       {

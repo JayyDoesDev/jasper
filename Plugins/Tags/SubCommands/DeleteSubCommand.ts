@@ -19,7 +19,7 @@ export const DeleteSubCommand: ApplicationCommandOptions = {
     ]
 } as ApplicationCommandOptions;
 
-export async function RunDeleteSubCommand(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
+export async function del(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
     if (interaction.isChatInputCommand()) {
         if (interaction.options.getSubcommand() === DeleteSubCommand.name) {
             const guildId = interaction.guild.id;

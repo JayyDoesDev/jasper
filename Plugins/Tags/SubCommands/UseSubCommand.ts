@@ -24,7 +24,7 @@ export const UseSubCommand: ApplicationCommandOptions = {
     ],
 } as ApplicationCommandOptions;
 
-export async function RunUseSubCommand(
+export async function use(
     ctx: Context,
     interaction: ChatInputCommandInteraction | AutocompleteInteraction
 ) {

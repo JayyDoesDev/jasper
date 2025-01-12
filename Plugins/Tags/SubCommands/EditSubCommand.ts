@@ -9,7 +9,7 @@ export const EditSubCommand: ApplicationCommandOptions = {
   options: []
 } as ApplicationCommandOptions;
 
-export async function RunEditSubCommand(ctx: Context, interaction: ChatInputCommandInteraction) {
+export async function edit(ctx: Context, interaction: ChatInputCommandInteraction) {
   if (interaction.options.getSubcommand() === EditSubCommand.name) {
     await interaction.showModal(
       {
