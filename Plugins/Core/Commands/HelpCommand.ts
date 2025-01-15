@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ApplicationCommandType } from "@antibot/interactions";
-import { ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import fs from 'fs';
 import path from 'path';
 import { documentationAutocomplete } from "../Controllers/documentationAutocomplete";
@@ -35,7 +35,7 @@ export = {
                 color: global.embedColor
             };
 
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         },
         autocomplete: async (_, interaction) => {
             const choices = documentationAutocomplete(documentationContent);

@@ -1,6 +1,6 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
+import { AutocompleteInteraction, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { Options, TagResponse } from "../../../Services/TagService";
 
 export const ShowSubCommand: ApplicationCommandOptions = {
@@ -28,7 +28,7 @@ export async function show(ctx: Context, interaction: ChatInputCommandInteractio
 
             const exists = await ctx.services.tags.itemExists<Options>();
 
-            if (!exists) return interaction.reply({ content: 'Tag not found!', ephemeral: true });
+            if (!exists) return interaction.reply({ content: 'Tag not found!', flags: MessageFlags.Ephemeral });
 
             const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = await ctx.services.tags.getValues<Options, TagResponse>();
 
@@ -44,7 +44,7 @@ export async function show(ctx: Context, interaction: ChatInputCommandInteractio
                         }
                     }
                 ],
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             })
         }
     }

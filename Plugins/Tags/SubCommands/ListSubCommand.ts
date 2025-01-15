@@ -1,6 +1,6 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
+import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from "discord.js";
 import { Tag } from "../../../Models/GuildDocument";
 
 function chunkArray<T>(array: T[], size: number): T[][] {
@@ -25,7 +25,7 @@ export async function list(ctx: Context, interaction: ChatInputCommandInteractio
 
         const tags = await ctx.services.tags.getMultiValues<Snowflake, Tag[]>(guildId);
 
-        if (!tags || tags.length === 0) return interaction.reply({ content: 'Couldn\'t find any tags for this guild!', ephemeral: true });
+        if (!tags || tags.length === 0) return interaction.reply({ content: 'Couldn\'t find any tags for this guild!', flags: MessageFlags.Ephemeral });
 
         const tagPages = chunkArray(tags, 10);
 
@@ -68,7 +68,7 @@ export async function list(ctx: Context, interaction: ChatInputCommandInteractio
               ]
             }
           ],
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
       });
 
       }

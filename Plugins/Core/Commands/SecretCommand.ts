@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { ApplicationCommandType, PermissionBitToString, Permissions, PermissionsToHuman } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { defineCommand } from "../../../Common/define";
@@ -27,7 +27,7 @@ export = {
                     color: global.embedColor,
                 },
             ],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
         });
       },
   }),

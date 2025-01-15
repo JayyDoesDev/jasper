@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { ApplicationCommandOptionType, ApplicationCommandType, PermissionsBitField } from "@antibot/interactions";
 import { defineCommand } from "../../../Common/define";
-import { ChannelType, ChatInputCommandInteraction } from "discord.js";
+import { ChannelType, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { checkForRoles } from "../../../Common/roles";
 
 export = {
@@ -37,7 +37,7 @@ export = {
                 const appliedTags = (interaction.channel as any).appliedTags;
                 if (interaction.channel.type == ChannelType.PublicThread) {
                     if (appliedTags.length >= 5) {
-                        return interaction.reply({ content: "This thread already has 5 tags applied.\nPlease remove one tag before executing `/resolve` again!", ephemeral: true });
+                        return interaction.reply({ content: "This thread already has 5 tags applied.\nPlease remove one tag before executing `/resolve` again!", flags: MessageFlags.Ephemeral });
                     }
                   
                     if (!appliedTags.includes("1144008960966402149")) {
@@ -74,10 +74,10 @@ export = {
                     }
                     return;
                 } else {
-                    return interaction.reply({ content: "Channel is not a thread. This command **must be** executed in Forum Posts!",ephemeral: true });
+                    return interaction.reply({ content: "Channel is not a thread. This command **must be** executed in Forum Posts!", flags: MessageFlags.Ephemeral });
                 }
             }
-            return interaction.reply({ content: "Sorry but you can't use this command.", ephemeral: true });
+            return interaction.reply({ content: "Sorry but you can't use this command.", flags: MessageFlags.Ephemeral });
         },
     })
 }

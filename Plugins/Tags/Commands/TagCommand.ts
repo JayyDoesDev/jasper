@@ -1,7 +1,7 @@
 import { ApplicationCommandOptions, ApplicationCommandType, } from "@antibot/interactions";
 import { defineCommand } from "../../../Common/define";
 import { Context } from "../../../Source/Context";
-import { ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import {
   CreateSubCommand,
   DeleteSubCommand,
@@ -56,10 +56,7 @@ export = {
         if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || TagAuthor === interaction.user.id) {
           await del(ctx, interaction);
         } else {
-          return interaction.reply({
-            content: "Sorry but you can't use this command.",
-            ephemeral: true,
-          });
+          return interaction.reply({ content: "Sorry but you can't use this command.", flags: MessageFlags.Ephemeral, });
         }
       }
 
@@ -88,10 +85,7 @@ export = {
             break;
         }
       } else {
-        return interaction.reply({
-          content: "Sorry but you can't use this command.",
-          ephemeral: true,
-        });
+        return interaction.reply({ content: "Sorry but you can't use this command.", flags: MessageFlags.Ephemeral, });
       }
       return;
     },

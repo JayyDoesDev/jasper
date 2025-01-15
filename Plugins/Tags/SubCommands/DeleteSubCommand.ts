@@ -1,6 +1,6 @@
 import { Context } from "../../../Source/Context";
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
-import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
+import { AutocompleteInteraction, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { Emojis } from "../../../Common/enums";
 import { Options, TagResponse } from "../../../Services/TagService";
 
@@ -29,7 +29,7 @@ export async function del(ctx: Context, interaction: ChatInputCommandInteraction
 
             const isDeleted = await ctx.services.tags.delete<Options, boolean>();
 
-            if (isDeleted) return interaction.reply({ content: `${Emojis.CHECK_MARK} Successfully deleted \`${name}\`!`, ephemeral: true });
+            if (isDeleted) return interaction.reply({ content: `${Emojis.CHECK_MARK} Successfully deleted \`${name}\`!`, flags: MessageFlags.Ephemeral });
 
             return interaction.reply({ content: 'Tag not found!', ephemeral: true });
         }

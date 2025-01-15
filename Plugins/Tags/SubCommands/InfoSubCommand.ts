@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { AutocompleteInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType } from "discord.js";
+import { AutocompleteInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from "discord.js";
 import { checkForRoles } from "../../../Common/roles";
 import { Options, TagResponse } from "../../../Services/TagService";
 
@@ -31,7 +31,7 @@ export async function info(ctx: Context, interaction: ChatInputCommandInteractio
 
             const exists = await ctx.services.tags.itemExists<Options>();
 
-            if (!exists) return interaction.reply({ content: 'Tag not found!', ephemeral: true });
+            if (!exists) return interaction.reply({ content: 'Tag not found!', flags: MessageFlags.Ephemeral });
 
             const { TagName, TagAuthor, TagEditedBy } = await ctx.services.tags.getValues<Options, TagResponse>();
 
@@ -81,7 +81,7 @@ export async function info(ctx: Context, interaction: ChatInputCommandInteractio
                         components: [...<any>buttons]
                     }
                 ],
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             })
 
         }

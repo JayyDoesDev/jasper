@@ -1,6 +1,6 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { ChatInputCommandInteraction, TextChannel } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags, TextChannel } from "discord.js";
 import fs from "fs";
 import path from "path";
 import { writeToThreadIdFile, writeToVideoIdFile } from "../../../Source";
@@ -32,7 +32,7 @@ export async function RunNotifyVideoDiscussionsSubCommand(ctx: Context, interact
                 //@ts-ignore
                 const channel: TextChannel = ctx.channels.resolve(ctx.env.get("youtube_post_channel"));
                 if (!channel) {
-                    return interaction.reply({ content: "Could not find the video discussions channel.", ephemeral: true });
+                    return interaction.reply({ content: "Could not find the video discussions channel.", flags: MessageFlags.Ephemeral });
                 }
 
                 try {
@@ -54,9 +54,9 @@ export async function RunNotifyVideoDiscussionsSubCommand(ctx: Context, interact
 
                         writeToThreadIdFile(thread.id);
                         writeToVideoIdFile(latest.id);
-                        return interaction.reply({ content: "Latest video now posted.", ephemeral: true });
+                        return interaction.reply({ content: "Latest video now posted.", flags: MessageFlags.Ephemeral });
                     } else {
-                        return interaction.reply({ content: "Latest video already posted.", ephemeral: true });
+                        return interaction.reply({ content: "Latest video already posted.", flags: MessageFlags.Ephemeral });
                     }
                 } catch (err) {
                     console.error('Error sending message or creating thread:', err);
@@ -65,7 +65,7 @@ export async function RunNotifyVideoDiscussionsSubCommand(ctx: Context, interact
                     }
                 }
             } else {
-                return interaction.reply({ content: "It looks like the most recent video has already been posted.", ephemeral: true });
+                return interaction.reply({ content: "It looks like the most recent video has already been posted.", flags: MessageFlags.Ephemeral });
             }
         }
     }

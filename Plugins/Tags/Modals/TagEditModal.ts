@@ -1,5 +1,5 @@
 import { defineEvent } from "../../../Common/define";
-import { ModalSubmitInteraction } from "discord.js";
+import { MessageFlags, ModalSubmitInteraction } from "discord.js";
 import { Context } from "../../../Source/Context";
 import { Emojis } from "../../../Common/enums";
 import { Options, TagResponse } from "../../../Services/TagService";
@@ -28,11 +28,11 @@ export = {
             const guildId = interaction.guild.id;
 
             if (!(await ctx.services.tags.itemExists<Options>({ guildId, name }))) {
-                return interaction.reply({ content: `> The support tag \`${name}\` doesn't exist!`, ephemeral: true });
+                return interaction.reply({ content: `> The support tag \`${name}\` doesn't exist!`, flags: MessageFlags.Ephemeral });
             }
 
             if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
-                return interaction.reply({ content: `> The provided image link is not a valid image URL!`, ephemeral: true })
+                return interaction.reply({ content: `> The provided image link is not a valid image URL!`, flags: MessageFlags.Ephemeral });
             }
 
             await ctx.services.tags.modify<Options & { tag?: Tag }, void>({ guildId, name, tag: { name, title, editedBy, description, image_url, footer } });
@@ -49,7 +49,8 @@ export = {
                         image: { url: TagEmbedImageURL ?? undefined },
                         footer: { text: TagEmbedFooter}
                     }
-                ]
+                ],
+                flags: MessageFlags.Ephemeral
             })
         }
     })

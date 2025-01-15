@@ -1,6 +1,6 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { AttachmentBuilder, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
+import { AttachmentBuilder, AutocompleteInteraction, ChatInputCommandInteraction, MessageFlags } from "discord.js";
 import { Options, Tag, TagResponse } from "../../../Services/TagService";
 
 export const RawSubCommand: ApplicationCommandOptions = {
@@ -28,7 +28,7 @@ export async function raw(ctx: Context, interaction: ChatInputCommandInteraction
 
             const exists = await ctx.services.tags.itemExists<Options>();
 
-            if (!exists) return interaction.reply({ content: 'Tag not found!', ephemeral: true });
+            if (!exists) return interaction.reply({ content: 'Tag not found!', flags: MessageFlags.Ephemeral });
 
             const { TagAuthor, TagName, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter, TagEditedBy } = await ctx.services.tags.getValues<Options, TagResponse>();
 
@@ -60,7 +60,7 @@ export async function raw(ctx: Context, interaction: ChatInputCommandInteraction
 
             const attachment = new AttachmentBuilder(Buffer.from(fileContent, "utf-8"), { name: `${TagName}.txt` });
 
-            return interaction.reply({ content: `Here is the raw content of the tag \`${TagName}\`:`, files: [attachment], ephemeral: true });
+            return interaction.reply({ content: `Here is the raw content of the tag \`${TagName}\`:`, files: [attachment], flags: MessageFlags.Ephemeral });
         }
     }
 

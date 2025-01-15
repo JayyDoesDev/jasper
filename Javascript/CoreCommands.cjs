@@ -1,4 +1,5 @@
 const { defineCommand } = require("../Common/define");
+const { MessageFlags } = require("discord.js");
 const { ApplicationCommandType } = require("@antibot/interactions");
 
 exports.Command = defineCommand({
@@ -11,7 +12,7 @@ exports.Command = defineCommand({
         on: (ctx, interaction) => {
             return interaction.reply({
                 content: "pong!",
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
     })
