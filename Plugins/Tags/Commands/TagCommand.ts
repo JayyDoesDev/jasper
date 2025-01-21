@@ -21,7 +21,7 @@ import {
   raw
 } from "../SubCommands";
 import { checkForRoles } from "../../../Common/roles";
-import { Options, TagResponse } from "../../../Services/TagService";
+import { Options } from "../../../Services/TagService";
 
 const subCommands: ApplicationCommandOptions[] = [
   CreateSubCommand,
@@ -50,10 +50,8 @@ export = {
         const name = interaction.options.getString("tag-name");
         
         await ctx.services.tags.configure<Options>({ guildId, name });
-        
-        const { TagAuthor } = await ctx.services.tags.getValues<Options, TagResponse>();
 
-        if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE) || TagAuthor === interaction.user.id) {
+        if (checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
           await del(ctx, interaction);
         } else {
           return interaction.reply({ content: "Sorry but you can't use this command.", flags: MessageFlags.Ephemeral, });

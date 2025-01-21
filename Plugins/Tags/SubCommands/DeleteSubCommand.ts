@@ -27,11 +27,11 @@ export async function del(ctx: Context, interaction: ChatInputCommandInteraction
 
             await ctx.services.tags.configure<Options>({ guildId, name });
 
-            const isDeleted = await ctx.services.tags.delete<Options, boolean>();
+            const isDeleted = await ctx.services.tags.deleteValue<Options, boolean>();
 
             if (isDeleted) return interaction.reply({ content: `${Emojis.CHECK_MARK} Successfully deleted \`${name}\`!`, flags: MessageFlags.Ephemeral });
 
-            return interaction.reply({ content: 'Tag not found!', ephemeral: true });
+            return interaction.reply({ content: 'Tag not found!', flags: MessageFlags.Ephemeral });
         }
     }
 

@@ -20,7 +20,7 @@ interface IService {
             R extends R[] ? R[] :
             R extends null | undefined ? [] : R[]
         > | Promise<CommonCondition<R>>;
-    delete<T, R>(d: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    deleteValue<T, R>(d: T): Promise<CommonCondition<R>> | CommonCondition<R>;
 }
 
 export abstract class Service extends Store implements IService {
@@ -38,6 +38,6 @@ export abstract class Service extends Store implements IService {
             R extends R[] ? R[] :
             R extends null | undefined ? [] : R[]
         > | Promise<CommonCondition<R>>;
-    public abstract delete<T, R>(d?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    public abstract deleteValue<T, R>(d?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
 }
 

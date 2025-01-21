@@ -1,7 +1,7 @@
 import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from "discord.js";
-import { Tag } from "../../../Models/GuildDocument";
+import { Tag } from "../../../Models/GuildSchema";
 
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];

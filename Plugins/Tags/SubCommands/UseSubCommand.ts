@@ -55,8 +55,7 @@ export async function use(
                             text: TagEmbedFooter ?? ''
                         }
                     }
-                ],
-                flags: MessageFlags.Ephemeral
+                ]
             })
         }
     }

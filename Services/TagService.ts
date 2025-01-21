@@ -2,9 +2,8 @@ import { Snowflake } from "@antibot/interactions";
 import { Nullable } from "../Common/types";
 import { Context } from "../Source/Context";
 import { CommonCondition, Service } from "./Service";
-import TagSchema from "../Models/GuildSchema";
-import GuildSchema from "../Models/GuildSchema";
-import { Tag as ExtTag } from "../Models/GuildDocument";
+import TagSchema, { GuildDocument } from "../Models/GuildSchema";
+import { getGuild } from "../Common/db";
 
 export type Options = {
     guildId: Snowflake;
@@ -32,15 +31,15 @@ export type TagResponse = {
 };
 
 class TagService extends Service {
-    public guildId: Snowflake;
-    public name: string;
-    public tag: Tag;
+    private guildId: Snowflake;
+    private name: string;
+    private tag: Tag;
 
     constructor(public ctx: Context) {
         super(ctx);
         this.guildId = "";
         this.name = "";
-        this.tag = { author: "", editedBy: null, name: "", title: "", description: null, image_url: null, footer: null };
+        this.tag = { author: null, editedBy: null, name: null, title: null, description: null, image_url: null, footer: null };
     }
 
     #makeGuildKey(id: string): Record<'guild', string> {
@@ -50,7 +49,7 @@ class TagService extends Service {
     public configure<T>(config: T extends Options ? Options & { tag?: Tag } : null): ThisParameterType<this> {
         this.guildId = config?.guildId ?? "";
         this.name = config?.name ?? "";
-        this.tag = config?.tag ?? { author: "", editedBy: null, name: "", title: "", description: null, image_url: null, footer: null };
+        this.tag = config?.tag ?? { author: null, editedBy: null, name: null, title: null, description: null, image_url: null, footer: null };
 
         return <ThisParameterType<this>>this;
     }
@@ -68,40 +67,10 @@ class TagService extends Service {
             name = exists.name;
         }
 
-        const key = this.#makeGuildKey(guildId);
-
-        if (!(await this.ctx.store.guildExists(key))) {
-            if (!(await GuildSchema.findOne({ _id: guildId }))) return false;
-            this.ctx.store.setKey(key);
-        }
-
-        let tags = await this.ctx.store.getGuild<TagResponse[]>(key);
-
-        if (!Array.isArray(tags)) {
-            tags = [];
-            this.ctx.store.setKey(key, ...tags);
-        }
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+        const tags = guild.Tags;
 
         if (tags.find((tag) => tag.TagName === name)) return true;
-
-        try {
-            const guild = await TagSchema.findOne({ _id: guildId });
-
-            if (guild) {
-                const tag = guild.Tags.find((tag) => tag.TagName === name);
-                if (!tag) return false;
-
-                const { TagName, TagAuthor, TagEditedBy, TagResponse } = tag;
-                const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = TagResponse;
-
-                tags.push({ TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter });
-                this.ctx.store.setKey(key, ...tags);
-                return true;
-            }
-        } catch (error) {
-            console.error("Error fetching tags from the database:", error);
-            return false;
-        }
 
         return false;
     }
@@ -115,18 +84,15 @@ class TagService extends Service {
             name = get.name;
         }
 
-        const key = this.#makeGuildKey(guildId);
+        if (!(await this.itemExists<Options>({ guildId, name }))) return null;
 
-        if (!(await this.ctx.services.tags.itemExists<Options>({ guildId, name }))) return null;
-
-        let tags = await this.ctx.store.getGuild<TagResponse[]>(key);
-
-        if (!Array.isArray(tags)) tags = [];
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+        const tags = guild.Tags;
 
         const tag = tags.find((tag) => tag.TagName === name);
-        if (!tag) return null;
 
-        const { TagName, TagAuthor, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = tag;
+        const { TagName, TagAuthor, TagResponse } = tag;
+        const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = TagResponse;
 
         return <CommonCondition<R extends TagResponse ? TagResponse : null>>{ TagName, TagAuthor, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter };
     }
@@ -142,11 +108,7 @@ class TagService extends Service {
             tag = create.tag ?? { author: "", editedBy: null, name: "", title: "", description: null, image_url: null, footer: null };
         }
 
-        const key = this.#makeGuildKey(guildId);
-
-        if (!(await this.ctx.store.guildExists(key))) this.ctx.store.setKey(key);
-
-        const cache = await this.ctx.store.getGuild<TagResponse[]>(key);
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
 
         const TagName = name.trim();
         const TagAuthor = tag.author;
@@ -156,9 +118,9 @@ class TagService extends Service {
         const TagEmbedImageURL = tag.image_url ?? null;
         const TagEmbedFooter = tag.footer ?? null;
 
-        cache.push({ TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter });
-        
-        this.ctx.store.setKey(key, ...cache);
+        guild.Tags.push({ TagName, TagAuthor, TagEditedBy, TagResponse: { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } });
+        await this.ctx.store.setForeignKey(guildId, guild);
+
         await TagSchema.updateOne(
             { _id: guildId },
             {
@@ -186,38 +148,35 @@ class TagService extends Service {
         if (!this.#checkConfig() && mod) {
             guildId = mod.guildId;
             name = mod.name;
-            tag = mod.tag ?? { author: "", editedBy: null, name: "", title: "", description: null, image_url: null, footer: null };
+            tag = mod.tag ?? { author: "", editedBy: null, name: "", title: null, description: null, image_url: null, footer: null }; // Ensure null default values
         }
 
-        const key = this.#makeGuildKey(guildId);
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+        const tagInDb = guild.Tags.find((tag) => tag.TagName === name);
+        const index = guild.Tags.findIndex((tag) => tag.TagName === name);
 
-        if (!(await this.ctx.services.tags.itemExists<Options>({ guildId, name }))) console.log("Tag not found");
-
-        let tags = await this.ctx.store.getGuild<TagResponse[]>(key);
-
-        if (!Array.isArray(tags)) tags = [];
-
-        const index = tags.findIndex((tag) => tag.TagName === name);
+        if (tag.title.length === 0) tag.title = tagInDb.TagResponse.TagEmbedTitle;
+        if (tag.editedBy.length === 0) tag.editedBy = tagInDb.TagEditedBy;
+        if (tag.description.length === 0) tag.description = tagInDb.TagResponse.TagEmbedDescription;
+        if (tag.image_url.length === 0) tag.image_url = tagInDb.TagResponse.TagEmbedImageURL;
+        if (tag.footer.length === 0) tag.footer = tagInDb.TagResponse.TagEmbedFooter;
 
         const TagName = tag.name;
         const TagEditedBy = tag.editedBy;
-        const TagEmbedTitle = tag.title ?? tags[index].TagEmbedTitle;
-        const TagEmbedDescription = tag.description ?? tags[index].TagEmbedDescription;
-        const TagEmbedImageURL = tag.image_url ?? tags[index].TagEmbedImageURL;
-        const TagEmbedFooter = tag.footer ?? tags[index].TagEmbedFooter;
+        const TagEmbedTitle = tag.title;
+        const TagEmbedDescription = tag.description;
+        const TagEmbedImageURL = tag.image_url;
+        const TagEmbedFooter = tag.footer;
 
-        if (index !== -1) {
-            const { TagAuthor } = tags[index];
+        guild[index] = { TagName, TagEditedBy, TagResponse: { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } };
 
-            tags[index] = { TagName, TagAuthor, TagEditedBy, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter };
-        } else {
-            console.log("Tag not found in cache");
-        }
+        await this.ctx.store.setForeignKey(guildId, guild);
 
-        this.ctx.store.setKey(key, ...tags);
-
-        await TagSchema.findOneAndUpdate(
-            { _id: guildId, "Tags.TagName": TagName },
+        await TagSchema.updateOne(
+            {
+                _id: guildId,
+                "Tags.TagName": TagName,
+            },
             {
                 $set: {
                     "Tags.$.TagEditedBy": TagEditedBy,
@@ -227,7 +186,7 @@ class TagService extends Service {
                     "Tags.$.TagResponse.TagEmbedFooter": TagEmbedFooter
                 }
             }
-        )
+        );
 
         return <CommonCondition<R>>null;
     }
@@ -239,31 +198,25 @@ class TagService extends Service {
             guildId = getMultiValues;
         }
 
-        const key = this.#makeGuildKey(guildId);
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+        const tags = guild.Tags;
 
-        let tags = await this.ctx.store.getGuild<ExtTag[]>(key);
+        const filteredTags = [];
 
-        if (!Array.isArray(tags) || tags.length === 0) {
-            const guild = await TagSchema.findOne({ _id: guildId });
-
-            if (guild) {
-                tags = guild.Tags;
-
-                const filteredTags = [];
-
-                for (const tag of tags) {
-                    const { TagAuthor, TagEditedBy, TagName, TagResponse } = tag;
-                    const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = TagResponse;
-                    filteredTags.push({ TagAuthor, TagEditedBy, TagName, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter });
-                }
-            } else {
-                tags = [];
-            }
+        if (tags.length === 0) {
+            return <CommonCondition<R>>filteredTags;
         }
-        return <CommonCondition<R>>tags;
+
+        for (const tag of tags) {
+            const { TagAuthor, TagEditedBy, TagName, TagResponse } = tag;
+            const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = TagResponse;
+            filteredTags.push({ TagAuthor, TagEditedBy, TagName, TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter });
+        }
+
+        return <CommonCondition<R>>filteredTags;
     }
 
-    public async delete<T, R>(d?: T extends Options ? Options : null): Promise<CommonCondition<R>> {
+    public async deleteValue<T, R>(d?: T extends Options ? Options : null): Promise<CommonCondition<R>> {
         let guildId = this.guildId;
         let name = this.name;
 
@@ -272,22 +225,20 @@ class TagService extends Service {
             name = d.name;
         }
 
-        const key = this.#makeGuildKey(guildId);
-
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
         const tag = await this.itemExists<Options>({ guildId, name });
 
         if (tag) {
-            const tags = await this.ctx.store.getGuild<TagResponse[]>(key);
-            const index = tags.findIndex((tag) => tag.TagName === name);
+            const index = guild.Tags.findIndex((tag) => tag.TagName === name);
 
-            tags.splice(index, 1);
-            this.ctx.store.setKey(key, ...tags);
+            guild.Tags.slice(index, 1);
+            await this.ctx.store.setForeignKey(guildId, guild);
 
-            await TagSchema.updateOne({ _id: guildId }, { $pull: { Tags: { TagName: name } } } );
+            await TagSchema.updateOne({ _id: guildId }, { $pull: { Tags: { TagName: name } } });
 
             return <CommonCondition<R>>true;
-        } 
-        
+        }
+
         return <CommonCondition<R>>false;
     }
 }

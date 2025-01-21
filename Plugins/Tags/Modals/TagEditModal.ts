@@ -3,7 +3,7 @@ import { MessageFlags, ModalSubmitInteraction } from "discord.js";
 import { Context } from "../../../Source/Context";
 import { Emojis } from "../../../Common/enums";
 import { Options, TagResponse } from "../../../Services/TagService";
-import { Tag } from "../../../Models/GuildDocument";
+import { Tag } from "../../../Models/GuildSchema";
 
 export = {
     Event: defineEvent({
@@ -47,7 +47,7 @@ export = {
                         color: 0x323338,
                         description: TagEmbedDescription,
                         image: { url: TagEmbedImageURL ?? undefined },
-                        footer: { text: TagEmbedFooter}
+                        footer: { text: TagEmbedFooter }
                     }
                 ],
                 flags: MessageFlags.Ephemeral
