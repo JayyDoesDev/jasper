@@ -23,7 +23,7 @@
     "dependencies": {
         "@antibot/interactions": "^1.4.3",
         "@antibot/zilla": "^1.0.2",
-        "discord.js": "^14.17.2",
+        "discord.js": "^14.17.3",
         "dotenv": "^16.4.7",
         "glob": "^7.2.0",
         "gulp": "^5.0.0",
