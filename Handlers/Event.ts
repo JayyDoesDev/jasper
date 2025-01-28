@@ -7,7 +7,7 @@ import { Plugin } from "../Common/define";
 export default function (ctx: Context): void {
     try {
         let events: string[] = [];
-        process.platform == "linux" ? events = glob.sync("./plugins/**/*.js") : events = glob.sync("./dist/plugins/**/*.js");
+        process.platform == "linux" ? events = glob.sync("./Plugins/**/*.js") : events = glob.sync("./dist/Plugins/**/*.js");
         for (let i = 0; i < events.length; i++) {
             try {
                 const filePath = path.resolve(events[i]);

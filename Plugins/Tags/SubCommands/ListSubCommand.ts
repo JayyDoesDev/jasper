@@ -3,6 +3,11 @@ import { Context } from "../../../Source/Context";
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from "discord.js";
 import { Tag } from "../../../Models/GuildSchema";
 
+interface PaginationState {
+    page: number;
+    tagPages: Tag[][];
+}
+
 function chunkArray<T>(array: T[], size: number): T[][] {
   const result: T[][] = [];
   for (let i = 0; i < array.length; i += size) {
@@ -19,51 +24,66 @@ export const ListSubCommand: ApplicationCommandOptions = {
 } as ApplicationCommandOptions;
 
 export async function list(ctx: Context, interaction: ChatInputCommandInteraction) {
-    if (interaction.isChatInputCommand()) {
-      if (interaction.options.getSubcommand() === ListSubCommand.name) {
-        const guildId = interaction.guild.id;
+    if (interaction.options.getSubcommand() !== ListSubCommand.name) return;
 
-        const tags = await ctx.services.tags.getMultiValues<Snowflake, Tag[]>(guildId);
+    const guildId = interaction.guild.id;
+    const tags = await ctx.services.tags.getMultiValues<Snowflake, Tag[]>(guildId) ?? [];
 
-        if (!tags || tags.length === 0) return interaction.reply({ content: 'Couldn\'t find any tags for this guild!', flags: MessageFlags.Ephemeral });
+    if (tags.length === 0) {
+        return interaction.reply({ 
+            content: 'No tags found in this guild!', 
+            flags: MessageFlags.Ephemeral 
+        });
+    }
 
-        const tagPages = chunkArray(tags, 10);
+    const tagPages = chunkArray<Tag>(tags, 10);
+    const initialState: PaginationState = { page: 0, tagPages };
+    
+    ctx.pagination.set(interaction.user.id, initialState);
+    const state = ctx.pagination.get(interaction.user.id);
 
-        ctx.pagination.set(interaction.user.id, { page: 0, tagPages });
+    if (!state) {
+        return interaction.reply({ 
+            content: 'Failed to initialize pagination state', 
+            flags: MessageFlags.Ephemeral 
+        });
+    }
 
-        const state = ctx.pagination.get(interaction.user.id);
-
-        return interaction.reply({
-          embeds: [
+    return interaction.reply({
+        embeds: [
             {
-              thumbnail: { url: interaction.guild.iconURL() },
-              title: `Server Tag List`,
-              description: state.tagPages[state.page].map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`).join("\n"),
-              footer: { text: `Page: ${state.page + 1}/${state.tagPages.length} • emojis by AnThOnY & deussa`},
-              color: global.embedColor,
+                thumbnail: { url: interaction.guild.iconURL() ?? undefined },
+                title: `Server Tag List`,
+                description: state.tagPages[state.page]
+                    .map((e, i) => `> **${i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : "None"}`)
+                    .join("\n"),
+                footer: { text: `Page: ${state.page + 1}/${state.tagPages.length} • Total Tags: ${tags.length}` },
+                color: global.embedColor = 0x323338,
             }
           ],
           components: [
-            {
-              type: ComponentType.ActionRow,
-              components: [
-                {
-                  type: ComponentType.Button,
-                  customId: `list_subcommand_button_previous_${interaction.user.id}`,
-                  style: ButtonStyle.Primary,
-                  emoji: "1268419004691779624",
-                },
-                {
-                  type: ComponentType.Button,
-                  customId: `list_subcommand_button_home_${interaction.user.id}`,
-                  style: ButtonStyle.Secondary,
-                  emoji: "1268421558066479214",
-                },
-                {
-                  type: ComponentType.Button,
-                  customId: `list_subcommand_button_next_${interaction.user.id}`,
-                  style: ButtonStyle.Primary,
-                  emoji: "1268418951407468556",
+            { 
+                type: ComponentType.ActionRow,
+                components: [
+                    {
+                        type: ComponentType.Button,
+                        customId: `list_subcommand_button_previous_${interaction.user.id}`,
+                        style: ButtonStyle.Primary,
+                        label: 'Previous',
+                        disabled: state.page === 0
+                    },
+                    {
+                        type: ComponentType.Button,
+                        customId: `list_subcommand_button_home_${interaction.user.id}`,
+                        style: ButtonStyle.Secondary,
+                        label: 'Home'
+                    },
+                    {
+                        type: ComponentType.Button,
+                        customId: `list_subcommand_button_next_${interaction.user.id}`,
+                        style: ButtonStyle.Primary,
+                        label: 'Next',
+                        disabled: state.page === state.tagPages.length - 1
                 },
               ]
             }
@@ -71,6 +91,4 @@ export async function list(ctx: Context, interaction: ChatInputCommandInteractio
           flags: MessageFlags.Ephemeral
       });
 
-      }
-    }
 }
