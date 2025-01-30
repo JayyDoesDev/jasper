@@ -138,21 +138,11 @@ class TagService extends Service {
         const TagAuthor = tag.author;
         const TagEditedBy = tag.editedBy;
         const TagEmbedTitle = tag.title;
-        const TagEmbedDescription = tag.description;
-        const TagEmbedImageURL = tag.image_url;
-        const TagEmbedFooter = tag.footer;
+        const TagEmbedDescription = tag.description ?? null;
+        const TagEmbedImageURL = tag.image_url ?? null;
+        const TagEmbedFooter = tag.footer ?? null;
 
-        guild.Tags.push({ 
-            TagName, 
-            TagAuthor, 
-            TagEditedBy, 
-            TagResponse: { 
-                TagEmbedTitle, 
-                TagEmbedDescription, 
-                TagEmbedImageURL, 
-                TagEmbedFooter 
-            } 
-        });
+        guild.Tags.push({ TagName, TagAuthor, TagEditedBy, TagResponse: { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } });
         await this.ctx.store.setForeignKey({ guild: guildId }, guild);
 
         await TagSchema.updateOne(
@@ -164,12 +154,7 @@ class TagService extends Service {
                         TagName,
                         TagAuthor,
                         TagEditedBy,
-                        TagResponse: { 
-                            TagEmbedTitle, 
-                            TagEmbedDescription, 
-                            TagEmbedImageURL, 
-                            TagEmbedFooter 
-                        },
+                        TagResponse: { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter },
                     },
                 },
             },
@@ -203,20 +188,12 @@ class TagService extends Service {
 
         const index = guild.Tags.findIndex((tag) => tag.TagName === name);
 
-        const updatedTagResponse = { ...tagInDb.TagResponse };
-
-        if (tag.title !== undefined && tag.title !== null) {
-            updatedTagResponse.TagEmbedTitle = tag.title;
-        }
-        if (tag.description !== null) {
-            updatedTagResponse.TagEmbedDescription = tag.description;
-        }
-        if (tag.image_url !== null) {
-            updatedTagResponse.TagEmbedImageURL = tag.image_url;
-        }
-        if (tag.footer !== null) {
-            updatedTagResponse.TagEmbedFooter = tag.footer;
-        }
+        const updatedTagResponse = {
+            TagEmbedTitle: tag.title || tagInDb.TagResponse.TagEmbedTitle,
+            TagEmbedDescription: typeof tag.description === 'string' ? tag.description : tagInDb.TagResponse.TagEmbedDescription,
+            TagEmbedImageURL: typeof tag.image_url === 'string' ? tag.image_url : tagInDb.TagResponse.TagEmbedImageURL,
+            TagEmbedFooter: typeof tag.footer === 'string' ? tag.footer : tagInDb.TagResponse.TagEmbedFooter
+        };
 
         const updatedTag = {
             TagName: name,

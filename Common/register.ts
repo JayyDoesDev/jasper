@@ -1,5 +1,5 @@
 import * as Path from "path";
-import glob from "glob";
+import { sync } from "glob";
 import { Command, Event } from "./define";
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from "discord.js";
 
@@ -11,7 +11,7 @@ function massRegister<T extends ChatInputCommandInteraction | ContextMenuCommand
     const items: (Command<T> | Event<T>)[] = [];
 
     for (const path of paths) {
-        const matchingPaths = glob.sync(Path.join(Path.join(dir, path), "**/**/*.js"));
+        const matchingPaths = sync(Path.join(Path.join(dir, path), "**/**/*.js"));
 
         for (const folder of matchingPaths) {
             const module = require(Path.resolve(folder));

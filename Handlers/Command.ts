@@ -1,5 +1,5 @@
 import { Context } from "../Source/Context";
-import glob from "glob";
+import { sync } from "glob";
 import path from "path";
 import { ICommand } from "@antibot/interactions";
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from "discord.js";
@@ -8,7 +8,7 @@ import { Command, Plugin } from "../Common/define";
 
 export default function (ctx: Context): void {
   let commands: string[] = []
-  process.platform == "linux" ? commands = glob.sync("./Plugins/**/*.js") : commands = glob.sync("./dist/Plugins/**/*.js");
+  process.platform == "linux" ? commands = sync("./Plugins/**/*.js") : commands = sync("./dist/Plugins/**/*.js");
 
     for (let i = 0; i < commands.length; i++) {
         const filePath = path.resolve(commands[i]);
