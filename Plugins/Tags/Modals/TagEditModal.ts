@@ -22,9 +22,7 @@ export = {
                     const description = interaction.fields.getTextInputValue("tag_edit_embed_description");
                     const image_url = interaction.fields.getTextInputValue("tag_edit_embed_image_url");
                     const footer = interaction.fields.getTextInputValue("tag_edit_embed_footer");
-                    
-                    console.log(title);
-                    console.log(description);
+
                     const guildId = interaction.guild.id;
 
                     if (!(await ctx.services.tags.itemExists<Options>({ guildId, name }))) {
