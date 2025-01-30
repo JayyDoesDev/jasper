@@ -18,14 +18,16 @@ interface IService {
     getMultiValues<T, R>(getMultiValues?: T):
         CommonCondition<
             R extends R[] ? R[] :
-            R extends null | undefined ? [] : R[]
+            R extends null | undefined ? [] : R[] 
         > | Promise<CommonCondition<R>>;
     deleteValue<T, R>(d: T): Promise<CommonCondition<R>> | CommonCondition<R>;
 }
 
-export abstract class Service extends Store implements IService {
+export abstract class Service implements IService {
+    protected store: Store;
+
     constructor(public readonly ctx: Context) {
-        super(ctx);
+        this.store = ctx.store;
     }
 
     public abstract configure<T>(config: T): ThisParameterType<this>;
@@ -36,8 +38,7 @@ export abstract class Service extends Store implements IService {
     public abstract getMultiValues<T, R>(getMultiValues?: T):
         CommonCondition<
             R extends R[] ? R[] :
-            R extends null | undefined ? [] : R[]
+            R extends null | undefined ? [] : R[] 
         > | Promise<CommonCondition<R>>;
     public abstract deleteValue<T, R>(d?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
 }
-
