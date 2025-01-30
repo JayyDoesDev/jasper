@@ -143,7 +143,7 @@ class TagService extends Service {
         const TagEmbedFooter = tag.footer ?? null;
 
         guild.Tags.push({ TagName, TagAuthor, TagEditedBy, TagResponse: { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } });
-        await this.ctx.store.setForeignKey(guildId, guild);
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
 
         await TagSchema.updateOne(
             { _id: guildId },
@@ -203,7 +203,7 @@ class TagService extends Service {
         };
 
         guild.Tags[index] = updatedTag;
-        await this.ctx.store.setForeignKey(guildId, guild);
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
 
         await TagSchema.updateOne(
             {
@@ -278,7 +278,7 @@ class TagService extends Service {
         }
 
         guild.Tags.splice(index, 1);
-        await this.ctx.store.setForeignKey(guildId, guild);
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
 
         await TagSchema.updateOne(
             { _id: guildId }, 

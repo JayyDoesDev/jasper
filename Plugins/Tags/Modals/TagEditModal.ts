@@ -22,7 +22,9 @@ export = {
                     const description = interaction.fields.getTextInputValue("tag_edit_embed_description");
                     const image_url = interaction.fields.getTextInputValue("tag_edit_embed_image_url");
                     const footer = interaction.fields.getTextInputValue("tag_edit_embed_footer");
-
+                    
+                    console.log(title);
+                    console.log(description);
                     const guildId = interaction.guild.id;
 
                     if (!(await ctx.services.tags.itemExists<Options>({ guildId, name }))) {
@@ -36,7 +38,7 @@ export = {
                     await ctx.services.tags.modify<Options & { tag?: Tag }, void>({ guildId, name, tag: { name, title, editedBy, description, image_url, footer } });
 
                     const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = await ctx.services.tags.getValues<Options, TagResponse>({ guildId, name });
-
+                    console.log(await ctx.services.tags.getValues<Options, TagResponse>({ guildId, name }))
                     return interaction.reply({
                         content: `${Emojis.CHECK_MARK} Successfully edited \`${name}\`!`,
                         embeds: [
