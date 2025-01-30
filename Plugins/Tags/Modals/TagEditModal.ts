@@ -17,11 +17,14 @@ export = {
                     if (!interaction.isModalSubmit()) return;
                     
                     const name = interaction.fields.getTextInputValue("tag_edit_embed_name");
-                    const title = interaction.fields.getTextInputValue("tag_edit_embed_title");
+
+                    const title = interaction.fields.getTextInputValue("tag_edit_embed_title").trim() || undefined;
                     const editedBy = interaction.user.id;
-                    const description = interaction.fields.getTextInputValue("tag_edit_embed_description");
-                    const image_url = interaction.fields.getTextInputValue("tag_edit_embed_image_url");
-                    const footer = interaction.fields.getTextInputValue("tag_edit_embed_footer");
+                    const description = interaction.fields.getTextInputValue("tag_edit_embed_description").trim() || null;
+                    const image_url = interaction.fields.getTextInputValue("tag_edit_embed_image_url").trim() || null;
+                    const footer = interaction.fields.getTextInputValue("tag_edit_embed_footer").trim() || null;
+
+                    console.log('Edit values:', { title, description, image_url, footer });
 
                     const guildId = interaction.guild.id;
 
