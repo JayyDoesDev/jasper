@@ -74,23 +74,21 @@ export function defineCommand<Interaction extends ChatInputCommandInteraction | 
             if (interaction instanceof ChatInputCommandInteraction) {
                 const subCommandName = interaction.options.getSubcommand(false);
                 if (subCommandName && options.subCommands?.[subCommandName]) {
+                    const message = {
+                        content: "Sorry but you can't use this command.",
+                        flags: MessageFlags.Ephemeral
+                    } as any // djs needs to update their types;
                     if (options.subCommands[subCommandName].permissions) {
                         for (const permission of options.subCommands[subCommandName].permissions) {
                             if (!interaction.memberPermissions.has(permission)) {
-                                await interaction.reply({
-                                    content: "Sorry but you can't use this command.",
-                                    flags: MessageFlags.Ephemeral
-                                });
+                                await interaction.reply(message);
                                 return;
                             }
                         }
                     }
                     if (options.subCommands[subCommandName].allowedRoles) {
                         if (!checkForRoles(interaction, ...options.subCommands[subCommandName].allowedRoles)) {
-                            await interaction.reply({
-                                content: "Sorry but you can't use this command.",
-                                flags: MessageFlags.Ephemeral
-                            });
+                            await interaction.reply(message);
                             return;
                         }
                     }
