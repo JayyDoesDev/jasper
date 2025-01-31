@@ -1,4 +1,4 @@
-import { ApplicationCommandType, PermissionBitToString, Permissions } from "@antibot/interactions";
+import { ApplicationCommandType } from "@antibot/interactions";
 import { defineCommand } from "../../../Common/define";
 import { Context } from "../../../Source/Context";
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
