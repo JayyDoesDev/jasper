@@ -77,7 +77,7 @@ export function defineCommand<Interaction extends ChatInputCommandInteraction | 
                     const message = {
                         content: "Sorry but you can't use this command.",
                         flags: MessageFlags.Ephemeral
-                    } as any // djs needs to update their types;
+                    } as any // djs needs to update their types
                     if (options.subCommands[subCommandName].permissions) {
                         for (const permission of options.subCommands[subCommandName].permissions) {
                             if (!interaction.memberPermissions.has(permission)) {
