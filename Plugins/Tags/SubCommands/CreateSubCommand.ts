@@ -5,6 +5,7 @@ import { defineSubCommand } from "../../../Common/define";
 
 export const CreateSubCommand = defineSubCommand({
   name: "create",
+  allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
   handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     await interaction.showModal({
       customId: `tag_create_${interaction.user.id}`,

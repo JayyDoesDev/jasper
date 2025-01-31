@@ -1,10 +1,13 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
-import { AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, Interaction, PermissionsBitField } from "discord.js";
+import { AutocompleteInteraction, ChatInputCommandInteraction, ContextMenuCommandInteraction, Interaction, MessageFlags, PermissionsBitField } from "discord.js";
 import { Context } from "../Source/Context";
-import { ICommand } from "@antibot/interactions";
+import { ICommand, Snowflake } from "@antibot/interactions";
+import { checkForRoles } from "./roles";
 
 export interface SubCommand {
     name: string;
+    allowedRoles?: Snowflake[];
+    permissions?: PermissionsBitField[] | any[];
     handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => Promise<void>;
 }
@@ -71,11 +74,31 @@ export function defineCommand<Interaction extends ChatInputCommandInteraction | 
             if (interaction instanceof ChatInputCommandInteraction) {
                 const subCommandName = interaction.options.getSubcommand(false);
                 if (subCommandName && options.subCommands?.[subCommandName]) {
+                    if (options.subCommands[subCommandName].permissions) {
+                        for (const permission of options.subCommands[subCommandName].permissions) {
+                            if (!interaction.memberPermissions.has(permission)) {
+                                await interaction.reply({
+                                    content: "Sorry but you can't use this command.",
+                                    flags: MessageFlags.Ephemeral
+                                });
+                                return;
+                            }
+                        }
+                    }
+                    if (options.subCommands[subCommandName].allowedRoles) {
+                        if (!checkForRoles(interaction, ...options.subCommands[subCommandName].allowedRoles)) {
+                            await interaction.reply({
+                                content: "Sorry but you can't use this command.",
+                                flags: MessageFlags.Ephemeral
+                            });
+                            return;
+                        }
+                    }
                     await options.subCommands[subCommandName].handler(ctx, interaction);
                     return;
                 }
             }
-            await originalOn(ctx, interaction);
+            originalOn(ctx, interaction);
         };
 
         if (originalAutocomplete) {
@@ -83,10 +106,24 @@ export function defineCommand<Interaction extends ChatInputCommandInteraction | 
                 if (interaction.isAutocomplete()) {
                     const subCommandName = interaction.options.getSubcommand(false);
                     if (subCommandName && options.subCommands?.[subCommandName]?.autocomplete) {
+                        if (options.subCommands[subCommandName].permissions) {
+                            for (const permission of options.subCommands[subCommandName].permissions) {
+                                if (!interaction.memberPermissions.has(permission)) {
+                                    await interaction.respond([]);
+                                    return;
+                                }
+                            }
+                        }
+                        if (options.subCommands[subCommandName].allowedRoles) {
+                            if (!checkForRoles(interaction, ...options.subCommands[subCommandName].allowedRoles)) {
+                                await interaction.respond([]);
+                                return;
+                            }
+                        }
                         await options.subCommands[subCommandName].autocomplete!(ctx, interaction);
                         return;
                     }
-                    await originalAutocomplete(ctx, interaction);
+                    originalAutocomplete(ctx, interaction);
                 }
             }
         }

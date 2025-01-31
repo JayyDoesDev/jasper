@@ -6,6 +6,7 @@ import { Options, TagResponse } from "../../../Services/TagService";
 
 export const DeleteSubCommand = defineSubCommand({
   name: "delete",
+  allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE],
   handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     const guildId = interaction.guildId!;
     const name = interaction.options.getString("tag-name", true);

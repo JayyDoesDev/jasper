@@ -16,6 +16,7 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
 export const ListSubCommand = defineSubCommand({
     name: "list",
+    allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
 

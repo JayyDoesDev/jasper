@@ -8,6 +8,7 @@ import { Emojis } from "../../../Common/enums";
 
 export const InfoSubCommand = defineSubCommand({
   name: "info",
+  allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
   handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     const guildId = interaction.guildId!;
     const name = interaction.options.getString("tag-name");

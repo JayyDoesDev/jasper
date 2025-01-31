@@ -5,6 +5,7 @@ import { ApplicationCommandOptionType } from "@antibot/interactions";
 
 export const EditSubCommand = defineSubCommand({
   name: "edit",
+  allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
   handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
     await interaction.showModal({
       customId: `tag_edit_${interaction.user.id}`,

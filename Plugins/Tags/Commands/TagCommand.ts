@@ -1,4 +1,4 @@
-import { ApplicationCommandType } from "@antibot/interactions";
+import { ApplicationCommandType, PermissionBitToString, Permissions } from "@antibot/interactions";
 import { defineCommand } from "../../../Common/define";
 import { Context } from "../../../Source/Context";
 import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
@@ -21,7 +21,7 @@ export = {
       name: "tag",
       type: ApplicationCommandType.CHAT_INPUT,
       description: "Create, list, edit, and delete tags!",
-      options: subCommandOptions,
+      options: subCommandOptions
     },
     subCommands: {
       create: CreateSubCommand,
