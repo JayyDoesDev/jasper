@@ -31,7 +31,6 @@ global.messageTimeWindow = CONFIG.slowmode.messageTimeWindow;
 global.messageThreshold = CONFIG.slowmode.messageThreshold;
 global.embedColor = CONFIG.embedColor;
 
-
 async function postNewVideo(): Promise<void> {
   if (ctx.env.get("youtube_post_update") === "0") return;
 
@@ -49,6 +48,7 @@ async function postNewVideo(): Promise<void> {
       const data = await fs.readFile(CONFIG.paths.latestVideo, 'utf-8');
       currentVideoId = JSON.parse(data).video;
     } catch (err) {
+      console.log(err);
     }
 
     if (currentVideoId === latest.id) {
@@ -87,6 +87,7 @@ async function postNewVideo(): Promise<void> {
         }
       }
     } catch (err) {
+      console.log(err);
     }
 
     await Promise.all([
