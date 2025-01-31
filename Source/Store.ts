@@ -47,7 +47,6 @@ export class Store extends Redis {
         
         try {
             const key = JSON.stringify(options);
-            console.log('Trying key:', key);
             let raw = await this.get(key);
             
             if (!raw && options.guild) {
@@ -67,7 +66,6 @@ export class Store extends Redis {
             }
             
             const parsed = JSON.parse(raw);
-            console.log('Parsed result:', parsed);
             return parsed as T;
         } catch (err) {
             console.error('Error in getGuild:', err);

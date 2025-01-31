@@ -1,100 +1,94 @@
-/* eslint @typescript-eslint/no-explicit-any: "off" */
-import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
+import { ApplicationCommandOptionType } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { AutocompleteInteraction, ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from "discord.js";
-import { checkForRoles } from "../../../Common/roles";
+import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import { defineSubCommand } from "../../../Common/define";
 import { Options, TagResponse } from "../../../Services/TagService";
+import { Emojis } from "../../../Common/enums";
 
-export const InfoSubCommand: ApplicationCommandOptions = {
-    name: "info",
-    description: "Get the info of a tag!",
-    type: ApplicationCommandOptionType.SUB_COMMAND,
-    options: [
+
+export const InfoSubCommand = defineSubCommand({
+  name: "info",
+  handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
+    const guildId = interaction.guildId!;
+    const name = interaction.options.getString("tag-name");
+
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+    await ctx.services.tags.configure<Options>({ guildId, name });
+    const tag = await ctx.services.tags.getValues<Options, TagResponse>();
+    
+    if (!tag) {
+      await interaction.editReply("Tag not found.");
+      return;
+    }
+
+    const exists = (value: string | undefined) => value ? Emojis.CHECK_MARK : Emojis.CROSS_MARK;
+
+    const embed = {
+      thumbnail: { url: ctx.user.displayAvatarURL() },
+      title: `Tag Info: ${tag.TagName}`,
+      color: global.embedColor,
+      fields: [
         {
-            name: "tag-name",
-            description: "Provide the tag name of the tag you would like to check!",
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
-            autocomplete: true
+          name: "Author",
+          value: tag.TagAuthor ? `<@${tag.TagAuthor}>` : "Unknown",
+          inline: true
+        },
+        {
+          name: "Edited by",
+          value: tag.TagEditedBy ? `<@${tag.TagEditedBy}>` : "Orignal Author",
+          inline: true
+        },
+        {
+          name: "Title",
+          value: tag.TagEmbedTitle || "No title",
+          inline: true
+        },
+        {
+          name: "Has Description",
+          value: exists(tag.TagEmbedDescription),
+          inline: true
+        },
+        {
+          name: "Has Image",
+          value: exists(tag.TagEmbedImageURL),
+          inline: true
+        },
+        {
+          name: "Has Footer",
+          value: exists(tag.TagEmbedFooter),
+          inline: true
         }
-    ]
-} as ApplicationCommandOptions;
-
-export async function info(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
-    if (interaction.isChatInputCommand()) {
-        if (interaction.options.getSubcommand() === InfoSubCommand.name) {
-            const guildId = interaction.guild.id;
-            const name = interaction.options.getString('tag-name');
-            const author = interaction.user.id;
-
-            await ctx.services.tags.configure<Options>({ guildId, name });
-
-            const exists = await ctx.services.tags.itemExists<Options>();
-
-            if (!exists) return interaction.reply({ content: 'Tag not found!', flags: MessageFlags.Ephemeral });
-
-            const { TagName, TagAuthor, TagEditedBy } = await ctx.services.tags.getValues<Options, TagResponse>();
-
-            const buttons = [
-                {
-                    type: ComponentType.Button,
-                    label: 'Raw',
-                    customId: `raw_info_subcommand_${TagName}_${author}`,
-                    style: ButtonStyle.Primary,
-                    disabled: false
-                },
-                {
-                    type: ComponentType.Button,
-                    label: 'Edit',
-                    customId: `edit_info_subcommand_${TagName}_${author}`,
-                    style: ButtonStyle.Primary,
-                    disabled: false
-                },
-                {
-                    type: ComponentType.Button,
-                    label: 'Delete',
-                    customId: `delete_info_subcommand_${TagName}_${author}`,
-                    style: ButtonStyle.Primary,
-                    disabled: true
-                }
-            ];
-
-            if (!checkForRoles(interaction, process.env.ADMIN_ROLE, process.env.STAFF_ROLE)) {
-                for (const button of buttons) {
-                    if (button.label == 'Delete') {
-                        button.disabled = true;
-                    }
-                }
-            }
-
-            return interaction.reply({
-                embeds: [
-                    {
-                        title: TagName,
-                        color: global.embedColor,
-                        description: `> **Created by ${TagAuthor ? `<@${TagAuthor}>` : "Unknown"}**\n**> Edited by ${TagEditedBy ? `<@${TagEditedBy}>` : "No one"}**`
-                    }
-                ],
-                components: [
-                    {
-                        type: ComponentType.ActionRow,
-                        components: [...<any>buttons]
-                    }
-                ],
-                flags: MessageFlags.Ephemeral
-            })
-
-        }
+      ]
     }
 
-    if (interaction.isAutocomplete()) {
-        if (interaction.options.getSubcommand() === InfoSubCommand.name) {
-            const focus = interaction.options.getFocused();
+    await interaction.editReply({ embeds: [embed] });
+  },
+  autocomplete: async (ctx: Context, interaction) => {
+    const guildId = interaction.guildId!;
+    const query = interaction.options.getString("tag-name") || "";
 
-            const tags = await ctx.services.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
-            const filteredTags = focus.length > 0 ? tags.filter((tag) => tag.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
+    const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
+    const filtered = tags
+      .filter(tag => tag.TagName.toLowerCase().includes(query.toLowerCase()))
+      .slice(0, 25)
+      .map(tag => ({ name: tag.TagName, value: tag.TagName }));
 
-            await interaction.respond(filteredTags.map((tag) => ({ name: tag.TagName, value: tag.TagName })).slice(0, 20));
-        }
+    await interaction.respond(filtered);
+  }
+});
+
+export const commandOptions = {
+  name: InfoSubCommand.name,
+  description: "Show information about a tag",
+  type: ApplicationCommandOptionType.SUB_COMMAND,
+  options: [
+    {
+      name: "tag-name",
+      description: "The name of the tag to get info for",
+      type: ApplicationCommandOptionType.STRING,
+      required: true,
+      autocomplete: true
     }
-}
+  ]
+};

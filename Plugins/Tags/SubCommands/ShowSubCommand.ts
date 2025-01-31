@@ -1,62 +1,60 @@
-import { ApplicationCommandOptions, ApplicationCommandOptionType, Snowflake } from "@antibot/interactions";
+import { ApplicationCommandOptionType } from "@antibot/interactions";
 import { Context } from "../../../Source/Context";
-import { AutocompleteInteraction, ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags } from "discord.js";
+import { defineSubCommand } from "../../../Common/define";
 import { Options, TagResponse } from "../../../Services/TagService";
 
-export const ShowSubCommand: ApplicationCommandOptions = {
-    name: "show",
-    description: "Show a tag!",
-    type: ApplicationCommandOptionType.SUB_COMMAND,
-    options: [
-        {
-            name: "tag-name",
-            description: "Provide the name of the tag you would like to check out!",
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
-            autocomplete: true
-        }
-    ]
-} as ApplicationCommandOptions;
+export const ShowSubCommand = defineSubCommand({
+  name: "show",
+  handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
+    const guildId = interaction.guildId!;
+    const name = interaction.options.getString("tag-name", true);
 
-export async function show(ctx: Context, interaction: ChatInputCommandInteraction | AutocompleteInteraction) {
-    if (interaction.isChatInputCommand()) {
-        if (interaction.options.getSubcommand() === ShowSubCommand.name) {
-            const guildId = interaction.guild.id;
-            const name = interaction.options.getString('tag-name');
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-            await ctx.services.tags.configure<Options>({ guildId, name });
-
-            const exists = await ctx.services.tags.itemExists<Options>();
-
-            if (!exists) return interaction.reply({ content: 'Tag not found!', flags: MessageFlags.Ephemeral });
-
-            const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = await ctx.services.tags.getValues<Options, TagResponse>();
-
-            return interaction.reply({
-                embeds: [
-                    {
-                        title: TagEmbedTitle,
-                        color: global.embedColor,
-                        description: TagEmbedDescription,
-                        image: TagEmbedImageURL ? { url: TagEmbedImageURL } : undefined,
-                        footer: {
-                            text: TagEmbedFooter ?? ''
-                        }
-                    }
-                ],
-                flags: MessageFlags.Ephemeral
-            })
-        }
+    await ctx.services.tags.configure<Options>({ guildId, name });
+    const tag = await ctx.services.tags.getValues<Options, TagResponse>();
+    
+    if (!tag) {
+      await interaction.editReply("Tag not found.");
+      return;
     }
 
-    if (interaction.isAutocomplete()) {
-        if (interaction.options.getSubcommand() === ShowSubCommand.name) {
-            const focus = interaction.options.getFocused();
-
-            const tags = await ctx.services.tags.getMultiValues<Snowflake, TagResponse[]>(interaction.guild.id);
-            const filteredTags = focus.length > 0 ? tags.filter((tag) => tag.TagName.toLowerCase().includes(focus.toLowerCase())) : tags;
-
-            await interaction.respond(filteredTags.map((tag) => ({ name: tag.TagName, value: tag.TagName })).slice(0, 20));
-        }
+    const embed = {
+      title: tag.TagEmbedTitle,
+      color: global.embedColor,
+      description: tag.TagEmbedDescription,
+      image: { url: tag.TagEmbedImageURL },
+      footer: { text: tag.TagEmbedFooter }
     }
-}
+
+    await interaction.editReply({ embeds: [embed] });
+  },
+  autocomplete: async (ctx: Context, interaction) => {
+    const guildId = interaction.guildId!;
+    const name = interaction.options.getString("tag-name") || "";
+
+    const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
+    const filtered = tags
+      .filter(tag => tag.TagName.toLowerCase().includes(name.toLowerCase()))
+      .slice(0, 25)
+      .map(tag => ({ name: tag.TagName, value: tag.TagName }));
+
+    await interaction.respond(filtered);
+  }
+});
+
+export const commandOptions = {
+  name: ShowSubCommand.name,
+  description: "Show a tag's content",
+  type: ApplicationCommandOptionType.SUB_COMMAND,
+  options: [
+    {
+      name: "tag-name",
+      description: "The name of the tag to show",
+      type: ApplicationCommandOptionType.STRING,
+      required: true,
+      autocomplete: true
+    }
+  ]
+};

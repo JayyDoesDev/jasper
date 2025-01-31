@@ -34,7 +34,9 @@ export = {
                         return interaction.reply({ content: `> The provided image link is not a valid image URL!`, flags: MessageFlags.Ephemeral });
                     }
 
-                    await ctx.services.tags.modify<Options & { tag?: Tag }, void>({ guildId, name, tag: { name, title, editedBy, description, image_url, footer } });
+                    ctx.services.tags.configure<Options>({ guildId, name, tag: { name, title, editedBy, description, image_url, footer } });
+
+                    await ctx.services.tags.modify<Options & { tag: Tag }, void>();
 
                     const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } = await ctx.services.tags.getValues<Options, TagResponse>({ guildId, name });
 
