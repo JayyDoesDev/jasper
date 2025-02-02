@@ -1,12 +1,11 @@
-import { defineEvent } from "../../../Common/define"
+import { defineEvent } from '../../../Common/define';
 
 export = {
     Event: defineEvent({
         event: {
-            name: "interactionCreate",
-            once: false
+            name: 'interactionCreate',
+            once: false,
         },
-        on: () => {
-        }
-    })
-}
+        on: () => {},
+    }),
+};

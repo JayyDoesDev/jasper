@@ -1,9 +1,9 @@
-import { Nullable } from "../../../Common/types";
+import { Nullable } from '../../../Common/types';
 
 type DocumentationItem = {
     name: string;
     value: string;
-  }
+};
 
 /**
  * Autocomplete topics and subtopics from the documentation content.
@@ -22,12 +22,12 @@ export function documentationAutocomplete(content: string): DocumentationItem[] 
         if (currentSubtopic && currentContent.length > 0) {
             result.push({
                 name: `${currentTopic} > ${currentSubtopic}`,
-                value: currentContent.join('\n').trim()
+                value: currentContent.join('\n').trim(),
             });
         } else if (currentTopic && !currentSubtopic && currentContent.length > 0) {
             result.push({
                 name: currentTopic,
-                value: currentContent.join('\n').trim()
+                value: currentContent.join('\n').trim(),
             });
         }
     };

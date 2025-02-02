@@ -1,10 +1,7 @@
-import gulp from "gulp";
+import gulp from 'gulp';
 
 gulp.task('copy-json', () => {
-    return gulp.src('Javascript/**/*')
-        .pipe(
-            gulp.dest('dist/Javascript')
-        );
+    return gulp.src('Javascript/**/*').pipe(gulp.dest('dist/Javascript'));
 });
 
 gulp.task('js', gulp.series('copy-json'));

@@ -1,5 +1,4 @@
 {
     "image": "mcr.microsoft.com/devcontainers/javascript-node",
-    "features": {
-    }
+    "features": {}
 }

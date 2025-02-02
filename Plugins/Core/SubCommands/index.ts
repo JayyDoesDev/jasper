@@ -1,9 +1,8 @@
-import { commandOptions as notifyVideoDiscussionsOptions, NotifyVideoDiscussionsSubCommand } from "./NotifyVideoDiscussionsSubCommand";
+import {
+    commandOptions as notifyVideoDiscussionsOptions,
+    NotifyVideoDiscussionsSubCommand,
+} from './NotifyVideoDiscussionsSubCommand';
 
-export const subCommandOptions = [
-    notifyVideoDiscussionsOptions
-];
+export const subCommandOptions = [notifyVideoDiscussionsOptions];
 
-export {
-    NotifyVideoDiscussionsSubCommand
-};
+export { NotifyVideoDiscussionsSubCommand };

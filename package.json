@@ -6,6 +6,7 @@
         "start": "node dist/Source/index.js",
         "dev": "yarn build && yarn eslint && node dist/Source/index.js",
         "eslint": "eslint \"**/*.{ts,mjs,cjs}\"",
+        "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
         "builddocker": "docker build -t jasper .",
         "docker": "docker run -dp 127.0.0.1:3000:8000 --name jasper jasper:latest",
         "dockerstop": "docker stop jasper",
@@ -31,7 +32,8 @@
         "gulp": "^5.0.0",
         "ioredis": "^5.4.2",
         "mongoose": "^8.9.5",
-        "numeral": "^2.0.6"
+        "numeral": "^2.0.6",
+        "prettier": "^3.4.2"
     },
     "devDependencies": {
         "@types/numeral": "^2.0.5",

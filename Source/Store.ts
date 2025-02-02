@@ -1,10 +1,10 @@
-import { Redis } from "ioredis";
-import { Context } from "./Context";
-import { Snowflake } from "@antibot/interactions";
+import { Redis } from 'ioredis';
+import { Context } from './Context';
+import { Snowflake } from '@antibot/interactions';
 
-type GuildSnowflake = Record<"guild", Snowflake>;
+type GuildSnowflake = Record<'guild', Snowflake>;
 
-type UserSnowflake = Record<"user", Snowflake>;
+type UserSnowflake = Record<'user', Snowflake>;
 
 export class Store extends Redis {
     #ctx: Context;
@@ -12,20 +12,20 @@ export class Store extends Redis {
 
     constructor(protected ctx: Context) {
         super({
-            host: ctx.env.get("redis_host"),
-            port: ctx.env.get("redis_port") as number,
+            host: ctx.env.get('redis_host'),
+            port: ctx.env.get('redis_port') as number,
             retryStrategy: (times) => {
                 console.error(`Redis retry attempt ${times}`);
                 return Math.min(times * 100, 3000);
-            }
+            },
         });
         this.#ctx = ctx;
-        
+
         this.on('connect', () => {
             console.log('Redis connected');
             this.#connected = true;
         });
-        
+
         this.on('error', (err) => {
             console.error('Redis error:', err);
             this.#connected = false;
@@ -44,27 +44,27 @@ export class Store extends Redis {
 
     public async getGuild<T>(options: GuildSnowflake): Promise<T | null> {
         await this.ensureConnection();
-        
+
         try {
             const key = JSON.stringify(options);
             let raw = await this.get(key);
-            
+
             if (!raw && options.guild) {
                 const legacyKey = `"${options.guild}"`;
                 console.log('Key not found, trying legacy key:', legacyKey);
                 raw = await this.get(legacyKey);
-                
+
                 if (raw) {
                     console.log('Found data with legacy key, migrating...');
                     await this.set(key, raw);
                     await this.del(legacyKey);
                 }
             }
-            
+
             if (!raw) {
                 return null;
             }
-            
+
             const parsed = JSON.parse(raw);
             return parsed as T;
         } catch (err) {
@@ -86,11 +86,11 @@ export class Store extends Redis {
     }
 
     public async findGuild(options: GuildSnowflake): Promise<boolean> {
-        return await this.getGuild(options) !== null;
+        return (await this.getGuild(options)) !== null;
     }
 
     public async findUser(options: UserSnowflake): Promise<boolean> {
-        return await this.getUser(options) !== null;
+        return (await this.getUser(options)) !== null;
     }
 
     public deleteGuild(options: GuildSnowflake | UserSnowflake): void {
