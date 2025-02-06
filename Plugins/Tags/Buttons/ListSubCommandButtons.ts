@@ -38,7 +38,7 @@ export = {
                 embedBase.description = currentUserState.tagPages[currentUserState.page]
                     .map(
                         (e, i) =>
-                            `> **${i + 1}.** \`${e.TagName}\` **•** ${
+                            `> **${(currentUserState.page * 10) + i + 1}.** \`${e.TagName}\` **•** ${
                                 e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
                             }`,
                     )
