@@ -35,9 +35,10 @@ export async function updateSubCountChannel(ctx: Context): Promise<void> {
         numeral(json.items[0].statistics.subscriberCount).format('0.00a'),
     ).toUpperCase();
     // @ts-ignore
-    void ctx.channels.cache
-        .get(ctx.env.get('sub_count_channel'))
-        .setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
+    const channel = ctx.channels.cache.get(ctx.env.get('sub_count_channel')) as TextChannel;
+    if (channel) {
+        void channel.setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
+    }
 }
 
 // Not random

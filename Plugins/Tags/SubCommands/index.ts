@@ -6,6 +6,7 @@ import { commandOptions as infoOptions, InfoSubCommand } from './InfoSubCommand'
 import { commandOptions as rawOptions, RawSubCommand } from './RawSubCommand';
 import { commandOptions as useOptions, UseSubCommand } from './UseSubCommand';
 import { commandOptions as editOptions, EditSubCommand } from './EditSubCommand';
+import { commandOptions as importOptions, ImportSubCommand } from './ImportSubCommand';
 
 export const subCommandOptions = [
     createOptions,
@@ -16,6 +17,7 @@ export const subCommandOptions = [
     rawOptions,
     useOptions,
     editOptions,
+    importOptions,
 ];
 
 export {
@@ -27,4 +29,5 @@ export {
     RawSubCommand,
     UseSubCommand,
     EditSubCommand,
+    ImportSubCommand,
 };
