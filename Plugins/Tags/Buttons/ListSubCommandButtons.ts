@@ -1,9 +1,4 @@
-import {
-    ButtonInteraction,
-    ButtonStyle,
-    ActionRowBuilder,
-    ButtonBuilder
-} from 'discord.js';
+import { ButtonInteraction, ButtonStyle, ComponentType } from 'discord.js';
 import { defineEvent } from '../../../Common/define';
 import { Context } from '../../../Source/Context';
 
@@ -15,7 +10,7 @@ export = {
         },
         on: async (interaction: ButtonInteraction, ctx: Context) => {
             if (!interaction.isButton()) return;
-            
+
             const author = interaction.user.id;
             const title = 'Server Tag List';
             const thumbnail = { url: interaction.guild.iconURL() ?? '' };
@@ -38,7 +33,7 @@ export = {
                 embedBase.description = currentUserState.tagPages[currentUserState.page]
                     .map(
                         (e, i) =>
-                            `> **${(currentUserState.page * 10) + i + 1}.** \`${e.TagName}\` **•** ${
+                            `> **${currentUserState.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${
                                 e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
                             }`,
                     )
@@ -48,28 +43,38 @@ export = {
                     currentUserState.tagPages.length
                 } • emojis by AnThOnY & deussa`;
 
-                const updatedComponents = [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setCustomId(`list_subcommand_button_previous_${interaction.user.id}`)
-                            .setStyle(ButtonStyle.Primary)
-                            .setLabel('Previous')
-                            .setDisabled(currentUserState.page === 0),
-                        new ButtonBuilder()
-                            .setCustomId(`list_subcommand_button_home_${interaction.user.id}`)
-                            .setStyle(ButtonStyle.Secondary)
-                            .setLabel('Home'),
-                        new ButtonBuilder()
-                            .setCustomId(`list_subcommand_button_next_${interaction.user.id}`)
-                            .setStyle(ButtonStyle.Primary)
-                            .setLabel('Next')
-                            .setDisabled(currentUserState.page === currentUserState.tagPages.length - 1)
-                    )
+                const components = [
+                    {
+                        type: ComponentType.ActionRow,
+                        components: [
+                            {
+                                type: ComponentType.Button,
+                                customId: `list_subcommand_button_previous_${interaction.user.id}`,
+                                style: ButtonStyle.Primary,
+                                label: 'Previous',
+                                disabled: currentUserState.page === 0,
+                            },
+                            {
+                                type: ComponentType.Button,
+                                customId: `list_subcommand_button_home_${interaction.user.id}`,
+                                style: ButtonStyle.Secondary,
+                                label: 'Home',
+                            },
+                            {
+                                type: ComponentType.Button,
+                                customId: `list_subcommand_button_next_${interaction.user.id}`,
+                                style: ButtonStyle.Primary,
+                                label: 'Next',
+                                disabled:
+                                    currentUserState.page === currentUserState.tagPages.length - 1,
+                            },
+                        ],
+                    },
                 ];
 
                 await interaction.update({
                     embeds: [embedBase],
-                    components: updatedComponents,
+                    ...components,
                 });
             };
 
