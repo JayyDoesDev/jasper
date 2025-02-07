@@ -39,7 +39,9 @@ export const ImportSubCommand = defineSubCommand({
         }
 
         if (!checkRequiredVariables(data)) {
-            await interaction.editReply('> The JSON must contain at least "name" and "title" fields.');
+            await interaction.editReply(
+                '> The JSON must contain at least "name" and "title" fields.',
+            );
             return;
         }
 
@@ -76,7 +78,10 @@ export const ImportSubCommand = defineSubCommand({
             await interaction.editReply(`> The support tag \`${tagData.name}\` already exists!`);
             return;
         }
-        if (tagData.image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tagData.image_url)) {
+        if (
+            tagData.image_url &&
+            !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(tagData.image_url)
+        ) {
             await interaction.editReply('> The provided image link is not a valid image URL!');
             return;
         }

@@ -66,7 +66,7 @@ export const ListSubCommand = defineSubCommand({
                     description: state.tagPages[state.page]
                         .map(
                             (e, i) =>
-                                `> **${(state.page * 10) + i + 1}.** \`${e.TagName}\` **•** ${
+                                `> **${state.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${
                                     e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
                                 }`,
                         )
