@@ -10,7 +10,7 @@ import {
 import { Context } from '../Source/Context';
 import { ICommand, Snowflake } from '@antibot/interactions';
 import { checkForRoles } from './roles';
-import { Options } from '../Services/SettingsService';
+import { withConfigurationRoles } from './db';
 
 export enum ConfigurationRoles {
     SupportRoles,
@@ -19,6 +19,14 @@ export enum ConfigurationRoles {
     AdminRoles,
     StaffRoles,
 }
+
+export const configurationRolesContainer = [
+    [ConfigurationRoles.AdminRoles, 'AllowedAdminRoles'],
+    [ConfigurationRoles.StaffRoles, 'AllowedStaffRoles'],
+    [ConfigurationRoles.SupportRoles, 'SupportRoles'],
+    [ConfigurationRoles.TagRoles, 'AllowedTagRoles'],
+    [ConfigurationRoles.TagAdminRoles, 'AllowedTagAdminRoles'],
+] as const;
 
 export interface SubCommand {
     name: string;
@@ -62,6 +70,11 @@ export type Plugin = {
     public_plugin: boolean;
 };
 
+export const message = {
+    content: "Sorry but you can't use this command.",
+    flags: MessageFlags.Ephemeral,
+} as any;
+
 function isCommand<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction>(
     options: unknown,
 ): options is Command<Interaction> {
@@ -98,77 +111,14 @@ export function defineCommand<
     if (options.subCommands) {
         const originalOn = options.on;
         const originalAutocomplete = options.autocomplete;
-
         options.on = async (ctx: Context, interaction: Interaction) => {
             if (interaction instanceof ChatInputCommandInteraction) {
                 const subCommandName = interaction.options.getSubcommand(false);
                 if (subCommandName && options.subCommands?.[subCommandName]) {
-                    const message = {
-                        content: "Sorry but you can't use this command.",
-                        flags: MessageFlags.Ephemeral,
-                    } as any;
-
                     if (options.subCommands[subCommandName].permissions) {
                         for (const permission of options.subCommands[subCommandName].permissions) {
                             if (!interaction.memberPermissions.has(permission)) {
-                                await interaction.reply(message);
-                                return;
-                            }
-                        }
-                    }
-
-                    if (options.subCommands[subCommandName].useConfigRoles?.length) {
-                        const settings = await ctx.services.settings.configure<Options>({
-                            guildId: interaction.guildId,
-                        });
-
-                        for (const role of options.subCommands[subCommandName].useConfigRoles) {
-                            let roles: Snowflake[] | null = null;
-
-                            switch (role) {
-                                case ConfigurationRoles.AdminRoles:
-                                    roles = await settings.getRoles<Snowflake>(
-                                        interaction.guildId,
-                                        'AllowedAdminRoles',
-                                    );
-                                    break;
-                                case ConfigurationRoles.StaffRoles:
-                                    roles = await settings.getRoles<Snowflake>(
-                                        interaction.guildId,
-                                        'AllowedStaffRoles',
-                                    );
-                                    break;
-                                case ConfigurationRoles.SupportRoles:
-                                    roles = await settings.getRoles<Snowflake>(
-                                        interaction.guildId,
-                                        'SupportRoles',
-                                    );
-                                    break;
-                                case ConfigurationRoles.TagRoles:
-                                    roles = await settings.getRoles<Snowflake>(
-                                        interaction.guildId,
-                                        'AllowedTagRoles',
-                                    );
-                                    break;
-                                case ConfigurationRoles.TagAdminRoles:
-                                    roles = await settings.getRoles<Snowflake>(
-                                        interaction.guildId,
-                                        'AllowedTagAdminRoles',
-                                    );
-                                    break;
-                            }
-
-                            if (roles?.length && !checkForRoles(interaction, ...roles)) {
-                                await interaction.reply(message);
-                                return;
-                            }
-
-                            if (!roles?.length) {
-                                message.content =
-                                    message.content +
-                                    ' Configuration of roles required. Please check with the server administrator.';
-                                await interaction.reply(message);
-                                return;
+                                return await interaction.reply(message);
                             }
                         }
                     }
@@ -180,7 +130,31 @@ export function defineCommand<
                                 ...options.subCommands[subCommandName].allowedRoles,
                             )
                         ) {
+                            return await interaction.reply(message);
+                        }
+                    }
+
+                    if (options.subCommands[subCommandName].useConfigRoles?.length) {
+                        const { noRolesWithConfig, noRolesNoConfig } = await withConfigurationRoles(
+                            ctx,
+                            interaction,
+                            ...options.subCommands[subCommandName].useConfigRoles,
+                        );
+
+                        let configError = false;
+                        noRolesWithConfig(interaction, () => {
+                            configError = true;
+                        });
+
+                        noRolesNoConfig(interaction, () => {
+                            message.content +=
+                                ' Configuration of roles required. Please check with the server administrator.';
+                            configError = true;
+                        });
+
+                        if (configError) {
                             await interaction.reply(message);
+                            message.content = "Sorry but you can't use this command.";
                             return;
                         }
                     }

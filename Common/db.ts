@@ -3,6 +3,10 @@ import UserSchema from '../Models/UserSchema';
 import { Snowflake } from '@antibot/interactions';
 import { Context } from '../Source/Context';
 import _ from 'lodash';
+import { ConfigurationRoles, configurationRolesContainer } from './define';
+import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
+import { Options } from '../Services/SettingsService';
+import { checkForRoles } from './roles';
 
 export async function userExists(userId: Snowflake): Promise<boolean> {
     return (await UserSchema.findOne({ _id: userId })) ? true : false;
@@ -41,4 +45,55 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
 
         return ctx.store.getGuild({ guild: guildId });
     }
+}
+
+export async function withConfigurationRoles<
+    Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
+>(
+    context: Context,
+    interaction: Interaction,
+    ...configurationRoles: ConfigurationRoles[]
+): Promise<{
+    noRolesWithConfig: (interaction: Interaction, code: Function) => void;
+    noRolesNoConfig: (interaction: Interaction, code: Function) => void;
+}> {
+    let hasRolesWithConfig = false;
+    let hasCheckedAnyRoles = false;
+    let noConfiguredRoles = true;
+
+    for (const role of configurationRoles) {
+        for (const containerRole of configurationRolesContainer) {
+            if (containerRole[0] === role) {
+                hasCheckedAnyRoles = true;
+                const settings = await context.services.settings.configure<Options>({
+                    guildId: interaction.guild.id,
+                });
+
+                const roles = await settings.getRoles<Snowflake>(
+                    interaction.guild.id,
+                    containerRole[1],
+                );
+
+                if (roles?.length) {
+                    noConfiguredRoles = false;
+                    if (!checkForRoles(interaction, ...roles)) {
+                        hasRolesWithConfig = true;
+                    }
+                }
+            }
+        }
+    }
+
+    return {
+        noRolesWithConfig: (interaction: Interaction, code: (interaction: Interaction) => void) => {
+            if (hasRolesWithConfig) {
+                code(interaction);
+            }
+        },
+        noRolesNoConfig: (interaction: Interaction, code: (interaction: Interaction) => void) => {
+            if (hasCheckedAnyRoles && noConfiguredRoles) {
+                code(interaction);
+            }
+        },
+    };
 }
