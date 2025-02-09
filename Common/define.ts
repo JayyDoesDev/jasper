@@ -10,10 +10,20 @@ import {
 import { Context } from '../Source/Context';
 import { ICommand, Snowflake } from '@antibot/interactions';
 import { checkForRoles } from './roles';
+import { Options } from '../Services/SettingsService';
+
+export enum ConfigurationRoles {
+    SupportRoles,
+    TagRoles,
+    TagAdminRoles,
+    AdminRoles,
+    StaffRoles,
+}
 
 export interface SubCommand {
     name: string;
     allowedRoles?: Snowflake[];
+    useConfigRoles?: ConfigurationRoles[];
     permissions?: PermissionsBitField[] | any[];
     handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => Promise<void>;
@@ -95,7 +105,8 @@ export function defineCommand<
                     const message = {
                         content: "Sorry but you can't use this command.",
                         flags: MessageFlags.Ephemeral,
-                    } as any; // djs needs to update their types
+                    } as any;
+
                     if (options.subCommands[subCommandName].permissions) {
                         for (const permission of options.subCommands[subCommandName].permissions) {
                             if (!interaction.memberPermissions.has(permission)) {
@@ -104,6 +115,65 @@ export function defineCommand<
                             }
                         }
                     }
+
+                    if (options.subCommands[subCommandName].useConfigRoles?.length) {
+                        const settings = await ctx.services.settings.configure<Options>({
+                            guildId: interaction.guildId,
+                        });
+
+                        console.log(settings);
+
+                        for (const role of options.subCommands[subCommandName].useConfigRoles) {
+                            let roles: Snowflake[] | null = null;
+
+                            switch (role) {
+                                case ConfigurationRoles.AdminRoles:
+                                    roles = await settings.getRoles<Snowflake>(
+                                        interaction.guildId,
+                                        'AllowedAdminRoles',
+                                    );
+                                    break;
+                                case ConfigurationRoles.StaffRoles:
+                                    roles = await settings.getRoles<Snowflake>(
+                                        interaction.guildId,
+                                        'AllowedStaffRoles',
+                                    );
+                                    break;
+                                case ConfigurationRoles.SupportRoles:
+                                    roles = await settings.getRoles<Snowflake>(
+                                        interaction.guildId,
+                                        'SupportRoles',
+                                    );
+                                    break;
+                                case ConfigurationRoles.TagRoles:
+                                    roles = await settings.getRoles<Snowflake>(
+                                        interaction.guildId,
+                                        'AllowedTagRoles',
+                                    );
+                                    break;
+                                case ConfigurationRoles.TagAdminRoles:
+                                    roles = await settings.getRoles<Snowflake>(
+                                        interaction.guildId,
+                                        'AllowedTagAdminRoles',
+                                    );
+                                    break;
+                            }
+
+                            if (roles?.length && !checkForRoles(interaction, ...roles)) {
+                                await interaction.reply(message);
+                                return;
+                            }
+
+                            if (!roles?.length) {
+                                message.content =
+                                    message.content +
+                                    ' Configuration of roles required. Please check with the server administrator.';
+                                await interaction.reply(message);
+                                return;
+                            }
+                        }
+                    }
+
                     if (options.subCommands[subCommandName].allowedRoles) {
                         if (
                             !checkForRoles(
@@ -115,6 +185,7 @@ export function defineCommand<
                             return;
                         }
                     }
+
                     await options.subCommands[subCommandName].handler(ctx, interaction);
                     return;
                 }

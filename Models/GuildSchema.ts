@@ -4,7 +4,6 @@ import { Nullable } from '../Common/types';
 
 export interface GuildDocument extends Document {
     _id: Snowflake;
-    SupportRoles: Snowflake[];
     GuildSettings: Settings;
     Tags: Tag[];
 }
@@ -14,9 +13,11 @@ export type Settings = {
         AllowedTagChannels: Snowflake[];
     };
     Roles: {
+        SupportRoles: Snowflake[];
         AllowedTagRoles: Snowflake[];
         AllowedTagAdminRoles: Snowflake[];
         AllowedAdminRoles: Snowflake[];
+        AllowedStaffRoles: Snowflake[];
     };
 };
 
@@ -37,16 +38,16 @@ export default model<GuildDocument>(
     new Schema(
         {
             _id: String,
-
-            SupportRoles: { type: [String], default: [] },
             GuildSettings: {
                 Channels: {
                     AllowedTagChannels: { type: [], default: [] },
                 },
                 Roles: {
+                    SupportRoles: { type: [], default: [] },
                     AllowedTagRoles: { type: [], default: [] },
                     AllowedTagAdminRoles: { type: [], default: [] },
                     AllowedAdminRoles: { type: [], default: [] },
+                    AllowedStaffRoles: { type: [], default: [] },
                 },
             },
             Tags: {

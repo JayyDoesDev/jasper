@@ -13,11 +13,14 @@ import { Store } from './Store';
 import { State } from '../Plugins/types';
 import { Env } from './Env';
 import TagService from '../Services/TagService';
+import SettingsService from '../Services/SettingsService';
 
 class Services {
     public readonly tags: TagService;
+    public readonly settings: SettingsService;
     constructor(public ctx: Context) {
         this.tags = new TagService(ctx);
+        this.settings = new SettingsService(ctx);
     }
 }
 

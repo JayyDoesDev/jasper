@@ -50,9 +50,7 @@ class TagService extends Service {
         };
     }
 
-    public configure<T>(
-        config: T extends Options ? Options & { tag?: Tag } : null,
-    ): ThisParameterType<this> {
+    public configure<T>(config: T extends Options ? Options & { tag?: Tag } : null): this {
         this.guildId = config?.guildId ?? '';
         this.name = config?.name ?? '';
         this.tag = config?.tag ?? {
@@ -65,11 +63,7 @@ class TagService extends Service {
             footer: null,
         };
 
-        return <ThisParameterType<this>>this;
-    }
-
-    #checkConfig(): boolean {
-        return Boolean(this.guildId && this.name);
+        return this;
     }
 
     public async itemExists<T>(
@@ -345,6 +339,10 @@ class TagService extends Service {
         await TagSchema.updateOne({ _id: guildId }, { $pull: { Tags: { TagName: name } } });
 
         return <CommonCondition<R>>true;
+    }
+
+    #checkConfig(): boolean {
+        return Boolean(this.guildId && this.name);
     }
 }
 
