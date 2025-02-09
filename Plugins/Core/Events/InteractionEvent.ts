@@ -4,8 +4,9 @@ import {
     ContextMenuCommandInteraction,
     Interaction,
 } from 'discord.js';
-import { Command, defineEvent } from '../../../Common/define';
+import { Command, defineEvent, message } from '../../../Common/define';
 import { PermissionsToHuman, PlantPermission } from '@antibot/interactions';
+import { withConfigurationRoles } from '../../../Common/db';
 
 export = {
     Event: defineEvent({
@@ -13,13 +14,38 @@ export = {
             name: 'interactionCreate',
             once: false,
         },
-        on: (interaction: Interaction, ctx) => {
+        on: async (interaction: Interaction, ctx) => {
             switch (true) {
                 case interaction.isChatInputCommand() || interaction.isContextMenuCommand(): {
                     const command: Command<
                         ChatInputCommandInteraction | ContextMenuCommandInteraction
                     > = ctx.interactions.get(interaction.commandName);
                     if (command) {
+                        if (command.useConfigRoles?.length) {
+                            const { noRolesWithConfig, noRolesNoConfig } =
+                                await withConfigurationRoles(
+                                    ctx,
+                                    interaction,
+                                    ...command.useConfigRoles,
+                                );
+
+                            let configError = false;
+                            noRolesWithConfig(interaction, () => {
+                                configError = true;
+                            });
+
+                            noRolesNoConfig(interaction, () => {
+                                message.content +=
+                                    ' Configuration of roles required. Please check with the server administrator.';
+                                configError = true;
+                            });
+
+                            if (configError) {
+                                await interaction.reply(message);
+                                message.content = "Sorry but you can't use this command.";
+                                return;
+                            }
+                        }
                         if (command.permissions) {
                             const perms: any[] = [];
                             if (!interaction.appPermissions.has(command.permissions)) {
