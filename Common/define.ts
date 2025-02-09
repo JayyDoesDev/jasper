@@ -34,6 +34,7 @@ export interface Command<
 > {
     command: ICommand;
     permissions?: PermissionsBitField[] | any[];
+    useConfigRoles?: ConfigurationRoles[];
     on: (ctx: Context, interaction: Interaction) => void;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => void;
     subCommands?: {
@@ -121,8 +122,6 @@ export function defineCommand<
                             guildId: interaction.guildId,
                         });
 
-                        console.log(settings);
-
                         for (const role of options.subCommands[subCommandName].useConfigRoles) {
                             let roles: Snowflake[] | null = null;
 
@@ -207,6 +206,7 @@ export function defineCommand<
                                 }
                             }
                         }
+
                         if (options.subCommands[subCommandName].allowedRoles) {
                             if (
                                 !checkForRoles(
