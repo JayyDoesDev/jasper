@@ -134,4 +134,3 @@ The command execution requires the user to have one of the following roles:
 - `ADMIN_ROLE`
 - `STAFF_ROLE`
 - `SUPPORT_ROLE`
-
