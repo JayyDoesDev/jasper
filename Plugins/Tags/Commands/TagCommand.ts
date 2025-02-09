@@ -13,6 +13,7 @@ import {
     RawSubCommand,
     UseSubCommand,
     EditSubCommand,
+    ImportSubCommand,
 } from '../SubCommands';
 
 export = {
@@ -32,6 +33,7 @@ export = {
             raw: RawSubCommand,
             use: UseSubCommand,
             edit: EditSubCommand,
+            import: ImportSubCommand,
         },
         on: async (ctx: Context, interaction) => {
             if (
@@ -68,6 +70,7 @@ export = {
                 raw: RawSubCommand,
                 use: UseSubCommand,
                 edit: EditSubCommand,
+                import: ImportSubCommand,
             }[subCommand];
 
             if (!subCommandHandler?.autocomplete) {

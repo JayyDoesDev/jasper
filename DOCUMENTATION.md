@@ -47,6 +47,16 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Feature Flags**: `Modal`
 
+### `/` `tag` `import` <_json_>
+
+> **Permissions**: `STAFF_ROLE`, `ADMIN_ROLE`
+
+> **Description**: Import an tag using the json provided from `/tag raw` command.
+
+> Syntax
+
+> **Feature Flags**: `Autocomplete`
+
 ### `/` `tag` `info` <_tag_name_>
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
@@ -67,7 +77,7 @@ wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
 > **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
 
-> **Description**: Get the raw content of a tag and sent it as an ephemeral text attachment file.
+> **Description**: Get the raw content of a tag and sent it as an ephemeral json message.
 
 > **Feature Flags**: `Autocomplete`
 
