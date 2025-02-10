@@ -31,7 +31,7 @@
         "glob": "7.2.0",
         "gulp": "^5.0.0",
         "ioredis": "^5.4.2",
-        "mongoose": "^8.9.5",
+        "mongoose": "^8.10.0",
         "numeral": "^2.0.6",
         "prettier": "^3.4.2"
     },
