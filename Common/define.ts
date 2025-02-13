@@ -11,22 +11,7 @@ import { Context } from '../Source/Context';
 import { ICommand, Snowflake } from '@antibot/interactions';
 import { checkForRoles } from './roles';
 import { withConfigurationRoles } from './db';
-
-export enum ConfigurationRoles {
-    SupportRoles,
-    TagRoles,
-    TagAdminRoles,
-    AdminRoles,
-    StaffRoles,
-}
-
-export const configurationRolesContainer = [
-    [ConfigurationRoles.AdminRoles, 'AllowedAdminRoles'],
-    [ConfigurationRoles.StaffRoles, 'AllowedStaffRoles'],
-    [ConfigurationRoles.SupportRoles, 'SupportRoles'],
-    [ConfigurationRoles.TagRoles, 'AllowedTagRoles'],
-    [ConfigurationRoles.TagAdminRoles, 'AllowedTagAdminRoles'],
-] as const;
+import { ConfigurationRoles } from './container';
 
 export interface SubCommand {
     name: string;
@@ -45,9 +30,7 @@ export interface Command<
     useConfigRoles?: ConfigurationRoles[];
     on: (ctx: Context, interaction: Interaction) => void;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => void;
-    subCommands?: {
-        [key: string]: SubCommand;
-    };
+    subCommands?: { [key: string]: SubCommand };
 }
 
 export interface Event<
@@ -55,10 +38,7 @@ export interface Event<
         ? Interaction
         : unknown,
 > {
-    event: {
-        name: string;
-        once: boolean;
-    };
+    event: { name: string; once: boolean };
     on: (event: T, ctx: Context) => void;
 }
 
@@ -118,7 +98,7 @@ export function defineCommand<
                     if (options.subCommands[subCommandName].permissions) {
                         for (const permission of options.subCommands[subCommandName].permissions) {
                             if (!interaction.memberPermissions.has(permission)) {
-                                return await interaction.reply(message);
+                                return interaction.reply(message);
                             }
                         }
                     }
@@ -130,7 +110,7 @@ export function defineCommand<
                                 ...options.subCommands[subCommandName].allowedRoles,
                             )
                         ) {
-                            return await interaction.reply(message);
+                            return interaction.reply(message);
                         }
                     }
 
@@ -192,6 +172,30 @@ export function defineCommand<
                                 return;
                             }
                         }
+
+                        if (options.subCommands[subCommandName].useConfigRoles?.length) {
+                            const { noRolesWithConfig, noRolesNoConfig } =
+                                await withConfigurationRoles(
+                                    ctx,
+                                    interaction,
+                                    ...options.subCommands[subCommandName].useConfigRoles,
+                                );
+
+                            let configError = false;
+                            noRolesWithConfig(interaction, () => {
+                                configError = true;
+                            });
+
+                            noRolesNoConfig(interaction, () => {
+                                configError = true;
+                            });
+
+                            if (configError) {
+                                await interaction.respond([]);
+                                return;
+                            }
+                        }
+
                         await options.subCommands[subCommandName].autocomplete!(ctx, interaction);
                         return;
                     }

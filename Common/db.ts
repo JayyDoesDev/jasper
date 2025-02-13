@@ -3,10 +3,14 @@ import UserSchema from '../Models/UserSchema';
 import { Snowflake } from '@antibot/interactions';
 import { Context } from '../Source/Context';
 import _ from 'lodash';
-import { ConfigurationRoles, configurationRolesContainer } from './define';
-import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
+import {
+    AutocompleteInteraction,
+    ChatInputCommandInteraction,
+    ContextMenuCommandInteraction,
+} from 'discord.js';
 import { Options } from '../Services/SettingsService';
 import { checkForRoles } from './roles';
+import { ConfigurationRoles, configurationRolesContainer } from './container';
 
 export async function userExists(userId: Snowflake): Promise<boolean> {
     return (await UserSchema.findOne({ _id: userId })) ? true : false;
@@ -48,7 +52,10 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
 }
 
 export async function withConfigurationRoles<
-    Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
+    Interaction extends
+        | ChatInputCommandInteraction
+        | ContextMenuCommandInteraction
+        | AutocompleteInteraction,
 >(
     context: Context,
     interaction: Interaction,
