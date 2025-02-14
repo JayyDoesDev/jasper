@@ -77,7 +77,7 @@ export const RemoveChannelSubCommand = defineSubCommand({
 
 export const commandOptions = {
     name: 'remove_channel',
-    description: 'Remove a channel frp, the configuration',
+    description: 'Remove a channel from the configuration',
     type: ApplicationCommandOptionType.SUB_COMMAND,
     options: [
         {
