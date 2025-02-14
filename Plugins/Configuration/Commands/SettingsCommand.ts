@@ -1,7 +1,13 @@
 import { ApplicationCommandType, PermissionBitToString, Permissions } from '@antibot/interactions';
 import { defineCommand } from '../../../Common/define';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { subCommandOptions, AddChannelSubCommand, RemoveChannelSubCommand } from '../SubCommands';
+import {
+    subCommandOptions,
+    AddChannelSubCommand,
+    RemoveChannelSubCommand,
+    AddRoleSubCommand,
+    RemoveRoleSubCommand,
+} from '../SubCommands';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
@@ -12,7 +18,12 @@ export = {
             default_member_permissions: PermissionBitToString(Permissions({ BanMembers: true })),
             options: subCommandOptions,
         },
-        subCommands: { add_channel: AddChannelSubCommand, remove_channel: RemoveChannelSubCommand },
+        subCommands: {
+            add_channel: AddChannelSubCommand,
+            remove_channel: RemoveChannelSubCommand,
+            add_role: AddRoleSubCommand,
+            remove_role: RemoveRoleSubCommand,
+        },
         on: async () => {},
         autocomplete: async (ctx, interaction) => {
             const subCommand = interaction.options.getSubcommand(false);
@@ -24,6 +35,8 @@ export = {
             const subCommandHandler = {
                 add_channel: AddChannelSubCommand,
                 remove_channel: RemoveChannelSubCommand,
+                add_role: AddRoleSubCommand,
+                remove_role: RemoveRoleSubCommand,
             }[subCommand];
 
             if (!subCommandHandler) {
