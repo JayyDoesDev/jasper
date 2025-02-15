@@ -229,7 +229,7 @@ export const MyCommand = defineCommand({
         description: 'Command description',
     },
     permissions: [], // Optional Discord permissions
-    useConfigRoles: [], // Optional configuration roles
+    restrictToConfigRoles: [], // Optional configuration roles
     on: async (ctx, interaction) => {
         // Command logic
     },
@@ -246,7 +246,7 @@ import { defineSubCommand } from '../../../Common/define';
 
 export const MySubCommand = defineSubCommand({
     name: 'mysubcommand',
-    useConfigRoles: [], // Optional configuration roles
+    restrictToConfigRoles: [], // Optional configuration roles
     handler: async (ctx, interaction) => {
         // Subcommand logic
     },
@@ -314,7 +314,7 @@ import { ConfigurationRoles } from '../../../Common/define';
 
 export const MyCommand = defineCommand({
     // ... other command options
-    useConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
+    restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
 });
 ```
 
