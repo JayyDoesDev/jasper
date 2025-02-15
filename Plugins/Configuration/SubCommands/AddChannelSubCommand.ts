@@ -60,6 +60,7 @@ export const AddChannelSubCommand = defineSubCommand({
                     color: global.embedColor,
                 },
             ],
+            flags: MessageFlags.Ephemeral,
         });
     },
     autocomplete: async (ctx: Context, interaction) => {

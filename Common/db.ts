@@ -64,9 +64,9 @@ export async function withConfigurationRoles<
     noRolesWithConfig: (interaction: Interaction, code: Function) => void;
     noRolesNoConfig: (interaction: Interaction, code: Function) => void;
 }> {
-    let hasRolesWithConfig = false;
     let hasCheckedAnyRoles = false;
     let noConfiguredRoles = true;
+    let hasAnyRole = false;
 
     for (const role of configurationRoles) {
         for (const containerRole of configurationRolesContainer) {
@@ -83,13 +83,15 @@ export async function withConfigurationRoles<
 
                 if (roles?.length) {
                     noConfiguredRoles = false;
-                    if (!checkForRoles(interaction, ...roles)) {
-                        hasRolesWithConfig = true;
+                    if (checkForRoles(interaction, ...roles)) {
+                        hasAnyRole = true;
                     }
                 }
             }
         }
     }
+
+    const hasRolesWithConfig = !hasAnyRole && !noConfiguredRoles;
 
     return {
         noRolesWithConfig: (interaction: Interaction, code: (interaction: Interaction) => void) => {

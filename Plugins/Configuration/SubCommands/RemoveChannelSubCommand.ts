@@ -64,6 +64,7 @@ export const RemoveChannelSubCommand = defineSubCommand({
                     color: global.embedColor,
                 },
             ],
+            flags: MessageFlags.Ephemeral,
         });
     },
     autocomplete: async (ctx: Context, interaction) => {

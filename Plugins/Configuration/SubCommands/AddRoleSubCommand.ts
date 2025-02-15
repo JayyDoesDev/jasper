@@ -59,6 +59,7 @@ export const AddRoleSubCommand = defineSubCommand({
             embeds: [
                 { title: 'Current Roles in Configuration', description, color: global.embedColor },
             ],
+            flags: MessageFlags.Ephemeral,
         });
     },
     autocomplete: async (ctx: Context, interaction) => {
