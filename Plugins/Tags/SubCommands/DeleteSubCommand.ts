@@ -3,17 +3,22 @@ import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, TagResponse } from '../../../Services/TagService';
+import { ConfigurationRoles } from '../../../Common/container';
 
 export const DeleteSubCommand = defineSubCommand({
     name: 'delete',
-    allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE],
+    restrictToConfigRoles: [
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name', true);
 
         await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-        await ctx.services.tags.configure<Options>({ guildId, name });
+        ctx.services.tags.configure<Options>({ guildId, name });
         const isDeleted = await ctx.services.tags.deleteValue<Options, boolean>();
 
         if (!isDeleted) {

@@ -16,7 +16,7 @@ import { ConfigurationRoles } from './container';
 export interface SubCommand {
     name: string;
     allowedRoles?: Snowflake[];
-    useConfigRoles?: ConfigurationRoles[];
+    restrictToConfigRoles?: ConfigurationRoles[];
     permissions?: PermissionsBitField[] | any[];
     handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => Promise<void>;
@@ -27,7 +27,7 @@ export interface Command<
 > {
     command: ICommand;
     permissions?: PermissionsBitField[] | any[];
-    useConfigRoles?: ConfigurationRoles[];
+    restrictToConfigRoles?: ConfigurationRoles[];
     on: (ctx: Context, interaction: Interaction) => void;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => void;
     subCommands?: { [key: string]: SubCommand };
@@ -114,11 +114,11 @@ export function defineCommand<
                         }
                     }
 
-                    if (options.subCommands[subCommandName].useConfigRoles?.length) {
+                    if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
                         const { noRolesWithConfig, noRolesNoConfig } = await withConfigurationRoles(
                             ctx,
                             interaction,
-                            ...options.subCommands[subCommandName].useConfigRoles,
+                            ...options.subCommands[subCommandName].restrictToConfigRoles,
                         );
 
                         let configError = false;
@@ -173,12 +173,12 @@ export function defineCommand<
                             }
                         }
 
-                        if (options.subCommands[subCommandName].useConfigRoles?.length) {
+                        if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
                             const { noRolesWithConfig, noRolesNoConfig } =
                                 await withConfigurationRoles(
                                     ctx,
                                     interaction,
-                                    ...options.subCommands[subCommandName].useConfigRoles,
+                                    ...options.subCommands[subCommandName].restrictToConfigRoles,
                                 );
 
                             let configError = false;

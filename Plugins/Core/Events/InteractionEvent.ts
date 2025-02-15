@@ -21,12 +21,12 @@ export = {
                         ChatInputCommandInteraction | ContextMenuCommandInteraction
                     > = ctx.interactions.get(interaction.commandName);
                     if (command) {
-                        if (command.useConfigRoles?.length) {
+                        if (command.restrictToConfigRoles?.length) {
                             const { noRolesWithConfig, noRolesNoConfig } =
                                 await withConfigurationRoles(
                                     ctx,
                                     interaction,
-                                    ...command.useConfigRoles,
+                                    ...command.restrictToConfigRoles,
                                 );
 
                             let configError = false;

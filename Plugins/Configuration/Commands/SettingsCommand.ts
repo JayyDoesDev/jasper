@@ -7,6 +7,7 @@ import {
     RemoveChannelSubCommand,
     AddRoleSubCommand,
     RemoveRoleSubCommand,
+    ViewChannelSubCommand,
 } from '../SubCommands';
 
 export = {
@@ -15,7 +16,9 @@ export = {
             name: 'settings',
             type: ApplicationCommandType.CHAT_INPUT,
             description: 'Configure the settings',
-            default_member_permissions: PermissionBitToString(Permissions({ BanMembers: true })),
+            default_member_permissions: PermissionBitToString(
+                Permissions({ ManageChannels: true }),
+            ),
             options: subCommandOptions,
         },
         subCommands: {
@@ -23,6 +26,7 @@ export = {
             remove_channel: RemoveChannelSubCommand,
             add_role: AddRoleSubCommand,
             remove_role: RemoveRoleSubCommand,
+            view: ViewChannelSubCommand,
         },
         on: async () => {},
         autocomplete: async (ctx, interaction) => {
@@ -37,6 +41,7 @@ export = {
                 remove_channel: RemoveChannelSubCommand,
                 add_role: AddRoleSubCommand,
                 remove_role: RemoveRoleSubCommand,
+                view: ViewChannelSubCommand,
             }[subCommand];
 
             if (!subCommandHandler) {

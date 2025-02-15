@@ -4,10 +4,7 @@ import { CommonCondition, Service } from './Service';
 import TagSchema, { GuildDocument, Settings } from '../Models/GuildSchema';
 import { getGuild } from '../Common/db';
 
-export type Options = {
-    guildId: Snowflake;
-    GuildSettings?: Settings;
-};
+export type Options = { guildId: Snowflake; GuildSettings?: Settings };
 
 export type SetChannelOptions = {
     guildId: Snowflake;
@@ -29,9 +26,7 @@ class SettingsService extends Service {
         super(ctx);
         this.guildId = '';
         this.guildSettings = {
-            Channels: {
-                AllowedTagChannels: [],
-            },
+            Channels: { AllowedTagChannels: [], AutomaticSlowmodeChannels: [] },
             Roles: {
                 SupportRoles: [],
                 AllowedTagRoles: [],
@@ -55,6 +50,7 @@ class SettingsService extends Service {
         this.guildSettings = {
             Channels: {
                 AllowedTagChannels: Channels.AllowedTagChannels,
+                AutomaticSlowmodeChannels: Channels.AutomaticSlowmodeChannels,
             },
             Roles: {
                 SupportRoles: Roles.SupportRoles,
@@ -66,6 +62,10 @@ class SettingsService extends Service {
         };
 
         return this;
+    }
+
+    public getSettings(): CommonCondition<Settings> {
+        return this.guildSettings;
     }
 
     public async setChannels<T>(
@@ -95,11 +95,7 @@ class SettingsService extends Service {
 
         await TagSchema.updateOne(
             { _id: guildId },
-            {
-                $set: {
-                    [`GuildSettings.Channels.${key}`]: updatedChannels,
-                },
-            },
+            { $set: { [`GuildSettings.Channels.${key}`]: updatedChannels } },
             { upsert: true },
         );
 
@@ -135,11 +131,7 @@ class SettingsService extends Service {
 
         await TagSchema.updateOne(
             { _id: guildId },
-            {
-                $set: {
-                    [`GuildSettings.Channels.${key}`]: updatedChannels,
-                },
-            },
+            { $set: { [`GuildSettings.Channels.${key}`]: updatedChannels } },
         );
 
         return updatedChannels;
@@ -186,11 +178,7 @@ class SettingsService extends Service {
 
         await TagSchema.updateOne(
             { _id: guildId },
-            {
-                $set: {
-                    [`GuildSettings.Roles.${key}`]: updatedRoles,
-                },
-            },
+            { $set: { [`GuildSettings.Roles.${key}`]: updatedRoles } },
             { upsert: true },
         );
 
@@ -224,11 +212,7 @@ class SettingsService extends Service {
 
         await TagSchema.updateOne(
             { _id: guildId },
-            {
-                $set: {
-                    [`GuildSettings.Roles.${key}`]: updatedRoles,
-                },
-            },
+            { $set: { [`GuildSettings.Roles.${key}`]: updatedRoles } },
         );
 
         return updatedRoles;

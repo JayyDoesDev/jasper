@@ -3,10 +3,17 @@ import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction } from 'discord.js';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, TagResponse } from '../../../Services/TagService';
+import { ConfigurationRoles } from '../../../Common/container';
 
 export const UseSubCommand = defineSubCommand({
     name: 'use',
-    allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name', true);
@@ -14,7 +21,7 @@ export const UseSubCommand = defineSubCommand({
 
         await interaction.deferReply();
 
-        await ctx.services.tags.configure<Options>({ guildId, name });
+        ctx.services.tags.configure<Options>({ guildId, name });
         const tag = await ctx.services.tags.getValues<Options, TagResponse>();
 
         if (!tag) {

@@ -1,136 +1,63 @@
 # Jasper User Documentation
 
-This document provides information and intructions on all of Jasper's functionalities.
+This document provides information and instructions on all of Jasper's functionalities.
 
 ## Commands
 
-Commands prefixed with a `/` are app command compatible and commands with `?` are message (prefix) compatible. Required parameters will be
-wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
+All commands in Jasper are slash commands. Required parameters are wrapped in `<>` while optional parameters are wrapped in `[]` brackets.
 
-### `/` `resolve` [*original_question*] [*summarized_answer*]
+### `/settings`
 
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
+> **Permissions**: `ManageChannels`
 
-> **Description**: Close a forum post with a finalizing message.
+> **Description**: Configure server settings
 
-> **Feature Flags**: `-`
+> **Subcommands**:
 
-### `/` `tag` `create`
+- `add_channel`: Add a channel to configuration
+- `remove_channel`: Remove a channel from configuration
+- `add_role`: Add a role to configuration
+- `remove_role`: Remove a role from configuration
+- `view`: View current settings
 
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
+### `/help <section>`
 
-> **Description**: Create a new tag.
+> **Permissions**: None
 
-> **Feature Flags**: `Modal`
+> **Description**: Displays documentation sections
 
-### `/` `tag` `list`
+> **Features**: `Autocomplete`
 
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
+### `/tag`
 
-> **Description**: List all tags for the current guild.
+> **Description**: Manage server tags
 
-> **Feature Flags**: `-`
+> **Subcommands**:
 
-### `/` `tag` `delete` <_tag_name_>
+- `create`: Create a new tag (**Modal**)
+- `delete <tag_name>`: Delete a tag (**Staff+**, **Autocomplete**)
+- `edit`: Edit an existing tag (**Modal**)
+- `list`: List all tags
+- `info <tag_name>`: View tag details (**Autocomplete**)
+- `raw <tag_name>`: Get tag JSON data (**Autocomplete**)
+- `use <tag_name>`: Use a tag (**Autocomplete**)
+- `import <json>`: Import a tag from JSON (**Staff+**, **Autocomplete**)
+- `show <tag_name>`: Display a tag (**Autocomplete**)
 
-> **Permissions**: `STAFF_ROLE`, `ADMIN_ROLE`
+### `/resolve` [*original_question*] [*summarized_answer*]
 
-> **Description**: Delete a tag.
+> **Permissions**: `ManageThreads`
 
-> **Feature Flags**: `Autocomplete`
+> **Config Roles**: `SupportRoles`, `StaffRoles`, `AdminRoles`, `TagAdminRoles`, `TagRoles`
 
-### `/` `tag` `edit`
+> **Description**: Marks a forum post as resolved and archives it
 
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
+### `/bruteforce`
 
-> **Description**: Edit a tag.
+> **Permissions**: `Administrator`
 
-> **Feature Flags**: `Modal`
+> **Description**: Force administrative actions
 
-### `/` `tag` `import` <_json_>
+> **Subcommands**:
 
-> **Permissions**: `STAFF_ROLE`, `ADMIN_ROLE`
-
-> **Description**: Import an tag using the json provided from `/tag raw` command.
-
-> Syntax
-
-> **Feature Flags**: `Autocomplete`
-
-### `/` `tag` `info` <_tag_name_>
-
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
-
-> **Description**: Get information about a tag.
-
-> **Feature Flags**: `Autocomplete`
-
-### `/` `tag` `show` <_tag_name_>
-
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
-
-> **Description**: Show a tag.
-
-> **Feature Flags**: `Autocomplete`
-
-### `/` `tag` `raw` <_tag_name_>
-
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
-
-> **Description**: Get the raw content of a tag and sent it as an ephemeral json message.
-
-> **Feature Flags**: `Autocomplete`
-
-### `/` `tag` `use` <_tag_name_>
-
-> **Permissions**: `SUPPORT_ROLE`, `STAFF_ROLE`, `ADMIN_ROLE`
-
-> **Description**: Use a tag.
-
-> **Feature Flags**: `Autocomplete`
-
-## Message Commands [Deprecated]
-
-Message Commands are triggered by specific message prefixes and provide various functionalities. Below are the details of the available
-message commands.
-
-### Prefixes
-
-The following prefixes are recognized by the command handler:
-
-- `yo`
-- `w`
-- `dude,`
-- `omg`
-- `lookhere`
-- `j`
-
-### Parameters and Actions
-
-Commands can include additional parameters and actions prefixed by a dash (`-`). Parameters and actions modify the behavior of the command.
-The recognized actions are:
-
-- `-mention` or `-m`: Mention a specific user in the response.
-- `-del` or `-d`: Delete the original command message after executing the command.
-
-### Command Structure
-
-A command is structured as follows:
-
-```plaintext
-<prefix> <command> [parameters] [actions]
-```
-
-Example:
-
-```plaintext
-yo tagname -mention @username -del
-```
-
-### Permissions
-
-The command execution requires the user to have one of the following roles:
-
-- `ADMIN_ROLE`
-- `STAFF_ROLE`
-- `SUPPORT_ROLE`
+- `notify_video_discussions`: Notify about video discussions

@@ -4,6 +4,7 @@ import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, Tag } from '../../../Services/TagService';
 import { Emojis } from '../../../Common/enums';
+import { ConfigurationRoles } from '../../../Common/container';
 
 interface TagImportData {
     name: string;
@@ -21,14 +22,16 @@ function checkRequiredVariables(obj: unknown): obj is TagImportData {
 
 export const ImportSubCommand = defineSubCommand({
     name: 'import',
-    allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE],
+    restrictToConfigRoles: [
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guild.id;
         const jsonString = interaction.options.getString('json', true);
 
-        await interaction.deferReply({
-            flags: MessageFlags.Ephemeral,
-        });
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         let data: unknown;
         try {
@@ -68,11 +71,7 @@ export const ImportSubCommand = defineSubCommand({
             footer: tagDataInput.footer ?? null,
         };
 
-        await ctx.services.tags.configure<Options>({
-            guildId,
-            name: tagData.name,
-            tag: tagData,
-        });
+        await ctx.services.tags.configure<Options>({ guildId, name: tagData.name, tag: tagData });
 
         if (await ctx.services.tags.itemExists<Options>()) {
             await interaction.editReply(`> The support tag \`${tagData.name}\` already exists!`);

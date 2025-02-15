@@ -1,8 +1,6 @@
 import { ApplicationCommandType } from '@antibot/interactions';
 import { defineCommand } from '../../../Common/define';
-import { Context } from '../../../Source/Context';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { checkForRoles } from '../../../Common/roles';
+import { ChatInputCommandInteraction } from 'discord.js';
 import {
     subCommandOptions,
     CreateSubCommand,
@@ -35,27 +33,7 @@ export = {
             edit: EditSubCommand,
             import: ImportSubCommand,
         },
-        on: async (ctx: Context, interaction) => {
-            if (
-                !checkForRoles(
-                    interaction,
-                    process.env.ADMIN_ROLE,
-                    process.env.STAFF_ROLE,
-                    process.env.SUPPORT_ROLE,
-                )
-            ) {
-                await interaction.reply({
-                    content: "Sorry but you can't use this command.",
-                    flags: MessageFlags.Ephemeral,
-                });
-                return;
-            }
-
-            await interaction.reply({
-                content: 'This command or subcommand is not properly configured.',
-                flags: MessageFlags.Ephemeral,
-            });
-        },
+        on: async () => {},
         autocomplete: async (ctx, interaction) => {
             const subCommand = interaction.options.getSubcommand(false);
             if (!subCommand) {
@@ -73,19 +51,7 @@ export = {
                 import: ImportSubCommand,
             }[subCommand];
 
-            if (!subCommandHandler?.autocomplete) {
-                await interaction.respond([]);
-                return;
-            }
-
-            if (
-                !checkForRoles(
-                    interaction,
-                    process.env.ADMIN_ROLE,
-                    process.env.STAFF_ROLE,
-                    process.env.SUPPORT_ROLE,
-                )
-            ) {
+            if (!subCommandHandler) {
                 await interaction.respond([]);
                 return;
             }

@@ -1,52 +1,47 @@
 services:
-  bot:
-    build: .
-    container_name: jasper-bot
-    environment:
-      - BOTID=${BOTID}
-      - PUBLICKEY=${PUBLICKEY}
-      - TOKEN=${TOKEN}
-      - MONGODB=mongodb://mongo:27017/jasper
-      - PREFIX=${PREFIX}
-      - SUPPORT_ROLE=${SUPPORT_ROLE}
-      - ADMIN_ROLE=${ADMIN_ROLE}
-      - STAFF_ROLE=${STAFF_ROLE}
-      - GUILD_ONLY_COMMANDS=${GUILD_ONLY_COMMANDS}
-      - GUILD_ONLY_COMMANDS_GUILD_ID=${GUILD_ONLY_COMMANDS_GUILD_ID}
-      - YOUTUBE_CHANNEL_ID=${YOUTUBE_CHANNEL_ID}
-      - YOUTUBE_KEY=${YOUTUBE_KEY}
-      - YOUTUBE_KEY_TWO=${YOUTUBE_KEY_TWO}
-      - YOUTUBE_KEY_THREE=${YOUTUBE_KEY_THREE}
-      - YOUTUBE_VIDEO_POST_CHANNEL_ID=${YOUTUBE_VIDEO_POST_CHANNEL_ID}
-      - YOUTUBE_VIDEO_POST_TIMER=${YOUTUBE_VIDEO_POST_TIMER}
-      - YOUTUBE_VIDEO_POST_UPDATE=${YOUTUBE_VIDEO_POST_UPDATE}
-      - YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID=${YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID}
-      - SUB_COUNT_CHANNEL=${SUB_COUNT_CHANNEL}
-      - SUB_COUNT_TIMER=${SUB_COUNT_TIMER}
-      - SUB_COUNT_UPDATE=${SUB_COUNT_UPDATE}
-      - REDISHOST=redis
-      - REDISPORT=6379
-      - SUPPORT_THREAD=${SUPPORT_THREAD}
-      - SLOWMODE=${SLOWMODE}
-      - SLOWMODE_CHANNEL_ID=${SLOWMODE_CHANNEL_ID}
-      - SLOWMODE_COOLDOWN=${SLOWMODE_COOLDOWN}
-      - SLOWMODE_MESSAGE_TIME=${SLOWMODE_MESSAGE_TIME}
-      - SLOWMODE_MESSAGE_THRESHOLD=${SLOWMODE_MESSAGE_THRESHOLD}
-      - SLOWMODE_RESET_SLOWMODE=${SLOWMODE_RESET_SLOWMODE}
-      - SLOWMODE_RESET_TIME=${SLOWMODE_RESET_TIME}
-    depends_on:
-      - mongo
-      - redis
+    bot:
+        build: .
+        container_name: jasper-bot
+        environment:
+            - BOTID=${BOTID}
+            - PUBLICKEY=${PUBLICKEY}
+            - TOKEN=${TOKEN}
+            - MONGODB=mongodb://mongo:27017/jasper
+            - PREFIX=${PREFIX}
+            - GUILD_ONLY_COMMANDS=${GUILD_ONLY_COMMANDS}
+            - GUILD_ONLY_COMMANDS_GUILD_ID=${GUILD_ONLY_COMMANDS_GUILD_ID}
+            - YOUTUBE_CHANNEL_ID=${YOUTUBE_CHANNEL_ID}
+            - YOUTUBE_KEY=${YOUTUBE_KEY}
+            - YOUTUBE_KEY_TWO=${YOUTUBE_KEY_TWO}
+            - YOUTUBE_KEY_THREE=${YOUTUBE_KEY_THREE}
+            - YOUTUBE_VIDEO_POST_CHANNEL_ID=${YOUTUBE_VIDEO_POST_CHANNEL_ID}
+            - YOUTUBE_VIDEO_POST_TIMER=${YOUTUBE_VIDEO_POST_TIMER}
+            - YOUTUBE_VIDEO_POST_UPDATE=${YOUTUBE_VIDEO_POST_UPDATE}
+            - YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID=${YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID}
+            - SUB_COUNT_CHANNEL=${SUB_COUNT_CHANNEL}
+            - SUB_COUNT_TIMER=${SUB_COUNT_TIMER}
+            - SUB_COUNT_UPDATE=${SUB_COUNT_UPDATE}
+            - REDISHOST=redis
+            - REDISPORT=6379
+            - SLOWMODE=${SLOWMODE}
+            - SLOWMODE_COOLDOWN=${SLOWMODE_COOLDOWN}
+            - SLOWMODE_MESSAGE_TIME=${SLOWMODE_MESSAGE_TIME}
+            - SLOWMODE_MESSAGE_THRESHOLD=${SLOWMODE_MESSAGE_THRESHOLD}
+            - SLOWMODE_RESET_SLOWMODE=${SLOWMODE_RESET_SLOWMODE}
+            - SLOWMODE_RESET_TIME=${SLOWMODE_RESET_TIME}
+        depends_on:
+            - mongo
+            - redis
 
-  mongo:
-    image: mongo:latest
-    container_name: jasper-mongo
-    volumes:
-      - mongo-data:/data/db
+    mongo:
+        image: mongo:latest
+        container_name: jasper-mongo
+        volumes:
+            - mongo-data:/data/db
 
-  redis:
-    image: redis:latest
-    container_name: jasper-redis
+    redis:
+        image: redis:latest
+        container_name: jasper-redis
 
 volumes:
-  mongo-data:
+    mongo-data:

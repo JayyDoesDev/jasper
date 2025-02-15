@@ -52,7 +52,7 @@ export class Context extends Client {
                 status: 'dnd',
                 activities: [
                     {
-                        name: '/tag create',
+                        name: '/help',
                         state: 'Working with support and handling slowmode',
                         url: `https://www.youtube.com/watch?v=avideothatdoesntexist`,
                         type: ActivityType.Streaming,
@@ -78,9 +78,6 @@ export class Context extends Client {
             { env: 'TOKEN', aliases: ['botToken', 'token', 'bot'] },
             { env: 'MONGODB', aliases: ['db'] },
             { env: 'PREFIX', aliases: ['prefix'] },
-            { env: 'SUPPORT_ROLE', aliases: ['support_role', 'supportrole', 'support'] },
-            { env: 'ADMIN_ROLE', aliases: ['admin_role', 'adminrole', 'admin'] },
-            { env: 'STAFF_ROLE', aliases: ['staff_role', 'staffrole', 'staff'] },
             { env: 'GUILD_ONLY_COMMANDS', aliases: ['guild_only_commands', 'guild_only'] },
             {
                 env: 'GUILD_ONLY_COMMANDS_GUILD_ID',
@@ -119,9 +116,7 @@ export class Context extends Client {
             { env: 'SUB_COUNT_UPDATE', aliases: ['sub_count_update', 'sub_update'] },
             { env: 'REDISHOST', aliases: ['redis_host', 'redishost'] },
             { env: 'REDISPORT', aliases: ['redis_port', 'redisport'] },
-            { env: 'SUPPORT_THREAD', aliases: ['support_thread', 'supporthread'] },
             { env: 'SLOWMODE', aliases: ['slowmode'] },
-            { env: 'SLOWMODE_CHANNEL_ID', aliases: ['slowmode_channel'] },
             { env: 'SLOWMODE_COOLDOWN', aliases: ['slowmode_cooldown'] },
             {
                 env: 'SLOWMODE_MESSAGE_TIME',

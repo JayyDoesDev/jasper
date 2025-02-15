@@ -11,6 +11,7 @@ export interface GuildDocument extends Document {
 export type Settings = {
     Channels: {
         AllowedTagChannels: Snowflake[];
+        AutomaticSlowmodeChannels: Snowflake[];
     };
     Roles: {
         SupportRoles: Snowflake[];
@@ -41,6 +42,7 @@ export default model<GuildDocument>(
             GuildSettings: {
                 Channels: {
                     AllowedTagChannels: { type: [], default: [] },
+                    AutomaticSlowmodeChannels: { type: [], default: [] },
                 },
                 Roles: {
                     SupportRoles: { type: [], default: [] },

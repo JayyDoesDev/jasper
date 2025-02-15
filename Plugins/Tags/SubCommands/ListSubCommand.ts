@@ -5,6 +5,7 @@ import { defineSubCommand } from '../../../Common/define';
 import { Tag } from '../../../Models/GuildSchema';
 import { State } from '../../types';
 import { TagResponse } from '../../../Services/TagService';
+import { ConfigurationRoles } from '../../../Common/container';
 
 function chunkArray<T>(array: T[], size: number): T[][] {
     const chunks: T[][] = [];
@@ -16,7 +17,13 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 
 export const ListSubCommand = defineSubCommand({
     name: 'list',
-    allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
 

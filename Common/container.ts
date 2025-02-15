@@ -8,6 +8,7 @@ export enum ConfigurationRoles {
 
 export enum ConfigurationChannels {
     AllowedTagChannels,
+    AutomaticSlowmodeChannels,
 }
 
 export const configurationRolesContainer = [
@@ -20,6 +21,7 @@ export const configurationRolesContainer = [
 
 export const configurationChannelsContainer = [
     [ConfigurationChannels.AllowedTagChannels, 'AllowedTagChannels'],
+    [ConfigurationChannels.AutomaticSlowmodeChannels, 'AutomaticSlowmodeChannels'],
 ] as const;
 
 export function filterContainer<R extends []>(

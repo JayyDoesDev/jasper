@@ -1,11 +1,28 @@
 import { Context } from '../../Source/Context';
 import { Message, TextChannel } from 'discord.js';
 import { definePlugin, Plugin } from '../../Common/define';
+import { Options } from '../../Services/SettingsService';
 
-let active: boolean = false;
-let messageCount: number = 0;
-let messageWindowStart: number = Date.now();
-let lastSlowmodeChange: number = 0;
+interface ChannelState {
+    active: boolean;
+    messageCount: number;
+    messageWindowStart: number;
+    lastSlowmodeChange: number;
+}
+
+const channelStates = new Map<string, ChannelState>();
+
+const getChannelState = (channelId: string): ChannelState => {
+    if (!channelStates.has(channelId)) {
+        channelStates.set(channelId, {
+            active: false,
+            messageCount: 0,
+            messageWindowStart: Date.now(),
+            lastSlowmodeChange: 0,
+        });
+    }
+    return channelStates.get(channelId)!;
+};
 
 export = definePlugin({
     name: 'slowmode',
@@ -18,40 +35,46 @@ export = definePlugin({
             },
             on: async (message: Message, ctx: Context) => {
                 if (ctx.env.get('slowmode') == '0') return;
+                if (message.author.bot) return;
+                await ctx.services.settings.configure<Options>({ guildId: message.guild!.id });
+                const { Channels } = ctx.services.settings.getSettings();
+                const slowmodeChannels = Channels.AutomaticSlowmodeChannels;
+
+                if (!slowmodeChannels.includes(message.channel.id)) return;
 
                 //@ts-ignore
-                const channel: TextChannel = ctx.channels.resolve(ctx.env.get('slowmode_channel'));
+                const channel: TextChannel = ctx.channels.resolve(message.channel.id);
+                const state = getChannelState(message.channel.id);
 
-                if (message.channel.id !== channel.id) return;
                 if (
-                    Date.now() - messageWindowStart >
+                    Date.now() - state.messageWindowStart >
                     ctx.env.get<string, number>('slowmode_msg_time') * 1000
                 ) {
-                    messageCount = 1;
-                    messageWindowStart = Date.now();
+                    state.messageCount = 1;
+                    state.messageWindowStart = Date.now();
                 } else {
-                    messageCount += 1;
+                    state.messageCount += 1;
                 }
 
-                if (messageCount >= ctx.env.get<string, number>('slowmode_msg_threshold')) {
-                    const multiplier: number = Math.max(Math.floor(messageCount / 3.5), 2);
+                if (state.messageCount >= ctx.env.get<string, number>('slowmode_msg_threshold')) {
+                    const multiplier: number = Math.max(Math.floor(state.messageCount / 3.5), 2);
 
                     const currentTime = Date.now();
                     if (
-                        currentTime - lastSlowmodeChange >
+                        currentTime - state.lastSlowmodeChange >
                         ctx.env.get<string, number>('slowmode_cooldown') * 1000
                     ) {
-                        lastSlowmodeChange = currentTime;
+                        state.lastSlowmodeChange = currentTime;
                         await channel.setRateLimitPerUser(multiplier).catch(() => {
                             return;
                         });
 
-                        if (!active) {
-                            active = true;
+                        if (!state.active) {
+                            state.active = true;
 
                             setTimeout(
                                 () => {
-                                    active = false;
+                                    state.active = false;
                                 },
                                 <number>ctx.env.get('slowmode_reset_time') * 1000,
                             );

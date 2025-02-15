@@ -59,7 +59,9 @@ problem you’re trying to solve and how your enhancement will help.
 
 ### Environment Variables
 
-Create a `.env` file in the root directory and add the following environment variables:
+#### Required Variables
+
+Create a `.env` file in the root directory with these required environment variables:
 
 ```dotenv
 BOTID=
@@ -67,32 +69,47 @@ PUBLICKEY=
 TOKEN=
 MONGODB=
 PREFIX=
-SUPPORT_ROLE=
-ADMIN_ROLE=
-STAFF_ROLE=
 GUILD_ONLY_COMMANDS=1 # 1 = true 0 = false
 GUILD_ONLY_COMMANDS_GUILD_ID=
+REDISHOST=
+REDISPORT=
+```
+
+#### Optional Features
+
+##### YouTube Integration
+
+```dotenv
 YOUTUBE_CHANNEL_ID=
 YOUTUBE_KEY=
 YOUTUBE_KEY_TWO=
 YOUTUBE_KEY_THREE=
 YOUTUBE_VIDEO_POST_CHANNEL_ID=
 YOUTUBE_VIDEO_POST_TIMER=
+YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID=
 YOUTUBE_VIDEO_POST_UPDATE=1 # 1 = true 0 = false
-SUB_COUNT_CHANNEL=
-SUB_COUNT_TIMER=
-SUB_COUNT_UPDATE=0 # 1 = true 0 = false
-REDISHOST=
-REDISPORT=
-SUPPORT_THREAD=
+```
+
+##### Slowmode Feature
+
+```dotenv
 SLOWMODE=1 # 1 = true 0 = false
-SLOWMODE_CHANNEL_ID=
 SLOWMODE_COOLDOWN=
 SLOWMODE_MESSAGE_TIME=
 SLOWMODE_MESSAGE_THRESHOLD=
 SLOWMODE_RESET_SLOWMODE=
 SLOWMODE_RESET_TIME=
 ```
+
+#### Removed Variables
+
+The following environment variables have been removed and are no longer supported:
+
+- `SUPPORT_ROLE`: Role management now handled through commands
+- `ADMIN_ROLE`: Role management now handled through commands
+- `STAFF_ROLE`: Role management now handled through commands
+- `SUPPORT_THREAD`: Support thread functionality removed
+- `SLOWMODE_CHANNEL_ID`: Channel management now handled through commands
 
 ### Scripts
 

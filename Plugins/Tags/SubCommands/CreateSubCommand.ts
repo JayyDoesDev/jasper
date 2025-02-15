@@ -2,10 +2,17 @@ import { ApplicationCommandOptionType } from '@antibot/interactions';
 import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, ComponentType, TextInputStyle } from 'discord.js';
 import { defineSubCommand } from '../../../Common/define';
+import { ConfigurationRoles } from '../../../Common/container';
 
 export const CreateSubCommand = defineSubCommand({
     name: 'create',
-    allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await interaction.showModal({
             customId: `tag_create_${interaction.user.id}`,

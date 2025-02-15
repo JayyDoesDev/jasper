@@ -2,10 +2,17 @@ import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, ComponentType, TextInputStyle } from 'discord.js';
 import { defineSubCommand } from '../../../Common/define';
 import { ApplicationCommandOptionType } from '@antibot/interactions';
+import { ConfigurationRoles } from '../../../Common/container';
 
 export const EditSubCommand = defineSubCommand({
     name: 'edit',
-    allowedRoles: [process.env.ADMIN_ROLE, process.env.STAFF_ROLE, process.env.SUPPORT_ROLE],
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await interaction.showModal({
             customId: `tag_edit_${interaction.user.id}`,
