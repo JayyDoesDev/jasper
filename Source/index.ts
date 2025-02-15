@@ -109,7 +109,7 @@ async function postNewVideo(): Promise<void> {
 async function main() {
     try {
         await Promise.all(
-            ['Command', 'Event'].map(async (x) => {
+            ['Command', 'Event', 'Listener'].map(async (x) => {
                 const handlerModule = await import(`../Handlers/${x}`);
                 return handlerModule.default(ctx);
             }),

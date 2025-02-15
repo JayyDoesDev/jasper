@@ -5,5 +5,6 @@ export = definePlugin({
     name: 'settings',
     description: 'Settings you can change in Jasper for your liking.',
     commands: massRegisterCommands(__dirname, ['Commands']),
+    events: [],
     public_plugin: true,
 }) satisfies Plugin;

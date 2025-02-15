@@ -1,7 +1,8 @@
-import { Context } from '../../Source/Context';
 import { Message, TextChannel } from 'discord.js';
-import { definePlugin, Plugin } from '../../Common/define';
-import { Options } from '../../Services/SettingsService';
+import { Context } from '../Source/Context';
+import { Listener } from './Listener';
+import { Options } from '../Services/SettingsService';
+import { defineEvent } from '../Common/define';
 
 interface ChannelState {
     active: boolean;
@@ -24,31 +25,27 @@ const getChannelState = (channelId: string): ChannelState => {
     return channelStates.get(channelId)!;
 };
 
-export = definePlugin({
-    name: 'slowmode',
-    description: 'Automatically change slowmode based on chat activity!',
-    events: [
-        {
-            event: {
-                name: 'messageCreate',
-                once: false,
-            },
-            on: async (message: Message, ctx: Context) => {
-                if (ctx.env.get('slowmode') == '0') return;
-                if (message.author.bot) return;
-                await ctx.services.settings.configure<Options>({ guildId: message.guild!.id });
-                const { Channels } = ctx.services.settings.getSettings();
-                const slowmodeChannels = Channels.AutomaticSlowmodeChannels;
+export default class MessageCreateListener extends Listener<'messageCreate'> {
+    constructor(ctx: Context) {
+        super(ctx, 'messageCreate');
+    }
 
-                if (!slowmodeChannels.includes(message.channel.id)) return;
+    public async execute(message: Message): Promise<void> {
+        if (message.author.bot) return;
 
-                //@ts-ignore
-                const channel: TextChannel = ctx.channels.resolve(message.channel.id);
+        if (message.guild) {
+            await this.ctx.services.settings.configure<Options>({ guildId: message.guild.id });
+            const { Channels } = this.ctx.services.settings.getSettings();
+
+            if (Channels.AutomaticSlowmodeChannels?.includes(message.channel.id)) {
+                if (this.ctx.env.get('slowmode') == '0') return;
+
+                const channel = this.ctx.channels.resolve(message.channel.id) as TextChannel;
                 const state = getChannelState(message.channel.id);
 
                 if (
                     Date.now() - state.messageWindowStart >
-                    ctx.env.get<string, number>('slowmode_msg_time') * 1000
+                    this.ctx.env.get<string, number>('slowmode_msg_time') * 1000
                 ) {
                     state.messageCount = 1;
                     state.messageWindowStart = Date.now();
@@ -56,13 +53,15 @@ export = definePlugin({
                     state.messageCount += 1;
                 }
 
-                if (state.messageCount >= ctx.env.get<string, number>('slowmode_msg_threshold')) {
+                if (
+                    state.messageCount >= this.ctx.env.get<string, number>('slowmode_msg_threshold')
+                ) {
                     const multiplier: number = Math.max(Math.floor(state.messageCount / 3.5), 2);
 
                     const currentTime = Date.now();
                     if (
                         currentTime - state.lastSlowmodeChange >
-                        ctx.env.get<string, number>('slowmode_cooldown') * 1000
+                        this.ctx.env.get<string, number>('slowmode_cooldown') * 1000
                     ) {
                         state.lastSlowmodeChange = currentTime;
                         await channel.setRateLimitPerUser(multiplier).catch(() => {
@@ -76,14 +75,22 @@ export = definePlugin({
                                 () => {
                                     state.active = false;
                                 },
-                                <number>ctx.env.get('slowmode_reset_time') * 1000,
+                                <number>this.ctx.env.get('slowmode_reset_time') * 1000,
                             );
                         }
                     }
                 }
+            }
+        }
+    }
+
+    public toEvent() {
+        return defineEvent({
+            event: {
+                name: this.name,
+                once: this.once,
             },
-        },
-    ],
-    public_plugin: true,
-    commands: [],
-}) satisfies Plugin;
+            on: (message: Message) => this.execute(message),
+        });
+    }
+}
