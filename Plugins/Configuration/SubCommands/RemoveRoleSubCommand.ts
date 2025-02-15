@@ -44,6 +44,7 @@ export const RemoveRoleSubCommand = defineSubCommand({
                         color: global.embedColor,
                     },
                 ],
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }

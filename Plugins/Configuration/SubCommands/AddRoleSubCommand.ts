@@ -38,6 +38,7 @@ export const AddRoleSubCommand = defineSubCommand({
                         color: global.embedColor,
                     },
                 ],
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }

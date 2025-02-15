@@ -48,6 +48,7 @@ export const RemoveChannelSubCommand = defineSubCommand({
                         color: global.embedColor,
                     },
                 ],
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }

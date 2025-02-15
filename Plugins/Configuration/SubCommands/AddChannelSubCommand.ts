@@ -38,6 +38,7 @@ export const AddChannelSubCommand = defineSubCommand({
                         color: global.embedColor,
                     },
                 ],
+                flags: MessageFlags.Ephemeral,
             });
             return;
         }
