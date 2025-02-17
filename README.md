@@ -64,6 +64,11 @@ To host your own instance of Jasper, follow these steps:
 Contributions to Jasper are welcome! If you encounter any issues or have ideas for new features, feel free to open an issue or submit a pull
 request. Make sure to follow the contribution guidelines outlined in `CONTRIBUTING.md`.
 
+## Contributors
+<a href="https://github.com/JayyDoesDev/Jasper/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=JayyDoesDev/Jasper" />
+</a>
+
 ## License
 
 Jasper is licensed under the MIT License. See `LICENSE` for more information.
