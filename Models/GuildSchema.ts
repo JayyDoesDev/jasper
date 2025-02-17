@@ -20,6 +20,9 @@ export type Settings = {
         AllowedAdminRoles: Snowflake[];
         AllowedStaffRoles: Snowflake[];
     };
+    Text: {
+        Topics: string[];
+    };
 };
 
 export type Tag = {
@@ -50,6 +53,9 @@ export default model<GuildDocument>(
                     AllowedTagAdminRoles: { type: [], default: [] },
                     AllowedAdminRoles: { type: [], default: [] },
                     AllowedStaffRoles: { type: [], default: [] },
+                },
+                Text: {
+                    Topics: { type: [], default: [] },
                 },
             },
             Tags: {

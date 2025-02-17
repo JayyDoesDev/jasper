@@ -4,19 +4,29 @@ import { CommonCondition, Service } from './Service';
 import TagSchema, { GuildDocument, Settings } from '../Models/GuildSchema';
 import { getGuild } from '../Common/db';
 
-export type Options = { guildId: Snowflake; GuildSettings?: Settings };
-
-export type SetChannelOptions = {
+export type GuildSnowflake = {
     guildId: Snowflake;
-    key: keyof Settings['Channels'];
+};
+
+export interface GuildSettingsWithKey<T extends keyof Settings> extends GuildSnowflake {
+    key: keyof Settings[T];
+}
+
+export interface Options extends GuildSnowflake {
+    GuildSettings?: Settings;
+}
+
+export interface SetChannelOptions extends GuildSettingsWithKey<'Channels'> {
     channels: Snowflake | Snowflake[];
-};
+}
 
-export type SetRoleOptions = {
-    guildId: Snowflake;
-    key: keyof Settings['Roles'];
+export interface SetRoleOptions extends GuildSettingsWithKey<'Roles'> {
     roles: Snowflake | Snowflake[];
-};
+}
+
+export interface SetTopicOptions extends GuildSettingsWithKey<'Text'> {
+    topics: string | string[];
+}
 
 class SettingsService extends Service {
     private guildId: Snowflake;
@@ -34,6 +44,7 @@ class SettingsService extends Service {
                 AllowedAdminRoles: [],
                 AllowedStaffRoles: [],
             },
+            Text: { Topics: [] },
         };
     }
 
@@ -59,6 +70,7 @@ class SettingsService extends Service {
                 AllowedAdminRoles: Roles.AllowedAdminRoles,
                 AllowedStaffRoles: Roles.AllowedStaffRoles,
             },
+            Text: { Topics: [] },
         };
 
         return this;
@@ -230,6 +242,87 @@ class SettingsService extends Service {
 
         const guild = await getGuild<GuildDocument>(this.ctx, targetGuildId);
         return guild.GuildSettings.Roles[key];
+    }
+
+    public async setTopics<T>(
+        options: T extends SetTopicOptions ? SetTopicOptions : null,
+    ): Promise<CommonCondition<string[]>> {
+        const guildId = options?.guildId ?? this.guildId;
+        const topics = options?.topics ?? [];
+        const key = options?.key;
+
+        if (!guildId) {
+            throw new Error('GuildId is required to set topics');
+        }
+
+        if (!key) {
+            throw new Error('Topic key is required');
+        }
+
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+
+        const topicsToAdd = Array.isArray(topics) ? topics : [topics];
+
+        const currentTopics = guild.GuildSettings.Text[key];
+        const updatedTopics = [...new Set([...currentTopics, ...topicsToAdd])];
+
+        guild.GuildSettings.Text[key] = updatedTopics;
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
+
+        await TagSchema.updateOne(
+            { _id: guildId },
+            { $set: { [`GuildSettings.Text.${key}`]: updatedTopics } },
+            { upsert: true },
+        );
+
+        return updatedTopics;
+    }
+
+    public async removeTopics<T>(
+        options: T extends SetTopicOptions ? SetTopicOptions : null,
+    ): Promise<CommonCondition<string[]>> {
+        const guildId = options?.guildId ?? this.guildId;
+        const topics = options?.topics ?? [];
+        const key = options?.key;
+
+        if (!guildId) {
+            throw new Error('GuildId is required to remove topics');
+        }
+
+        if (!key) {
+            throw new Error('Topic key is required');
+        }
+
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+
+        const topicsToRemove = Array.isArray(topics) ? topics : [topics];
+
+        const currentTopics = guild.GuildSettings.Text[key];
+        const updatedTopics = currentTopics.filter((topic) => !topicsToRemove.includes(topic));
+
+        guild.GuildSettings.Text[key] = updatedTopics;
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
+
+        await TagSchema.updateOne(
+            { _id: guildId },
+            { $set: { [`GuildSettings.Text.${key}`]: updatedTopics } },
+        );
+
+        return updatedTopics;
+    }
+
+    public async getTopics<T>(
+        guildId: T extends Snowflake ? Snowflake : null,
+        key: keyof Settings['Text'],
+    ): Promise<CommonCondition<string[]>> {
+        const targetGuildId = guildId ?? this.guildId;
+
+        if (!targetGuildId) {
+            throw new Error('GuildId is required to get topics');
+        }
+
+        const guild = await getGuild<GuildDocument>(this.ctx, targetGuildId);
+        return guild.GuildSettings.Text[key];
     }
 }
 
