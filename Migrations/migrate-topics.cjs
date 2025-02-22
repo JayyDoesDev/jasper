@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { config } = require('dotenv');
 const GuildModel = require('../Models/GuildSchema');
+const schema = GuildModel.default;
 config();
 
 async function migrateTopics() {
@@ -60,7 +61,7 @@ async function migrateTopics() {
         'If you could build your own dream house, what crazy features would it have?',
     ];
 
-    const guilds = await GuildModel.default.updateMany(
+    const guilds = await schema.updateMany(
         {
             $or: [
                 { 'GuildSettings.Text.Topics': { $exists: false } },
