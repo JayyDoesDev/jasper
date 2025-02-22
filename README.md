@@ -2,6 +2,16 @@
 <h1 align="center">Jasper</h1>
 <h2 align="center">🏷️ The Utility Discord bot for tags and subscriber count for the No Text To Speech Discord Server!</h2>
 
+<div>
+    <h2 align="center">
+        <img src="https://img.shields.io/github/commit-activity/m/jayydoesdev/jasper">
+        <img src="https://img.shields.io/github/license/jayydoesdev/jasper">
+        <img src="https://img.shields.io/github/languages/top/jayydoesdev/jasper">
+        <img src="https://img.shields.io/github/contributors/jayydoesdev/jasper">
+        <img src="https://img.shields.io/github/last-commit/jayydoesdev/jasper">
+    </h2>
+</div>
+
 ## Introduction
 
 Jasper is a Discord bot designed to provide utility features such as tag management and subscriber count tracking for the No Text To Speech
