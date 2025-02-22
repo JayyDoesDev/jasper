@@ -56,7 +56,7 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
                 if (
                     state.messageCount >= this.ctx.env.get<string, number>('slowmode_msg_threshold')
                 ) {
-                    const multiplier: number = Math.max(Math.floor(state.messageCount / 3.5), 2);
+                    const multiplier: number = Math.max(Math.floor(state.messageCount / 3.5), 3);
 
                     const currentTime = Date.now();
                     if (
