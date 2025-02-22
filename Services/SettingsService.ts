@@ -55,7 +55,7 @@ class SettingsService extends Service {
         }
 
         const {
-            GuildSettings: { Channels, Roles },
+            GuildSettings: { Channels, Roles, Text },
         } = await getGuild<GuildDocument>(this.ctx, this.guildId);
 
         this.guildSettings = {
@@ -70,7 +70,7 @@ class SettingsService extends Service {
                 AllowedAdminRoles: Roles.AllowedAdminRoles,
                 AllowedStaffRoles: Roles.AllowedStaffRoles,
             },
-            Text: { Topics: [] },
+            Text: { Topics: Text.Topics },
         };
 
         return this;

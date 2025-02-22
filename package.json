@@ -1,6 +1,6 @@
 {
     "name": "jasper",
-    "version": "2.6.7",
+    "version": "2.6.8",
     "scripts": {
         "build": "gulp js && tsc",
         "start": "node dist/Source/index.js",
@@ -11,7 +11,9 @@
         "docker": "docker run -dp 127.0.0.1:3000:8000 --name jasper jasper:latest",
         "dockerstop": "docker stop jasper",
         "docker-compose": "docker-compose up -d",
-        "docker-compose-stop": "docker-compose down"
+        "docker-compose-stop": "docker-compose down",
+        "migration": "gulp migration",
+        "migration:topics": "node dist/Migrations/migrate-topics.cjs"
     },
     "main": "dist/Source/index.js",
     "author": "JayyDoesDev",
