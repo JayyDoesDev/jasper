@@ -13,7 +13,7 @@
         "docker-compose": "docker-compose up -d",
         "docker-compose-stop": "docker-compose down",
         "migration": "gulp migration",
-        "migration:topics": "node dist/Migrations/migrate-topics.cjs"
+        "migration:topics": "yarn migration && node dist/Migrations/migrate-topics.cjs"
     },
     "main": "dist/Source/index.js",
     "author": "JayyDoesDev",
