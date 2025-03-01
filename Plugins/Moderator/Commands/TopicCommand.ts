@@ -1,4 +1,4 @@
-import { ApplicationCommandType } from '@antibot/interactions';
+import { ApplicationCommandType, PermissionsBitField } from '@antibot/interactions';
 import { defineCommand } from '../../../Common/define';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { ConfigurationRoles } from '../../../Common/container';
@@ -14,6 +14,7 @@ export = {
             options: [],
         },
         restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
+        permissions: [PermissionsBitField.SendMessages],
         on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             await ctx.services.settings.configure<Options>({ guildId: interaction.guildId });
             const { Text } = ctx.services.settings.getSettings();
@@ -34,7 +35,7 @@ export = {
                 channel.send({ content });
             }
 
-            await interaction.reply({ content: 'Topic sent!', flags: MessageFlags.Ephemeral });
+            return interaction.reply({ content: 'Topic sent!', flags: MessageFlags.Ephemeral });
         },
     }),
 };

@@ -204,8 +204,9 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                                 content: `I'm missing permissions! (${
                                     perms.length <= 2 ? perms.join(' & ') : perms.join(', ')
                                 })`,
-                                ephemeral: true,
+                                flags: MessageFlags.Ephemeral,
                             });
+                            return;
                         }
                     }
 
