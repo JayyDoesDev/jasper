@@ -2,15 +2,13 @@ import { ApplicationCommandOptionType } from '@antibot/interactions';
 import { Context } from '../../../Source/Context';
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from 'discord.js';
 import { defineSubCommand } from '../../../Common/define';
-import { Options, SetTopicOptions } from '../../../Services/SettingsService';
+import { Options } from '../../../Services/SettingsService';
 import { chunk } from '../../../Common/array';
 
-export const RemoveTopicSubCommand = defineSubCommand({
-    name: 'remove_topic',
+export const ViewTopicsSubCommand = defineSubCommand({
+    name: 'view_topics',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const index = interaction.options.getInteger('index')!;
-
         await ctx.services.settings.configure<Options>({ guildId });
         const topicsExistInDB = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
 
@@ -56,25 +54,7 @@ export const RemoveTopicSubCommand = defineSubCommand({
             },
         ];
 
-        if (!topicsExistInDB[index - 1] || index <= 0 || index > topicsExistInDB.length) {
-            await interaction.reply({
-                content: `I couldn't find a topic at index **${index}**`,
-                flags: MessageFlags.Ephemeral,
-            });
-            return;
-        }
-
-        const topic = topicsExistInDB[index - 1];
-        await ctx.services.settings.removeTopics<SetTopicOptions>({
-            guildId,
-            key: 'Topics',
-            topics: topic,
-        });
-
-        const updatedTopics = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
-
         await interaction.reply({
-            content: `I've removed **${topic}** from the topics list.`,
             embeds: [
                 {
                     thumbnail: { url: interaction.guild.iconURL() ?? '' },
@@ -87,27 +67,19 @@ export const RemoveTopicSubCommand = defineSubCommand({
                             )
                             .join('\n') || 'No topics',
                     footer: {
-                        text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${updatedTopics.length}`,
+                        text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${topicsExistInDB.length}`,
                     },
                     color: global.embedColor,
                 },
             ],
             components,
-            flags: MessageFlags.Ephemeral,
         });
     },
 });
 
 export const commandOptions = {
-    name: 'remove_topic',
-    description: 'Remove a topic from the configuration',
+    name: 'view_topics',
+    description: 'View the current topics in the configuration',
     type: ApplicationCommandOptionType.SUB_COMMAND,
-    options: [
-        {
-            name: 'index',
-            description: 'The index of the topic to remove',
-            type: ApplicationCommandOptionType.INTEGER,
-            required: true,
-        },
-    ],
+    options: [],
 };

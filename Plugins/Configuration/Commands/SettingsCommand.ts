@@ -10,6 +10,7 @@ import {
     ViewChannelSubCommand,
     AddTopicSubCommand,
     RemoveTopicSubCommand,
+    ViewTopicsSubCommand,
 } from '../SubCommands';
 
 export = {
@@ -31,6 +32,7 @@ export = {
             view: ViewChannelSubCommand,
             add_topic: AddTopicSubCommand,
             remove_topic: RemoveTopicSubCommand,
+            view_topics: ViewTopicsSubCommand,
         },
         on: async () => {},
         autocomplete: async (ctx, interaction) => {

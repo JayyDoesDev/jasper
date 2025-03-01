@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/jasper.png?raw=true" alt="jasper" width="500""></p>
 <h1 align="center">Jasper</h1>
-<h2 align="center">🏷️ The Utility Discord bot for tags and subscriber count for the No Text To Speech Discord Server!</h2>
+<h2 align="center">🔍🔨 A multipurpose Discord bot for the No Text To Speech Discord server!</h2>
 
 <div>
     <h2 align="center">
@@ -42,6 +42,7 @@ To host your own instance of Jasper, follow these steps:
 1. Clone this repository to your local machine.
 2. Install the required dependencies using `yarn`.
 3. Configure Jasper by creating a `.env` file in the root directory and adding the following environment variables:
+
     - `BOTID`: Your bot's ID.
     - `PUBLICKEY`: Your bot's public key.
     - `TOKEN`: Your bot's token.
@@ -59,7 +60,7 @@ To host your own instance of Jasper, follow these steps:
     - `YOUTUBE_VIDEO_POST_CHANNEL_ID`: Youtube channel ID
     - `YOUTUBE_VIDEO_POST_TIMER`: Interval in milliseconds for checking YouTube Data API.
     - `YOUTUBE_VIDEO_POST_UPDATE`: Set to `1` to enable automatic posting for video discussions.
-    - `YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID`: The ping role id for video discussions. 
+    - `YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID`: The ping role id for video discussions.
     - `SUB_COUNT_CHANNEL`: ID of the channel where subscriber count updates will be posted.
     - `SUB_COUNT_TIMER`: Interval in milliseconds for subscriber count updates.
     - `SUB_COUNT_UPDATE`: Set to `1` to enable automatic subscriber count updates.
@@ -75,6 +76,7 @@ Contributions to Jasper are welcome! If you encounter any issues or have ideas f
 request. Make sure to follow the contribution guidelines outlined in `CONTRIBUTING.md`.
 
 ## Contributors
+
 <a href="https://github.com/JayyDoesDev/Jasper/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=JayyDoesDev/Jasper" />
 </a>
