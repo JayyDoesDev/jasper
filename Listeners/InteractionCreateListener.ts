@@ -32,7 +32,11 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
     >(interaction: Interaction): Promise<void> {
         await this.handleCommands(interaction);
         if (interaction.isButton()) {
-            await this.onListSubCommandButtons(interaction);
+            if (interaction.customId.startsWith('list_subcommand_button_')) {
+                await this.onListSubCommandButtons(interaction);
+            } else if (interaction.customId.startsWith('add_topic_subcommand_button_')) {
+                await this.onAddTopicSubCommandButtons(interaction);
+            }
         }
         if (interaction.isModalSubmit()) {
             await this.handleModalSubmit(interaction);
@@ -239,6 +243,8 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         if (!interaction.guild) return;
         const thumbnail = { url: interaction.guild.iconURL() ?? '' };
         const color = global.embedColor;
+        const description = '';
+        const footer = { text: '' };
 
         const currentUserState = this.ctx.pagination.get(author);
         if (!currentUserState) return;
@@ -247,10 +253,8 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             thumbnail,
             title,
             color,
-            description: '',
-            footer: {
-                text: '',
-            },
+            description,
+            footer,
         };
 
         const updateEmbed = async () => {
@@ -313,6 +317,102 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 currentUserState.page =
                     (currentUserState.page - 1 + currentUserState.tagPages.length) %
                     currentUserState.tagPages.length;
+                break;
+
+            default:
+                break;
+        }
+
+        this.ctx.pagination.set(author, currentUserState);
+        await updateEmbed();
+    }
+
+    private async onAddTopicSubCommandButtons(interaction: ButtonInteraction): Promise<void> {
+        if (!interaction.isButton()) return;
+        const author = interaction.user.id;
+        const title = 'Current Topics in Configuration';
+        if (!interaction.guild) return;
+        const thumbnail = { url: interaction.guild.iconURL() ?? '' };
+        const color = global.embedColor;
+        const description = '';
+        const footer = { text: '' };
+
+        const currentUserState = this.ctx.pagination.get(author);
+        if (!currentUserState) return;
+
+        const embedBase = {
+            thumbnail,
+            title,
+            color,
+            description,
+            footer,
+        };
+
+        const updateEmbed = async () => {
+            embedBase.description = currentUserState.addTopicPages.pages[
+                currentUserState.addTopicPages.page
+            ]
+                .map(
+                    (string, i) =>
+                        `**${currentUserState.addTopicPages.page * 10 + i + 1}.** *${string}*`,
+                )
+                .join('\n');
+
+            embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${
+                currentUserState.addTopicPages.pages.length
+            } • Total Topics: ${currentUserState.addTopicPages.pages.length}`;
+
+            const row = {
+                type: ComponentType.ActionRow,
+                components: [
+                    {
+                        type: ComponentType.Button,
+                        customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
+                        style: ButtonStyle.Primary,
+                        label: 'Previous',
+                        disabled: currentUserState.addTopicPages.page === 0,
+                    } as const,
+                    {
+                        type: ComponentType.Button,
+                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        style: ButtonStyle.Secondary,
+                        label: 'Home',
+                    } as const,
+                    {
+                        type: ComponentType.Button,
+                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                        style: ButtonStyle.Primary,
+                        label: 'Next',
+                        disabled:
+                            currentUserState.addTopicPages.page ===
+                            currentUserState.addTopicPages.pages.length - 1,
+                    } as const,
+                ],
+            } as const;
+
+            await interaction.update({
+                embeds: [embedBase],
+                components: [row],
+            });
+        };
+
+        switch (interaction.customId) {
+            case `add_topic_subcommand_button_home_${author}`:
+                currentUserState.addTopicPages.page = 0;
+                break;
+
+            case `add_topic_subcommand_button_next_${author}`:
+                currentUserState.addTopicPages.page =
+                    (currentUserState.addTopicPages.page + 1) %
+                    currentUserState.addTopicPages.pages.length;
+                break;
+
+            case `add_topic_subcommand_button_previous_${author}`:
+                currentUserState.addTopicPages.page =
+                    (currentUserState.addTopicPages.page -
+                        1 +
+                        currentUserState.addTopicPages.pages.length) %
+                    currentUserState.addTopicPages.pages.length;
                 break;
 
             default:

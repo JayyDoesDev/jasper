@@ -43,6 +43,7 @@ export const RemoveChannelSubCommand = defineSubCommand({
                 content: `I've removed **${channel}** from **${config}**`,
                 embeds: [
                     {
+                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
                         title: 'Current Channels in Configuration',
                         description,
                         color: global.embedColor,
@@ -59,6 +60,7 @@ export const RemoveChannelSubCommand = defineSubCommand({
             content: `I couldn't find **${channel}** inside of **${config}**`,
             embeds: [
                 {
+                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
                     title: 'Current Channels in Configuration',
                     description,
                     color: global.embedColor,

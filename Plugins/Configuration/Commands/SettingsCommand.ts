@@ -8,6 +8,7 @@ import {
     AddRoleSubCommand,
     RemoveRoleSubCommand,
     ViewChannelSubCommand,
+    AddTopicSubCommand,
 } from '../SubCommands';
 
 export = {
@@ -27,6 +28,7 @@ export = {
             add_role: AddRoleSubCommand,
             remove_role: RemoveRoleSubCommand,
             view: ViewChannelSubCommand,
+            add_topic: AddTopicSubCommand,
         },
         on: async () => {},
         autocomplete: async (ctx, interaction) => {

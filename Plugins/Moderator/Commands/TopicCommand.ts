@@ -32,7 +32,12 @@ export = {
             const channel = ctx.channels.resolve(interaction.channelId);
 
             if (channel.isSendable()) {
-                channel.send({ content });
+                channel.send({ content }).catch(() => {
+                    return interaction.reply({
+                        content: 'Failed to send the topic!',
+                        flags: MessageFlags.Ephemeral,
+                    });
+                });
             }
 
             return interaction.reply({ content: 'Topic sent!', flags: MessageFlags.Ephemeral });

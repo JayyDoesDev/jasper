@@ -33,6 +33,7 @@ export const AddChannelSubCommand = defineSubCommand({
                 content: `For the record, **${channel}** is already in **${config}**`,
                 embeds: [
                     {
+                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
                         title: 'Current Channels in Configuration',
                         description,
                         color: global.embedColor,

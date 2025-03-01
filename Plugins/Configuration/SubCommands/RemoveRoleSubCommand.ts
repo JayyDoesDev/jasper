@@ -39,6 +39,7 @@ export const RemoveRoleSubCommand = defineSubCommand({
                 content: `I've removed **${role.name}** from **${config}**`,
                 embeds: [
                     {
+                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
                         title: 'Current Roles in Configuration',
                         description,
                         color: global.embedColor,
@@ -57,7 +58,12 @@ export const RemoveRoleSubCommand = defineSubCommand({
         await interaction.reply({
             content: `I couldn't find **${role.name}** inside of **${config}**`,
             embeds: [
-                { title: 'Current Roles in Configuration', description, color: global.embedColor },
+                {
+                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
+                    title: 'Current Roles in Configuration',
+                    description,
+                    color: global.embedColor,
+                },
             ],
             flags: MessageFlags.Ephemeral,
         });

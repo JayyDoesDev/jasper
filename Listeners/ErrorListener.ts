@@ -20,7 +20,7 @@ export default class ErrorListener extends Listener<'error'> {
                 `Error: ${error}\nMethod: ${networkError.method}\nUrl: ${networkError.url}`,
             );
         } else {
-            console.log(`Error: ${error}`);
+            console.log(`Error: ${error.stack}`);
         }
     }
 

@@ -33,6 +33,7 @@ export const AddRoleSubCommand = defineSubCommand({
                 content: `For the record, **${role.name}** is already in **${config}**`,
                 embeds: [
                     {
+                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
                         title: 'Current Roles in Configuration',
                         description,
                         color: global.embedColor,
@@ -57,7 +58,12 @@ export const AddRoleSubCommand = defineSubCommand({
         await interaction.reply({
             content: `I've added **${role.name}** to **${config}**`,
             embeds: [
-                { title: 'Current Roles in Configuration', description, color: global.embedColor },
+                {
+                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
+                    title: 'Current Roles in Configuration',
+                    description,
+                    color: global.embedColor,
+                },
             ],
             flags: MessageFlags.Ephemeral,
         });

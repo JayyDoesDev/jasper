@@ -6,14 +6,7 @@ import { Tag } from '../../../Models/GuildSchema';
 import { State } from '../../types';
 import { TagResponse } from '../../../Services/TagService';
 import { ConfigurationRoles } from '../../../Common/container';
-
-function chunkArray<T>(array: T[], size: number): T[][] {
-    const chunks: T[][] = [];
-    for (let i = 0; i < array.length; i += size) {
-        chunks.push(array.slice(i, i + size));
-    }
-    return chunks;
-}
+import { chunk } from '../../../Common/array';
 
 export const ListSubCommand = defineSubCommand({
     name: 'list',
@@ -51,7 +44,7 @@ export const ListSubCommand = defineSubCommand({
             },
         }));
 
-        const tagPages = chunkArray(tags, 10);
+        const tagPages = chunk(tags, 10);
         const initialState: State = { page: 0, tagPages };
 
         ctx.pagination.set(interaction.user.id, initialState);
