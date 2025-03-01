@@ -7,6 +7,10 @@ import { commandOptions as addRoleOptions, AddRoleSubCommand } from './AddRoleSu
 import { commandOptions as removeRoleOptions, RemoveRoleSubCommand } from './RemoveRoleSubCommand';
 import { commandOptions as viewOptions, ViewChannelSubCommand } from './ViewSubCommand';
 import { commandOptions as addTopicOptions, AddTopicSubCommand } from './AddTopicSubCommand';
+import {
+    commandOptions as removeTopicOptions,
+    RemoveTopicSubCommand,
+} from './RemoveTopicSubCommand';
 
 export const subCommandOptions = [
     addChannelOptions,
@@ -15,6 +19,7 @@ export const subCommandOptions = [
     removeRoleOptions,
     viewOptions,
     addTopicOptions,
+    removeTopicOptions,
 ];
 
 export {
@@ -24,4 +29,5 @@ export {
     RemoveRoleSubCommand,
     ViewChannelSubCommand,
     AddTopicSubCommand,
+    RemoveTopicSubCommand,
 };

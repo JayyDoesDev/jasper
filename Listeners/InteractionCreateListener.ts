@@ -360,7 +360,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
             embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${
                 currentUserState.addTopicPages.pages.length
-            } • Total Topics: ${currentUserState.addTopicPages.pages.length}`;
+            } • Total Topics: ${
+                (
+                    await this.ctx.services.settings.getTopics<string>(
+                        interaction.guild!.id,
+                        'Topics',
+                    )
+                ).length
+            }`;
 
             const row = {
                 type: ComponentType.ActionRow,
