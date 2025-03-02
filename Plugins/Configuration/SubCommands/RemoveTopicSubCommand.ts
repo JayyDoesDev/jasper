@@ -9,7 +9,7 @@ export const RemoveTopicSubCommand = defineSubCommand({
     name: 'remove_topic',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const index = interaction.options.getInteger('index')!;
+        const input = interaction.options.getString('topic')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
         const topicsExistInDB = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
@@ -56,15 +56,21 @@ export const RemoveTopicSubCommand = defineSubCommand({
             },
         ];
 
-        if (!topicsExistInDB[index - 1] || index <= 0 || index > topicsExistInDB.length) {
-            await interaction.reply({
-                content: `I couldn't find a topic at index **${index}**`,
-                flags: MessageFlags.Ephemeral,
-            });
-            return;
+        const index = Number(input);
+        let topic = topicsExistInDB[Number(index) - 1];
+
+        if (Number.isNaN(index)) {
+            topic = input;
+        } else {
+            if (!topicsExistInDB[index - 1] || index <= 0 || index > topicsExistInDB.length) {
+                await interaction.reply({
+                    content: `I couldn't find a topic at index **${index}**`,
+                    flags: MessageFlags.Ephemeral,
+                });
+                return;
+            }
         }
 
-        const topic = topicsExistInDB[index - 1];
         await ctx.services.settings.removeTopics<SetTopicOptions>({
             guildId,
             key: 'Topics',
@@ -96,6 +102,18 @@ export const RemoveTopicSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
+
+    autocomplete: async (ctx: Context, interaction) => {
+        const query = interaction.options.getString('topic') || '';
+        const filtered = (
+            await ctx.services.settings.getTopics<string>(interaction.guildId!, 'Topics')
+        )
+            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 25)
+            .map((key) => ({ name: key as string, value: key as string }));
+
+        await interaction.respond(filtered);
+    },
 });
 
 export const commandOptions = {
@@ -104,10 +122,11 @@ export const commandOptions = {
     type: ApplicationCommandOptionType.SUB_COMMAND,
     options: [
         {
-            name: 'index',
-            description: 'The index of the topic to remove',
-            type: ApplicationCommandOptionType.INTEGER,
+            name: 'topic',
+            description: 'Provide either the index position or name of the topic to remove',
+            type: ApplicationCommandOptionType.STRING,
             required: true,
+            autocomplete: true,
         },
     ],
 };

@@ -48,6 +48,7 @@ export = {
                 add_role: AddRoleSubCommand,
                 remove_role: RemoveRoleSubCommand,
                 view: ViewChannelSubCommand,
+                view_topics: ViewTopicsSubCommand,
             }[subCommand];
 
             if (!subCommandHandler) {
