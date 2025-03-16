@@ -4,6 +4,7 @@ import {
     Client,
     ContextMenuCommandInteraction,
     IntentsBitField,
+    Message,
     Partials,
 } from 'discord.js';
 import { ZillaCollection } from '@antibot/zilla';
@@ -32,6 +33,7 @@ export class Context extends Client {
     >;
     public readonly interact!: Interactions;
     public readonly pagination!: ZillaCollection<Snowflake, State>;
+    public readonly snipe!: ZillaCollection<Snowflake, Message>;
     public readonly env!: Env;
     public readonly store!: Store;
     public readonly services!: Services;
@@ -72,6 +74,7 @@ export class Context extends Client {
             debug: true,
         });
         this.pagination = new ZillaCollection<Snowflake, State>();
+        this.snipe = new ZillaCollection<Snowflake, Message<true>>();
         this.env = new Env(
             { env: 'BOTID', aliases: ['bot_id', 'botid'] },
             { env: 'PUBLICKEY', aliases: ['public_key', 'publickey'] },

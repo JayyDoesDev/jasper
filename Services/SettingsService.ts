@@ -36,7 +36,11 @@ class SettingsService extends Service {
         super(ctx);
         this.guildId = '';
         this.guildSettings = {
-            Channels: { AllowedTagChannels: [], AutomaticSlowmodeChannels: [] },
+            Channels: {
+                AllowedSnipeChannels: [],
+                AllowedTagChannels: [],
+                AutomaticSlowmodeChannels: [],
+            },
             Roles: {
                 SupportRoles: [],
                 AllowedTagRoles: [],
@@ -60,6 +64,7 @@ class SettingsService extends Service {
 
         this.guildSettings = {
             Channels: {
+                AllowedSnipeChannels: Channels.AllowedSnipeChannels,
                 AllowedTagChannels: Channels.AllowedTagChannels,
                 AutomaticSlowmodeChannels: Channels.AutomaticSlowmodeChannels,
             },

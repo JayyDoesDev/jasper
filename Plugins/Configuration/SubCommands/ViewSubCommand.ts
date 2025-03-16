@@ -39,6 +39,11 @@ export const ViewChannelSubCommand = defineSubCommand({
                                     Channels.AllowedTagChannels,
                                     true,
                                 ),
+                                createField(
+                                    'Allowed Snipe Channels',
+                                    Channels.AllowedSnipeChannels,
+                                    true,
+                                ),
                             ],
                             false,
                         ) +

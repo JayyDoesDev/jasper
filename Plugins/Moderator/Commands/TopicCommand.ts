@@ -4,6 +4,7 @@ import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { ConfigurationRoles } from '../../../Common/container';
 import { Context } from '../../../Source/Context';
 import { Options } from '../../../Services/TagService';
+import { shuffle } from '../../../Common/array';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
@@ -18,13 +19,6 @@ export = {
         on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             await ctx.services.settings.configure<Options>({ guildId: interaction.guildId });
             const { Text } = ctx.services.settings.getSettings();
-            const shuffle = (array: string[]) => {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            };
 
             const topics = shuffle(Text.Topics);
             const content = `# ${topics[Math.floor(Math.random() * topics.length)]}`;
