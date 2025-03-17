@@ -20,9 +20,13 @@ export type Settings = {
         AllowedTagAdminRoles: Snowflake[];
         AllowedAdminRoles: Snowflake[];
         AllowedStaffRoles: Snowflake[];
+        IgnoredSnipedRoles: Snowflake[];
     };
     Text: {
         Topics: string[];
+    };
+    Users: {
+        IgnoreSnipedUsers: Snowflake[];
     };
 };
 
@@ -113,6 +117,9 @@ export default model<GuildDocument>(
                             'If you could build your own dream house, what crazy features would it have?',
                         ],
                     },
+                },
+                Users: {
+                    IgnoreSnipedUsers: { type: [], default: [] },
                 },
             },
             Tags: {
