@@ -5,6 +5,7 @@ import { defineSubCommand } from '../../../Common/define';
 import { Options, SetRoleOptions } from '../../../Services/SettingsService';
 import { Settings } from '../../../Models/GuildSchema';
 import { getRoleConfigurationContainer } from '../../../Common/container';
+import { createConfigurationUpdateEmbed } from '../../../Common/embeds';
 
 export const RemoveRoleSubCommand = defineSubCommand({
     name: 'remove_role',
@@ -38,12 +39,11 @@ export const RemoveRoleSubCommand = defineSubCommand({
             await interaction.reply({
                 content: `I've removed **${role.name}** from **${config}**`,
                 embeds: [
-                    {
-                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                        title: 'Current Roles in Configuration',
+                    createConfigurationUpdateEmbed({
+                        configName: 'Roles',
                         description,
-                        color: global.embedColor,
-                    },
+                        guild: interaction.guild!,
+                    }),
                 ],
                 flags: MessageFlags.Ephemeral,
             });
@@ -58,12 +58,11 @@ export const RemoveRoleSubCommand = defineSubCommand({
         await interaction.reply({
             content: `I couldn't find **${role.name}** inside of **${config}**`,
             embeds: [
-                {
-                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Roles in Configuration',
+                createConfigurationUpdateEmbed({
+                    configName: 'Roles',
                     description,
-                    color: global.embedColor,
-                },
+                    guild: interaction.guild!,
+                }),
             ],
             flags: MessageFlags.Ephemeral,
         });

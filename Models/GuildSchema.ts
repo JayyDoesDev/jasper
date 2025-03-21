@@ -59,6 +59,7 @@ export default model<GuildDocument>(
                     AllowedTagAdminRoles: { type: [], default: [] },
                     AllowedAdminRoles: { type: [], default: [] },
                     AllowedStaffRoles: { type: [], default: [] },
+                    IgnoredSnipedRoles: { type: [], default: [] },
                 },
                 Text: {
                     Topics: {

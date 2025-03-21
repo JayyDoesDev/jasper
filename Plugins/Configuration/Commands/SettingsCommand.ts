@@ -11,6 +11,8 @@ import {
     AddTopicSubCommand,
     RemoveTopicSubCommand,
     ViewTopicsSubCommand,
+    AddUserSubCommand,
+    RemoveUserSubCommand,
 } from '../SubCommands';
 
 export = {
@@ -33,6 +35,8 @@ export = {
             add_topic: AddTopicSubCommand,
             remove_topic: RemoveTopicSubCommand,
             view_topics: ViewTopicsSubCommand,
+            add_user: AddUserSubCommand,
+            remove_user: RemoveUserSubCommand,
         },
         on: async () => {},
         autocomplete: async (ctx, interaction) => {
@@ -49,6 +53,10 @@ export = {
                 remove_role: RemoveRoleSubCommand,
                 view: ViewChannelSubCommand,
                 view_topics: ViewTopicsSubCommand,
+                add_topic: AddTopicSubCommand,
+                remove_topic: RemoveTopicSubCommand,
+                add_user: AddUserSubCommand,
+                remove_user: RemoveUserSubCommand,
             }[subCommand];
 
             if (!subCommandHandler) {

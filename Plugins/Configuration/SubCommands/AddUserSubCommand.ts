@@ -5,6 +5,10 @@ import { defineSubCommand } from '../../../Common/define';
 import { Options, SetUsersOptions } from '../../../Services/SettingsService';
 import { getUserConfigurationContainer } from '../../../Common/container';
 import { Settings } from '../../../Models/GuildSchema';
+import {
+    createConfigurationExistsEmbed,
+    createConfigurationUpdateEmbed,
+} from '../../../Common/embeds';
 
 export const AddUserSubCommand = defineSubCommand({
     name: 'add_user',
@@ -34,12 +38,11 @@ export const AddUserSubCommand = defineSubCommand({
             await interaction.reply({
                 content: `For the record, **${user.username}** is already in **${config}**`,
                 embeds: [
-                    {
-                        thumbnail: { url: user.displayAvatarURL() },
-                        title: 'Current Users in Configuration',
+                    createConfigurationExistsEmbed({
+                        configName: 'Users',
                         description,
-                        color: global.embedColor,
-                    },
+                        guild: interaction.guild!,
+                    }),
                 ],
                 flags: MessageFlags.Ephemeral,
             });
@@ -53,22 +56,28 @@ export const AddUserSubCommand = defineSubCommand({
 
         const updatedUsers = await ctx.services.settings.getUsers<Snowflake>(guildId, config);
         const updatedUserNames = await Promise.all(
-            updatedUsers.map(
-                async (k) => `${(await interaction.guild.members.fetch(k)).displayName}`,
-            ),
+            updatedUsers.map(async (k) => `${(await interaction.guild.members.fetch(k)).user}`),
         );
         const description = updatedUserNames.join(', ') || 'No users';
 
         await interaction.reply({
             content: `I've added **${user.username}** to **${config}**`,
             embeds: [
-                {
-                    title: 'Current Users in Configuration',
+                createConfigurationUpdateEmbed({
+                    configName: 'Users',
                     description,
-                    color: global.embedColor,
-                },
+                    guild: interaction.guild!,
+                }),
             ],
+            flags: MessageFlags.Ephemeral,
         });
+    },
+    autocomplete: async (ctx: Context, interaction) => {
+        const query = interaction.options.getString('config') || '';
+        const filtered = getUserConfigurationContainer()
+            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
+            .map((key) => ({ name: key as string, value: key as string }));
+        await interaction.respond(filtered);
     },
 });
 

@@ -1,10 +1,10 @@
-/* eslint @typescript-eslint/no-explicit-any: "off" */
 import {
     AutocompleteInteraction,
     ChatInputCommandInteraction,
     ContextMenuCommandInteraction,
     Interaction,
     MessageFlags,
+    PermissionResolvable,
     PermissionsBitField,
 } from 'discord.js';
 import { Context } from '../Source/Context';
@@ -17,7 +17,7 @@ export interface SubCommand {
     name: string;
     allowedRoles?: Snowflake[];
     restrictToConfigRoles?: ConfigurationRoles[];
-    permissions?: PermissionsBitField[] | any[];
+    permissions?: PermissionsBitField[] | PermissionResolvable[];
     handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => Promise<void>;
 }
@@ -26,7 +26,7 @@ export interface Command<
     Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
 > {
     command: ICommand;
-    permissions?: PermissionsBitField[] | any[];
+    permissions?: PermissionsBitField[] | PermissionResolvable[];
     restrictToConfigRoles?: ConfigurationRoles[];
     on: (ctx: Context, interaction: Interaction) => void;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => void;
@@ -53,7 +53,7 @@ export type Plugin = {
 export const message = {
     content: "Sorry but you can't use this command.",
     flags: MessageFlags.Ephemeral,
-} as any;
+} as { content: string; flags: MessageFlags.Ephemeral };
 
 function isCommand<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction>(
     options: unknown,

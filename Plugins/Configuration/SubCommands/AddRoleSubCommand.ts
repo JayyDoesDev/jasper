@@ -5,6 +5,10 @@ import { defineSubCommand } from '../../../Common/define';
 import { Options, SetRoleOptions } from '../../../Services/SettingsService';
 import { Settings } from '../../../Models/GuildSchema';
 import { getRoleConfigurationContainer } from '../../../Common/container';
+import {
+    createConfigurationExistsEmbed,
+    createConfigurationUpdateEmbed,
+} from '../../../Common/embeds';
 
 export const AddRoleSubCommand = defineSubCommand({
     name: 'add_role',
@@ -32,12 +36,11 @@ export const AddRoleSubCommand = defineSubCommand({
             await interaction.reply({
                 content: `For the record, **${role.name}** is already in **${config}**`,
                 embeds: [
-                    {
-                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                        title: 'Current Roles in Configuration',
+                    createConfigurationExistsEmbed({
+                        configName: 'Roles',
                         description,
-                        color: global.embedColor,
-                    },
+                        guild: interaction.guild!,
+                    }),
                 ],
                 flags: MessageFlags.Ephemeral,
             });
@@ -58,12 +61,11 @@ export const AddRoleSubCommand = defineSubCommand({
         await interaction.reply({
             content: `I've added **${role.name}** to **${config}**`,
             embeds: [
-                {
-                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Roles in Configuration',
+                createConfigurationUpdateEmbed({
+                    configName: 'Roles',
                     description,
-                    color: global.embedColor,
-                },
+                    guild: interaction.guild!,
+                }),
             ],
             flags: MessageFlags.Ephemeral,
         });

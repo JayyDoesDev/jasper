@@ -5,6 +5,10 @@ import { defineSubCommand } from '../../../Common/define';
 import { Options, SetChannelOptions } from '../../../Services/SettingsService';
 import { Settings } from '../../../Models/GuildSchema';
 import { getChannelConfigurationContainer } from '../../../Common/container';
+import {
+    createConfigurationExistsEmbed,
+    createConfigurationUpdateEmbed,
+} from '../../../Common/embeds';
 
 export const AddChannelSubCommand = defineSubCommand({
     name: 'add_channel',
@@ -32,12 +36,11 @@ export const AddChannelSubCommand = defineSubCommand({
             await interaction.reply({
                 content: `For the record, **${channel}** is already in **${config}**`,
                 embeds: [
-                    {
-                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                        title: 'Current Channels in Configuration',
+                    createConfigurationExistsEmbed({
+                        configName: 'Channels',
                         description,
-                        color: global.embedColor,
-                    },
+                        guild: interaction.guild!,
+                    }),
                 ],
                 flags: MessageFlags.Ephemeral,
             });
@@ -55,11 +58,11 @@ export const AddChannelSubCommand = defineSubCommand({
         await interaction.reply({
             content: `I've added **${channel}** to **${config}**`,
             embeds: [
-                {
-                    title: 'Current Channels in Configuration',
+                createConfigurationUpdateEmbed({
+                    configName: 'Channels',
                     description,
-                    color: global.embedColor,
-                },
+                    guild: interaction.guild!,
+                }),
             ],
             flags: MessageFlags.Ephemeral,
         });

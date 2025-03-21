@@ -12,6 +12,8 @@ import {
     RemoveTopicSubCommand,
 } from './RemoveTopicSubCommand';
 import { commandOptions as viewTopicsOptions, ViewTopicsSubCommand } from './ViewTopicsSubCommand';
+import { commandOptions as addUserOptions, AddUserSubCommand } from './AddUserSubCommand';
+import { commandOptions as removeUserOptions, RemoveUserSubCommand } from './RemoveUserSubCommand';
 
 export const subCommandOptions = [
     addChannelOptions,
@@ -22,6 +24,8 @@ export const subCommandOptions = [
     addTopicOptions,
     removeTopicOptions,
     viewTopicsOptions,
+    addUserOptions,
+    removeUserOptions,
 ];
 
 export {
@@ -33,4 +37,6 @@ export {
     AddTopicSubCommand,
     RemoveTopicSubCommand,
     ViewTopicsSubCommand,
+    AddUserSubCommand,
+    RemoveUserSubCommand,
 };

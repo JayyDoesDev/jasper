@@ -202,7 +202,9 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                         const perms: any[] = [];
                         if (!interaction.appPermissions.has(command.permissions)) {
                             for (const permission of command.permissions) {
-                                perms.push(PermissionsToHuman(PlantPermission(permission)));
+                                perms.push(
+                                    PermissionsToHuman(PlantPermission(permission.toString())),
+                                );
                             }
                             await interaction.reply({
                                 content: `I'm missing permissions! (${
