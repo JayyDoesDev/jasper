@@ -260,9 +260,10 @@ class SettingsService extends Service {
 
     public async getUsers<T>(
         guildId: T extends Snowflake ? Snowflake : null,
+        key: keyof Settings['Users'],
     ): Promise<CommonCondition<Snowflake[]>> {
         const validatedGuildId = this.validateGuildId(guildId, 'get users');
-        return this.getFromSettings('Users', 'IgnoreSnipedUsers', validatedGuildId);
+        return this.getFromSettings('Users', key, validatedGuildId);
     }
 }
 

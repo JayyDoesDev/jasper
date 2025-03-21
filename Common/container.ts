@@ -12,6 +12,10 @@ export enum ConfigurationChannels {
     AutomaticSlowmodeChannels,
 }
 
+export enum ConfigurationUsers {
+    IgnoreSnipedUsers,
+}
+
 export const configurationRolesContainer = [
     [ConfigurationRoles.AdminRoles, 'AllowedAdminRoles'],
     [ConfigurationRoles.StaffRoles, 'AllowedStaffRoles'],
@@ -26,8 +30,14 @@ export const configurationChannelsContainer = [
     [ConfigurationChannels.AutomaticSlowmodeChannels, 'AutomaticSlowmodeChannels'],
 ] as const;
 
+export const configurationUsersContainer = [
+    [ConfigurationUsers.IgnoreSnipedUsers, 'IgnoreSnipedUsers'],
+] as const;
+
 export function filterContainer<R extends []>(
-    container: ReadonlyArray<readonly [ConfigurationRoles | ConfigurationChannels, string]>,
+    container: ReadonlyArray<
+        readonly [ConfigurationRoles | ConfigurationChannels | ConfigurationUsers, string]
+    >,
 ): R {
     const array = [];
 
@@ -44,4 +54,8 @@ export function getRoleConfigurationContainer<R extends Array<R>>(): R {
 
 export function getChannelConfigurationContainer<R extends Array<R>>(): R {
     return filterContainer(configurationChannelsContainer) as unknown as R;
+}
+
+export function getUserConfigurationContainer<R extends Array<R>>(): R {
+    return filterContainer(configurationUsersContainer) as unknown as R;
 }
