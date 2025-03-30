@@ -28,6 +28,11 @@ export type Settings = {
     Users: {
         IgnoreSnipedUsers: Snowflake[];
     };
+    Skullboard: {
+        SkullboardChannel: Nullable<Snowflake>;
+        SkullboardEmoji: Nullable<string>;
+        SkullboardReactionThreshold: number;
+    }
 };
 
 export type Tag = {
@@ -122,6 +127,11 @@ export default model<GuildDocument>(
                 Users: {
                     IgnoreSnipedUsers: { type: [], default: [] },
                 },
+                Skullboard: {
+                    SkullboardChannel: { type: String, default: null },
+                    SkullboardEmoji: { type: String, default: null },
+                    SkullboardReactionThreshold: { type: Number, default: 4 },
+                }
             },
             Tags: {
                 type: [

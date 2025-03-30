@@ -134,6 +134,11 @@ class SettingsService extends Service {
             },
             Text: { Topics: [] },
             Users: { IgnoreSnipedUsers: [] },
+            Skullboard: {
+                SkullboardChannel: null,
+                SkullboardEmoji: null,
+                SkullboardReactionThreshold: 0,
+            },
         };
     }
 
@@ -144,7 +149,7 @@ class SettingsService extends Service {
         }
 
         const {
-            GuildSettings: { Channels, Roles, Text, Users },
+            GuildSettings: { Channels, Roles, Text, Users, Skullboard },
         } = await getGuild<GuildDocument>(this.ctx, this.guildId);
 
         this.guildSettings = {
@@ -163,6 +168,11 @@ class SettingsService extends Service {
             },
             Text: { Topics: Text.Topics },
             Users: { IgnoreSnipedUsers: Users.IgnoreSnipedUsers },
+            Skullboard: {
+                SkullboardChannel: Skullboard.SkullboardChannel,
+                SkullboardEmoji: Skullboard.SkullboardEmoji,
+                SkullboardReactionThreshold: Skullboard.SkullboardReactionThreshold,
+            },
         };
 
         return this;
