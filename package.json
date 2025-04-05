@@ -13,7 +13,9 @@
         "docker-compose": "docker-compose up -d",
         "docker-compose-stop": "docker-compose down",
         "migration": "gulp migration",
-        "migration:topics": "yarn migration && node dist/Migrations/migrate-topics.cjs"
+        "migration:topics": "yarn migration && node dist/Migrations/migrate-topics.cjs",
+        "migration:skull_default": "yarn migration && node dist/Migrations/migrate-skull-default.cjs",
+        "migration:ensure_skull_emoji": "yarn migration && node dist/Migrations/ensure-skull-emoji.cjs"
     },
     "main": "dist/Source/index.js",
     "author": "JayyDoesDev",

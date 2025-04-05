@@ -30,9 +30,9 @@ export type Settings = {
     };
     Skullboard: {
         SkullboardChannel: Nullable<Snowflake>;
-        SkullboardEmoji: Nullable<string>;
+        SkullboardEmoji: string;
         SkullboardReactionThreshold: number;
-    }
+    };
 };
 
 export type Tag = {
@@ -129,9 +129,9 @@ export default model<GuildDocument>(
                 },
                 Skullboard: {
                     SkullboardChannel: { type: String, default: null },
-                    SkullboardEmoji: { type: String, default: null },
+                    SkullboardEmoji: { type: String, default: '💀' },
                     SkullboardReactionThreshold: { type: Number, default: 4 },
-                }
+                },
             },
             Tags: {
                 type: [

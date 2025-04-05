@@ -38,7 +38,7 @@ export const ViewChannelSubCommand = defineSubCommand({
     name: 'view',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await ctx.services.settings.configure<Options>({ guildId: interaction.guildId! });
-        const { Channels, Roles, Users } = ctx.services.settings.getSettings();
+        const { Channels, Roles, Users, Skullboard } = ctx.services.settings.getSettings();
 
         await interaction.reply({
             embeds: [
@@ -110,6 +110,15 @@ export const ViewChannelSubCommand = defineSubCommand({
                                     isUser: true,
                                     isRole: false,
                                 }),
+                            ],
+                            false,
+                        ) +
+                        createTable(
+                            'Skullboard',
+                            [
+                                `   * **Skullboard Channel:** ${Skullboard.SkullboardChannel ? `<#${Skullboard.SkullboardChannel}>` : 'None'}\n`,
+                                `   * **Emoji:** ${Skullboard.SkullboardEmoji ?? '💀'}\n`,
+                                `   * **Reaction Threshold:** ${Skullboard.SkullboardReactionThreshold}\n`,
                             ],
                             false,
                         ) +

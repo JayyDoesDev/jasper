@@ -13,6 +13,9 @@ import {
     ViewTopicsSubCommand,
     AddUserSubCommand,
     RemoveUserSubCommand,
+    AddSkullboardChannelSubCommand,
+    SetSkullboardEmojiSubCommand,
+    SetSkullboardReactionThresholdSubCommand,
 } from '../SubCommands';
 
 export = {
@@ -37,6 +40,9 @@ export = {
             view_topics: ViewTopicsSubCommand,
             add_user: AddUserSubCommand,
             remove_user: RemoveUserSubCommand,
+            add_skullboard_channel: AddSkullboardChannelSubCommand,
+            set_skullboard_emoji: SetSkullboardEmojiSubCommand,
+            set_skullboard_reaction_thres: SetSkullboardReactionThresholdSubCommand,
         },
         on: async () => {},
         autocomplete: async (ctx, interaction) => {

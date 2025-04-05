@@ -3,6 +3,7 @@ import { Context } from '../Source/Context';
 import { CommonCondition, Service } from './Service';
 import TagSchema, { GuildDocument, Settings } from '../Models/GuildSchema';
 import { getGuild } from '../Common/db';
+import { Nullable } from '../Common/types';
 
 export interface GuildSnowflake {
     guildId: Snowflake;
@@ -32,6 +33,12 @@ export interface SetTopicOptions extends GuildSettingsWithKey<'Text'> {
     topics: string | string[];
 }
 
+export interface SetSkullboardOptions extends GuildSnowflake {
+    channel?: Snowflake;
+    emoji?: string;
+    threshold?: number;
+}
+
 class SettingsService extends Service {
     private guildId: Snowflake;
     private guildSettings: Settings;
@@ -58,7 +65,7 @@ class SettingsService extends Service {
         category: T,
         key: K,
         guildId: string,
-        values: Settings[T][K] extends (infer U)[] ? U | U[] : never,
+        values: Settings[T][K] extends (infer U)[] ? U | U[] : Nullable<string | number>,
     ): Promise<Settings[T][K]> {
         const guild = await getGuild<GuildDocument>(this.ctx, guildId);
         const currentValues = guild.GuildSettings[category][key] as Settings[T][K];
@@ -86,7 +93,7 @@ class SettingsService extends Service {
         category: T,
         key: K,
         guildId: string,
-        values: Settings[T][K] extends (infer U)[] ? U | U[] : never,
+        values: Settings[T][K] extends (infer U)[] ? U | U[] : Nullable<string | number>,
     ): Promise<Settings[T][K]> {
         const guild = await getGuild<GuildDocument>(this.ctx, guildId);
         const currentValues = guild.GuildSettings[category][key] as Settings[T][K];
@@ -136,8 +143,8 @@ class SettingsService extends Service {
             Users: { IgnoreSnipedUsers: [] },
             Skullboard: {
                 SkullboardChannel: null,
-                SkullboardEmoji: null,
-                SkullboardReactionThreshold: 0,
+                SkullboardEmoji: '💀',
+                SkullboardReactionThreshold: 4,
             },
         };
     }
@@ -170,7 +177,7 @@ class SettingsService extends Service {
             Users: { IgnoreSnipedUsers: Users.IgnoreSnipedUsers },
             Skullboard: {
                 SkullboardChannel: Skullboard.SkullboardChannel,
-                SkullboardEmoji: Skullboard.SkullboardEmoji,
+                SkullboardEmoji: Skullboard.SkullboardEmoji ?? '💀',
                 SkullboardReactionThreshold: Skullboard.SkullboardReactionThreshold,
             },
         };
@@ -274,6 +281,68 @@ class SettingsService extends Service {
     ): Promise<CommonCondition<Snowflake[]>> {
         const validatedGuildId = this.validateGuildId(guildId, 'get users');
         return this.getFromSettings('Users', key, validatedGuildId);
+    }
+
+    public async setSkullboard<T>(
+        options: T extends SetSkullboardOptions ? SetSkullboardOptions : null,
+    ): Promise<CommonCondition<Settings['Skullboard']>> {
+        const guildId = this.validateGuildId(options?.guildId, 'set skullboard');
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+
+        if (options?.channel !== undefined) {
+            guild.GuildSettings.Skullboard.SkullboardChannel = options.channel;
+        }
+        if (options?.emoji !== undefined) {
+            guild.GuildSettings.Skullboard.SkullboardEmoji = options.emoji;
+        }
+        if (options?.threshold !== undefined) {
+            guild.GuildSettings.Skullboard.SkullboardReactionThreshold = options.threshold;
+        }
+
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
+        await TagSchema.updateOne(
+            { _id: guildId },
+            {
+                $set: {
+                    'GuildSettings.Skullboard': guild.GuildSettings.Skullboard,
+                },
+            },
+            { upsert: true },
+        );
+
+        return guild.GuildSettings.Skullboard;
+    }
+
+    public async getSkullboard<T>(
+        guildId: T extends Snowflake ? Snowflake : null,
+    ): Promise<CommonCondition<Settings['Skullboard']>> {
+        const validatedGuildId = this.validateGuildId(guildId, 'get skullboard');
+        const guild = await getGuild<GuildDocument>(this.ctx, validatedGuildId);
+        return guild.GuildSettings.Skullboard;
+    }
+
+    public async removeSkullboard<T>(
+        options: T extends SetSkullboardOptions ? SetSkullboardOptions : null,
+    ): Promise<CommonCondition<Settings['Skullboard']>> {
+        const guildId = this.validateGuildId(options?.guildId, 'remove skullboard');
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+
+        guild.GuildSettings.Skullboard.SkullboardChannel = null;
+        guild.GuildSettings.Skullboard.SkullboardEmoji = '💀';
+        guild.GuildSettings.Skullboard.SkullboardReactionThreshold = 4;
+
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
+        await TagSchema.updateOne(
+            { _id: guildId },
+            {
+                $set: {
+                    'GuildSettings.Skullboard': guild.GuildSettings.Skullboard,
+                },
+            },
+            { upsert: true },
+        );
+
+        return guild.GuildSettings.Skullboard;
     }
 }
 

@@ -14,6 +14,18 @@ import {
 import { commandOptions as viewTopicsOptions, ViewTopicsSubCommand } from './ViewTopicsSubCommand';
 import { commandOptions as addUserOptions, AddUserSubCommand } from './AddUserSubCommand';
 import { commandOptions as removeUserOptions, RemoveUserSubCommand } from './RemoveUserSubCommand';
+import {
+    commandOptions as addSkullboardChannelOptions,
+    AddSkullboardChannelSubCommand,
+} from './AddSkullboardChannelSubCommand';
+import {
+    commandOptions as setSkullboardEmojiOptions,
+    SetSkullboardEmojiSubCommand,
+} from './SetSkullboardEmoji';
+import {
+    commandOptions as setSkullboardReactionThresholdOptions,
+    SetSkullboardReactionThresholdSubCommand,
+} from './SetSkullboardReactionThreshold';
 
 export const subCommandOptions = [
     addChannelOptions,
@@ -26,6 +38,9 @@ export const subCommandOptions = [
     viewTopicsOptions,
     addUserOptions,
     removeUserOptions,
+    addSkullboardChannelOptions,
+    setSkullboardEmojiOptions,
+    setSkullboardReactionThresholdOptions,
 ];
 
 export {
@@ -39,4 +54,7 @@ export {
     ViewTopicsSubCommand,
     AddUserSubCommand,
     RemoveUserSubCommand,
+    AddSkullboardChannelSubCommand,
+    SetSkullboardEmojiSubCommand,
+    SetSkullboardReactionThresholdSubCommand,
 };

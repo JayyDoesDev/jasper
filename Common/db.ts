@@ -31,7 +31,31 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
                 ctx.store.setForeignKey({ guild: guildId }, guildInDb);
                 return <R>guildInDb;
             } else {
-                const newGuild = new GuildSchema({ _id: guildId });
+                const newGuild = new GuildSchema({
+                    _id: guildId,
+                    GuildSettings: {
+                        Channels: {
+                            AllowedSnipeChannels: [],
+                            AllowedTagChannels: [],
+                            AutomaticSlowmodeChannels: [],
+                        },
+                        Roles: {
+                            SupportRoles: [],
+                            AllowedTagRoles: [],
+                            AllowedTagAdminRoles: [],
+                            AllowedAdminRoles: [],
+                            AllowedStaffRoles: [],
+                            IgnoredSnipedRoles: [],
+                        },
+                        Text: { Topics: [] },
+                        Users: { IgnoreSnipedUsers: [] },
+                        Skullboard: {
+                            SkullboardChannel: null,
+                            SkullboardEmoji: '💀',
+                            SkullboardReactionThreshold: 4,
+                        },
+                    },
+                });
                 await newGuild.save();
 
                 ctx.store.setForeignKey({ guild: guildId }, newGuild);
