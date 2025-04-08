@@ -60,7 +60,7 @@ export const commandOptions = {
         {
             name: 'threshold',
             description: 'The threshold for the skullboard reaction',
-            type: ApplicationCommandOptionType.STRING,
+            type: ApplicationCommandOptionType.INTEGER,
             required: true,
         },
     ],

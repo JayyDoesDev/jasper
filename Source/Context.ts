@@ -45,8 +45,15 @@ export class Context extends Client {
                 IntentsBitField.Flags.Guilds,
                 IntentsBitField.Flags.GuildMembers,
                 IntentsBitField.Flags.GuildMessages,
+                IntentsBitField.Flags.GuildMessageReactions,
             ],
-            partials: [Partials.Channel, Partials.GuildMember, Partials.Message, Partials.User],
+            partials: [
+                Partials.Channel,
+                Partials.GuildMember,
+                Partials.Message,
+                Partials.User,
+                Partials.Reaction,
+            ],
             allowedMentions: {
                 parse: ['users'],
             },
