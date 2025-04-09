@@ -47,6 +47,27 @@ function isValidUrl(url: string): boolean {
     return VALID_URL_PATTERN.test(url);
 }
 
+async function parseMentions(ctx: Context, text: string[]): Promise<string[]> {
+    for (let i = 0; i < text.length; i++) {
+        if (text[i].startsWith('<@')) {
+            const userId = text[i].slice(2, -1);
+            const user = await ctx.users.fetch(userId);
+
+            if (user) {
+                if (text[i][1] === '!') {
+                    text[i] =
+                        `<span class="mention" data-user-id="${user.username}">@${user.username}</span>`;
+                } else {
+                    text[i] =
+                        `<span class="mention" data-user-id="${user.username}">@${user.username}</span>`;
+                }
+            }
+        }
+    }
+
+    return text;
+}
+
 export default class MessageReactionAddListener extends Listener<'messageReactionAdd'> {
     private templateCache: TemplateCache = {
         html: '',
@@ -108,7 +129,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                 font-style: italic;
             }
 
-body {
+            body {
                 margin: 0;
                 font-family: 'gg sans', sans-serif;
                 background-color: #313338;
@@ -178,6 +199,13 @@ body {
                 top: 3px;
                 font-size: 13px;
                 line-height: 15px;
+            }
+
+            .mention {
+                color: #7289da;
+                background-color: rgba(114,137,218,0.1);
+                border-radius: 3px;
+                padding: 0 2px;
             }
 
             .image-container {
@@ -332,15 +360,13 @@ body {
                 });
                 const page = await context.newPage();
 
-                await page.route('**/*', async (route) => {
+                await page.route('**/*', (route) => {
+                    const headers = { ...route.request().headers() };
                     if (route.request().resourceType() === 'document') {
-                        const headers = route.request().headers();
                         headers['Content-Security-Policy'] =
                             "default-src 'self' cdn.discordapp.com media.discordapp.net i.imgur.com; img-src 'self' cdn.discordapp.com media.discordapp.net i.imgur.com; font-src 'self' data:";
-                        await route.continue({ headers });
-                    } else {
-                        await route.continue();
                     }
+                    return route.continue({ headers });
                 });
 
                 await Promise.race([
@@ -373,9 +399,7 @@ body {
     }
 
     private async queueOperation<T>(operation: () => Promise<T>): Promise<T> {
-        const currentOperation = this.templateCache.operationQueue.then(async () => {
-            return await operation();
-        });
+        const currentOperation = this.templateCache.operationQueue.then(() => operation());
         this.templateCache.operationQueue = currentOperation.then(() => {});
         return currentOperation;
     }
@@ -439,10 +463,24 @@ body {
                     }
                 }
 
-                const sannitizeedUsername = sanitize(username);
+                const sanitizedUsername = sanitize(username);
                 const sanitizedNickname = sanitize(nickname);
-                const sanitizedContent = sanitize(content);
+                const parsedContent = (await parseMentions(this.ctx, content.split(' '))).join(' ');
+                const sanitizedContent = DOMPurify.sanitize(parsedContent, {
+                    ...sanitizerConfig,
+                    ALLOWED_TAGS: [...sanitizerConfig.ALLOWED_TAGS, 'span'],
+                    ALLOWED_ATTR: [...sanitizerConfig.ALLOWED_ATTR, 'data-user-id'],
+                });
                 const sanitizedTimestamp = sanitize(timestamp);
+
+                let parsedReplyContent = '';
+                if (repliedToMessage && repliedToMessage.content) {
+                    const parsedReplyArray = await parseMentions(
+                        this.ctx,
+                        repliedToMessage.content.split(' '),
+                    );
+                    parsedReplyContent = sanitize(parsedReplyArray.join(' '));
+                }
 
                 type MessageData = {
                     username: string;
@@ -509,7 +547,7 @@ body {
 
                             usernameEl.textContent = `${data.username} (${data.nickname})`;
                             usernameEl.style.color = data.roleColor;
-                            messageEl.textContent = data.content;
+                            messageEl.innerHTML = data.content;
                             timeEl.textContent = 'Today at ' + data.timestamp;
 
                             avatarEl.src = data.avatarUrl;
@@ -545,9 +583,7 @@ body {
                                     range.setStartAfter(replyUsernameEl);
                                     range.deleteContents();
 
-                                    replyContainer.appendChild(
-                                        document.createTextNode(data.reply.content || ''),
-                                    );
+                                    replyContainer.innerHTML += data.reply.content;
                                 }
                             }
 
@@ -573,7 +609,7 @@ body {
                         });
                     },
                     {
-                        username: sannitizeedUsername,
+                        username: sanitizedUsername,
                         nickname: sanitizedNickname,
                         content: sanitizedContent,
                         timestamp: sanitizedTimestamp,
@@ -585,7 +621,7 @@ body {
                             repliedToMessage && repliedToMember
                                 ? {
                                       username: repliedToMessage.author.username,
-                                      content: repliedToMessage.content,
+                                      content: parsedReplyContent,
                                       avatarUrl: repliedToMessage.author.displayAvatarURL(),
                                       member: repliedToMember,
                                       roleColor: (() => {
@@ -759,7 +795,7 @@ body {
                         const imageBuffer = await this.generateMessageImage(
                             sanitize(message.member.nickname || message.author?.globalName || ''),
                             sanitize(message.author?.username || 'Unknown User'),
-                            sanitize(message.content || ''),
+                            message.content || '',
                             sanitize(timestamp),
                             member.user.displayAvatarURL({
                                 forceStatic: true,
