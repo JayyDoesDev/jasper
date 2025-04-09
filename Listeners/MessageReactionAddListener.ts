@@ -13,11 +13,6 @@ import { defineEvent } from '../Common/define';
 import DOMPurify from 'isomorphic-dompurify';
 import type { Config as DOMPurifyConfig } from 'isomorphic-dompurify';
 import { chromium, type Browser, type Page } from 'playwright';
-import * as fs from 'fs/promises';
-import * as fsSync from 'fs';
-import * as path from 'path';
-import * as crypto from 'crypto';
-
 const VALID_URL_PATTERN =
     /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net|i\.imgur\.com)\//;
 const PAGE_OPERATION_TIMEOUT = 5000;
@@ -50,11 +45,6 @@ function sanitize(text: string): string {
 
 function isValidUrl(url: string): boolean {
     return VALID_URL_PATTERN.test(url);
-}
-
-function generateTempPath(): string {
-    const random = crypto.randomBytes(16).toString('hex');
-    return path.join(process.cwd(), 'temp', `message-${random}.png`);
 }
 
 export default class MessageReactionAddListener extends Listener<'messageReactionAdd'> {
@@ -390,35 +380,6 @@ body {
         return currentOperation;
     }
 
-    private async getImageCache(key: string): Promise<string | null> {
-        const cacheDir = path.join(process.cwd(), 'temp', 'cache');
-        const cachePath = path.join(cacheDir, `${key}.png`);
-        try {
-            if (fsSync.existsSync(cachePath)) {
-                const stats = await fs.stat(cachePath);
-                if (Date.now() - stats.mtimeMs < 60 * 60 * 1000) {
-                    return cachePath;
-                }
-
-                await fs.unlink(cachePath);
-            }
-        } catch (error) {
-            console.error('Cache access error:', error);
-        }
-        return null;
-    }
-
-    private async setImageCache(key: string, imagePath: string): Promise<void> {
-        const cacheDir = path.join(process.cwd(), 'temp', 'cache');
-        try {
-            await fs.mkdir(cacheDir, { recursive: true });
-            const cachePath = path.join(cacheDir, `${key}.png`);
-            await fs.copyFile(imagePath, cachePath);
-        } catch (error) {
-            console.error('Cache write error:', error);
-        }
-    }
-
     private async ensureBrowserHealth() {
         if (!this.templateCache.browser) {
             await this.initializeCache();
@@ -445,7 +406,7 @@ body {
         message: Message,
         repliedToMessage: Message | null,
         repliedToMember: any | null,
-    ): Promise<string> {
+    ): Promise<Buffer> {
         await this.ensureBrowserHealth();
 
         if (Date.now() - this.templateCache.lastCleanup > 5 * 60 * 1000) {
@@ -459,20 +420,7 @@ body {
         }
         if (!page) throw new Error('Failed to get a browser page');
 
-        const cacheKey = crypto
-            .createHash('sha256')
-            .update(
-                `${username}${nickname}${content}${timestamp}${avatarUrl}${roleColor}${roleIconUrl}${repliedToMessage?.id || ''}${repliedToMember?.roles?.highest?.hexColor || ''}`,
-            )
-            .digest('hex');
-
-        const cachedPath = await this.getImageCache(cacheKey);
-        if (cachedPath) {
-            return cachedPath;
-        }
-
         return this.queueOperation(async () => {
-            const outputPath = generateTempPath();
             try {
                 let retries = 0;
                 const maxRetries = 2;
@@ -664,16 +612,12 @@ body {
                     document.body.style.padding = '0';
                 });
 
-                const data = await messageContainer.screenshot({
+                const buffer = (await messageContainer.screenshot({
                     type: 'png',
                     omitBackground: false,
-                });
+                })) as Buffer;
 
-                await fs.writeFile(outputPath, Buffer.from(data as any) as any);
-
-                await this.setImageCache(cacheKey, outputPath);
-
-                return outputPath;
+                return buffer;
             } catch (error) {
                 console.error('Error during page operations:', error);
                 throw error;
@@ -764,8 +708,6 @@ body {
 
     public async execute(reaction: MessageReaction | PartialMessageReaction): Promise<void> {
         try {
-            const tempDir = path.join(process.cwd(), 'temp');
-            await fs.mkdir(tempDir, { recursive: true });
             const guildId = reaction.message.guildId!;
             await this.ctx.services.settings.configure<Options>({ guildId });
             const { Skullboard } = this.ctx.services.settings.getSettings();
@@ -814,7 +756,7 @@ body {
                             throw new Error('Invalid avatar or role icon URL');
                         }
 
-                        const imagePath = await this.generateMessageImage(
+                        const imageBuffer = await this.generateMessageImage(
                             sanitize(message.member.nickname || message.author?.globalName || ''),
                             sanitize(message.author?.username || 'Unknown User'),
                             sanitize(message.content || ''),
@@ -832,14 +774,16 @@ body {
                             repliedToMember,
                         );
 
-                        const attachment = new AttachmentBuilder(imagePath);
+                        const attachment = new AttachmentBuilder(imageBuffer, {
+                            name: 'screenshot.png',
+                        });
                         await skullboardChannel.send({
                             files: [attachment],
                             embeds: [
                                 {
                                     title: `${message.author?.username} (${message.author?.id})`,
                                     image: {
-                                        url: `attachment://${path.basename(imagePath)}`,
+                                        url: 'attachment://screenshot.png',
                                     },
                                     fields: [
                                         {
@@ -853,8 +797,6 @@ body {
                                 },
                             ],
                         });
-
-                        await fs.unlink(imagePath);
                     } catch (error) {
                         console.error('Error generating message image:', error);
                         await skullboardChannel.send({
