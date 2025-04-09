@@ -13,6 +13,7 @@ import { defineEvent } from '../Common/define';
 import DOMPurify from 'isomorphic-dompurify';
 import type { Config as DOMPurifyConfig } from 'isomorphic-dompurify';
 import { chromium, type Browser, type Page } from 'playwright';
+import { Snowflake } from '@antibot/interactions';
 const VALID_URL_PATTERN =
     /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net|i\.imgur\.com)\//;
 const PAGE_OPERATION_TIMEOUT = 5000;
@@ -47,19 +48,21 @@ function isValidUrl(url: string): boolean {
     return VALID_URL_PATTERN.test(url);
 }
 
-async function parseMentions(ctx: Context, text: string[]): Promise<string[]> {
+async function parseMentions(ctx: Context, guildId: Snowflake, text: string[]): Promise<string[]> {
     for (let i = 0; i < text.length; i++) {
         if (text[i].startsWith('<@')) {
             const userId = text[i].slice(2, -1);
-            const user = await ctx.users.fetch(userId);
-
+            const user = (await ctx.guilds.fetch(guildId)).members.fetch(userId);
+            const name = (await (
+                await user
+            ).displayName)
+                ? (await user).displayName
+                : (await user).nickname || (await user).user.username;
             if (user) {
                 if (text[i][1] === '!') {
-                    text[i] =
-                        `<span class="mention" data-user-id="${user.username}">@${user.username}</span>`;
+                    text[i] = `<span class="mention" data-user-id="${name}">@${name}</span>`;
                 } else {
-                    text[i] =
-                        `<span class="mention" data-user-id="${user.username}">@${user.username}</span>`;
+                    text[i] = `<span class="mention" data-user-id="${name}">@${name}</span>`;
                 }
             }
         }
@@ -465,7 +468,9 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
 
                 const sanitizedUsername = sanitize(username);
                 const sanitizedNickname = sanitize(nickname);
-                const parsedContent = (await parseMentions(this.ctx, content.split(' '))).join(' ');
+                const parsedContent = (
+                    await parseMentions(this.ctx, message.guild.id, content.split(' '))
+                ).join(' ');
                 const sanitizedContent = DOMPurify.sanitize(parsedContent, {
                     ...sanitizerConfig,
                     ALLOWED_TAGS: [...sanitizerConfig.ALLOWED_TAGS, 'span'],
@@ -477,6 +482,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                 if (repliedToMessage && repliedToMessage.content) {
                     const parsedReplyArray = await parseMentions(
                         this.ctx,
+                        repliedToMessage.guild.id,
                         repliedToMessage.content.split(' '),
                     );
                     parsedReplyContent = sanitize(parsedReplyArray.join(' '));
