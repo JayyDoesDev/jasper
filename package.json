@@ -28,6 +28,7 @@
     "dependencies": {
         "@antibot/interactions": "^1.4.6",
         "@antibot/zilla": "^1.0.2",
+        "@playwright/test": "^1.51.1",
         "@types/lodash": "^4.17.16",
         "@types/minimatch": "^5.1.2",
         "discord.js": "^14.17.3",
@@ -38,8 +39,8 @@
         "isomorphic-dompurify": "^2.23.0",
         "mongoose": "^8.13.1",
         "numeral": "^2.0.6",
-        "prettier": "^3.5.1",
-        "puppeteer": "^24.6.0"
+        "playwright": "^1.51.1",
+        "prettier": "^3.5.1"
     },
     "devDependencies": {
         "@types/numeral": "^2.0.5",
