@@ -35,7 +35,7 @@
         "dotenv": "^16.4.7",
         "glob": "7.2.0",
         "gulp": "^5.0.0",
-        "ioredis": "^5.6.0",
+        "ioredis": "^5.6.1",
         "isomorphic-dompurify": "^2.23.0",
         "mongoose": "^8.13.1",
         "numeral": "^2.0.6",
