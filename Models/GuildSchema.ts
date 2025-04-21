@@ -32,6 +32,7 @@ export type Settings = {
         SkullboardChannel: Nullable<Snowflake>;
         SkullboardEmoji: string;
         SkullboardReactionThreshold: number;
+        SkullboardBoolean: boolean;
     };
 };
 
