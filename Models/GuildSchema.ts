@@ -132,6 +132,7 @@ export default model<GuildDocument>(
                     SkullboardChannel: { type: String, default: null },
                     SkullboardEmoji: { type: String, default: '💀' },
                     SkullboardReactionThreshold: { type: Number, default: 4 },
+                    SkullboardBoolean: { type: Boolean, default: false },
                 },
             },
             Tags: {
