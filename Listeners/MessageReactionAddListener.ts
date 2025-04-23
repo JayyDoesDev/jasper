@@ -83,12 +83,8 @@ async function parseMentions(ctx: Context, guildId: Snowflake, text: string[]): 
     for (let i = 0; i < text.length; i++) {
         if (text[i].startsWith('<@')) {
             const userId = text[i].slice(2, -1);
-            const user = (await ctx.guilds.fetch(guildId)).members.fetch(userId);
-            const name = (await (
-                await user
-            ).displayName)
-                ? (await user).displayName
-                : (await user).nickname || (await user).user.username;
+            const user = await (await ctx.guilds.fetch(guildId)).members.fetch(userId);
+            const name = user.displayName ? user.displayName : user.nickname || user.user.username;
             if (user) {
                 if (text[i][1] === '!') {
                     text[i] = `<span class="mention" data-user-id="${name}">@${name}</span>`;
@@ -823,9 +819,9 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                     : String(coloredRole.hexColor),
                             roleIconUrl:
                                 roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
-                            message: message,
-                            repliedToMessage: repliedToMessage,
-                            repliedToMember: repliedToMember,
+                            message,
+                            repliedToMessage,
+                            repliedToMember,
                         });
 
                         const attachment = new AttachmentBuilder(imageBuffer, {
