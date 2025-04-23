@@ -40,6 +40,37 @@ interface TemplateCache {
     lastCleanup: number;
 }
 
+interface GenerateMessageOptions {
+    username: string;
+    nickname: string;
+    content: string;
+    timestamp: string;
+    avatarUrl: string;
+    roleColor: string;
+    roleIconUrl: string;
+    message: Message;
+    repliedToMessage: Message | null;
+    repliedToMember: any | null;
+}
+
+interface MessageData {
+    username: string;
+    nickname: string;
+    content: string;
+    timestamp: string;
+    avatarUrl: string;
+    roleColor: string;
+    roleIconUrl: string;
+    attachments: string[];
+    reply: {
+        username: string;
+        content: string;
+        avatarUrl: string;
+        roleColor: string;
+        member: any;
+    } | null;
+}
+
 function sanitize(text: string): string {
     return DOMPurify.sanitize(text, sanitizerConfig);
 }
@@ -422,18 +453,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
         }
     }
 
-    private async generateMessageImage(
-        username: string,
-        nickname: string,
-        content: string,
-        timestamp: string,
-        avatarUrl: string,
-        roleColor: string,
-        roleIconUrl: string,
-        message: Message,
-        repliedToMessage: Message | null,
-        repliedToMember: any | null,
-    ): Promise<Buffer> {
+    private async generateMessageImage(options: GenerateMessageOptions): Promise<Buffer> {
         await this.ensureBrowserHealth();
 
         if (Date.now() - this.templateCache.lastCleanup > 5 * 60 * 1000) {
@@ -466,45 +486,31 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                     }
                 }
 
-                const sanitizedUsername = sanitize(username);
-                const sanitizedNickname = sanitize(nickname);
+                const username = sanitize(options.username);
+                const nickname = sanitize(options.nickname);
                 const parsedContent = (
-                    await parseMentions(this.ctx, message.guild.id, content.split(' '))
+                    await parseMentions(
+                        this.ctx,
+                        options.message.guild.id,
+                        options.content.split(' '),
+                    )
                 ).join(' ');
-                const sanitizedContent = DOMPurify.sanitize(parsedContent, {
+                const content = DOMPurify.sanitize(parsedContent, {
                     ...sanitizerConfig,
                     ALLOWED_TAGS: [...sanitizerConfig.ALLOWED_TAGS, 'span'],
                     ALLOWED_ATTR: [...sanitizerConfig.ALLOWED_ATTR, 'data-user-id'],
                 });
-                const sanitizedTimestamp = sanitize(timestamp);
+                const timestamp = sanitize(options.timestamp);
 
                 let parsedReplyContent = '';
-                if (repliedToMessage && repliedToMessage.content) {
+                if (options.repliedToMessage && options.repliedToMessage.content) {
                     const parsedReplyArray = await parseMentions(
                         this.ctx,
-                        repliedToMessage.guild.id,
-                        repliedToMessage.content.split(' '),
+                        options.repliedToMessage.guild.id,
+                        options.repliedToMessage.content.split(' '),
                     );
                     parsedReplyContent = sanitize(parsedReplyArray.join(' '));
                 }
-
-                type MessageData = {
-                    username: string;
-                    nickname: string;
-                    content: string;
-                    timestamp: string;
-                    avatarUrl: string;
-                    roleColor: string;
-                    roleIconUrl: string;
-                    attachments: string[];
-                    reply: {
-                        username: string;
-                        content: string;
-                        avatarUrl: string;
-                        roleColor: string;
-                        member: any;
-                    } | null;
-                };
 
                 await page.evaluate(
                     (data: MessageData) => {
@@ -615,24 +621,26 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                         });
                     },
                     {
-                        username: sanitizedUsername,
-                        nickname: sanitizedNickname,
-                        content: sanitizedContent,
-                        timestamp: sanitizedTimestamp,
-                        avatarUrl,
-                        roleColor,
-                        roleIconUrl,
-                        attachments: Array.from(message.attachments.values()).map((a) => a.url),
+                        username,
+                        nickname,
+                        content,
+                        timestamp,
+                        avatarUrl: options.avatarUrl,
+                        roleColor: options.roleColor,
+                        roleIconUrl: options.roleIconUrl,
+                        attachments: Array.from(options.message.attachments.values()).map(
+                            (a) => a.url,
+                        ),
                         reply:
-                            repliedToMessage && repliedToMember
+                            options.repliedToMessage && options.repliedToMember
                                 ? {
-                                      username: repliedToMessage.author.username,
+                                      username: options.repliedToMessage.author.username,
                                       content: parsedReplyContent,
-                                      avatarUrl: repliedToMessage.author.displayAvatarURL(),
-                                      member: repliedToMember,
+                                      avatarUrl: options.repliedToMessage.author.displayAvatarURL(),
+                                      member: options.repliedToMember,
                                       roleColor: (() => {
                                           const roleColor =
-                                              repliedToMember.roles.cache
+                                              options.repliedToMember.roles.cache
                                                   .filter((role) => role.color !== 0)
                                                   .sort((a, b) => b.position - a.position)
                                                   .first()?.hexColor || '#FFFFFF';
@@ -798,23 +806,27 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             throw new Error('Invalid avatar or role icon URL');
                         }
 
-                        const imageBuffer = await this.generateMessageImage(
-                            sanitize(message.member.nickname || message.author?.globalName || ''),
-                            sanitize(message.author?.username || 'Unknown User'),
-                            message.content || '',
-                            sanitize(timestamp),
-                            member.user.displayAvatarURL({
+                        const imageBuffer = await this.generateMessageImage({
+                            username: sanitize(message.author?.username || 'Unknown User'),
+                            nickname: sanitize(
+                                message.member.nickname || message.author?.globalName || '',
+                            ),
+                            content: message.content || '',
+                            timestamp: sanitize(timestamp),
+                            avatarUrl: member.user.displayAvatarURL({
                                 forceStatic: true,
                                 size: 1024,
                             }),
-                            typeof coloredRole === 'string'
-                                ? coloredRole
-                                : String(coloredRole.hexColor),
-                            roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
-                            message,
-                            repliedToMessage,
-                            repliedToMember,
-                        );
+                            roleColor:
+                                typeof coloredRole === 'string'
+                                    ? coloredRole
+                                    : String(coloredRole.hexColor),
+                            roleIconUrl:
+                                roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+                            message: message,
+                            repliedToMessage: repliedToMessage,
+                            repliedToMember: repliedToMember,
+                        });
 
                         const attachment = new AttachmentBuilder(imageBuffer, {
                             name: 'screenshot.png',
