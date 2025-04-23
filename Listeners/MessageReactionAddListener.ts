@@ -14,6 +14,7 @@ import DOMPurify from 'isomorphic-dompurify';
 import type { Config as DOMPurifyConfig } from 'isomorphic-dompurify';
 import { BrowserContext, chromium, type Browser, type Page } from 'playwright';
 import { Snowflake } from '@antibot/interactions';
+import { Nullable } from '../Common/types';
 const VALID_URL_PATTERN =
     /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net|i\.imgur\.com)\//;
 const PAGE_OPERATION_TIMEOUT = 5000;
@@ -29,7 +30,7 @@ const sanitizerConfig: DOMPurifyConfig = {
 
 interface TemplateCache {
     html: string;
-    browser: Browser | null;
+    browser: Nullable<Browser>;
     pages: Array<{
         page: Page;
         context: BrowserContext;
@@ -49,8 +50,8 @@ interface GenerateMessageOptions {
     roleColor: string;
     roleIconUrl: string;
     message: Message;
-    repliedToMessage: Message | null;
-    repliedToMember: GuildMember | null;
+    repliedToMessage: Nullable<Message>;
+    repliedToMember: Nullable<GuildMember>;
 }
 
 interface MessageData {
@@ -68,7 +69,7 @@ interface MessageData {
         avatarUrl: string;
         roleColor: string;
         member: GuildMember;
-    } | null;
+    };
 }
 
 function sanitize(text: string): string {
