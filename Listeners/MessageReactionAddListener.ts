@@ -1,10 +1,10 @@
-/* eslint @typescript-eslint/no-explicit-any: "off" */
 import {
     MessageReaction,
     PartialMessageReaction,
     TextChannel,
     AttachmentBuilder,
     Message,
+    GuildMember,
 } from 'discord.js';
 import { Context } from '../Source/Context';
 import { Listener } from './Listener';
@@ -12,7 +12,7 @@ import { Options } from '../Services/SettingsService';
 import { defineEvent } from '../Common/define';
 import DOMPurify from 'isomorphic-dompurify';
 import type { Config as DOMPurifyConfig } from 'isomorphic-dompurify';
-import { chromium, type Browser, type Page } from 'playwright';
+import { BrowserContext, chromium, type Browser, type Page } from 'playwright';
 import { Snowflake } from '@antibot/interactions';
 const VALID_URL_PATTERN =
     /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net|i\.imgur\.com)\//;
@@ -32,7 +32,7 @@ interface TemplateCache {
     browser: Browser | null;
     pages: Array<{
         page: Page;
-        context: any;
+        context: BrowserContext;
         lastUsed: number;
     }>;
     maxPages: number;
@@ -50,7 +50,7 @@ interface GenerateMessageOptions {
     roleIconUrl: string;
     message: Message;
     repliedToMessage: Message | null;
-    repliedToMember: any | null;
+    repliedToMember: GuildMember | null;
 }
 
 interface MessageData {
@@ -67,7 +67,7 @@ interface MessageData {
         content: string;
         avatarUrl: string;
         roleColor: string;
-        member: any;
+        member: GuildMember;
     } | null;
 }
 
