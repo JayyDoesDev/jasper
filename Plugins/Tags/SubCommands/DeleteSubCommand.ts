@@ -1,17 +1,24 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+
+import { ConfigurationRoles } from '../../../Common/container';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, TagResponse } from '../../../Services/TagService';
-import { ConfigurationRoles } from '../../../Common/container';
+import { Context } from '../../../Source/Context';
 
 export const DeleteSubCommand = defineSubCommand({
-    name: 'delete',
-    restrictToConfigRoles: [
-        ConfigurationRoles.StaffRoles,
-        ConfigurationRoles.AdminRoles,
-        ConfigurationRoles.TagAdminRoles,
-    ],
+    autocomplete: async (ctx: Context, interaction) => {
+        const guildId = interaction.guildId!;
+        const query = interaction.options.getString('tag-name') || '';
+
+        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
+        const filtered = tags
+            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 25)
+            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
+
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name', true);
@@ -28,31 +35,25 @@ export const DeleteSubCommand = defineSubCommand({
 
         await interaction.editReply('Tag deleted successfully.');
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const guildId = interaction.guildId!;
-        const query = interaction.options.getString('tag-name') || '';
-
-        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
-        const filtered = tags
-            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 25)
-            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
-
-        await interaction.respond(filtered);
-    },
+    name: 'delete',
+    restrictToConfigRoles: [
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+    ],
 });
 
 export const commandOptions = {
-    name: DeleteSubCommand.name,
     description: 'Delete a tag!',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: DeleteSubCommand.name,
     options: [
         {
-            name: 'tag-name',
-            description: 'The name of the tag to delete',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'The name of the tag to delete',
+            name: 'tag-name',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

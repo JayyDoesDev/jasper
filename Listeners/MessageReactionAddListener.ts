@@ -1,120 +1,23 @@
 import {
+    AttachmentBuilder,
     MessageReaction,
     PartialMessageReaction,
     TextChannel,
-    AttachmentBuilder,
-    Message,
-    GuildMember,
 } from 'discord.js';
-import { Context } from '../Source/Context';
-import { Listener } from './Listener';
-import { Options } from '../Services/SettingsService';
+
 import { defineEvent } from '../Common/define';
-import DOMPurify from 'isomorphic-dompurify';
-import type { Config as DOMPurifyConfig } from 'isomorphic-dompurify';
-import { BrowserContext, chromium, type Browser, type Page } from 'playwright';
-import { Snowflake } from '@antibot/interactions';
-import { Nullable } from '../Common/types';
-const VALID_URL_PATTERN =
-    /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net|i\.imgur\.com)\//;
-const PAGE_OPERATION_TIMEOUT = 5000;
-const sanitizerConfig: DOMPurifyConfig = {
-    ALLOWED_TAGS: ['div', 'span', 'img'],
-    ALLOWED_ATTR: ['class', 'src', 'alt', 'title'],
-    FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'svg', 'math'],
-    ALLOW_DATA_ATTR: false,
-    ALLOW_ARIA_ATTR: false,
-    ALLOW_UNKNOWN_PROTOCOLS: false,
-    SAFE_FOR_TEMPLATES: true,
-};
+import { Options } from '../Services/SettingsService';
+import { Context } from '../Source/Context';
+import { playwright } from '../Source/Playwright';
 
-interface TemplateCache {
-    html: string;
-    browser: Nullable<Browser>;
-    pages: Array<{
-        page: Page;
-        context: BrowserContext;
-        lastUsed: number;
-    }>;
-    maxPages: number;
-    operationQueue: Promise<void>;
-    lastCleanup: number;
-}
-
-interface GenerateMessageOptions {
-    username: string;
-    nickname: string;
-    content: string;
-    timestamp: string;
-    avatarUrl: string;
-    roleColor: string;
-    roleIconUrl: string;
-    message: Message;
-    repliedToMessage: Nullable<Message>;
-    repliedToMember: Nullable<GuildMember>;
-}
-
-interface MessageData {
-    username: string;
-    nickname: string;
-    content: string;
-    timestamp: string;
-    avatarUrl: string;
-    roleColor: string;
-    roleIconUrl: string;
-    attachments: string[];
-    reply: {
-        username: string;
-        content: string;
-        avatarUrl: string;
-        roleColor: string;
-        member: GuildMember;
-    };
-}
-
-function sanitize(text: string): string {
-    return DOMPurify.sanitize(text, sanitizerConfig);
-}
-
-function isValidUrl(url: string): boolean {
-    return VALID_URL_PATTERN.test(url);
-}
-
-async function parseMentions(ctx: Context, guildId: Snowflake, text: string[]): Promise<string[]> {
-    for (let i = 0; i < text.length; i++) {
-        if (text[i].startsWith('<@')) {
-            const userId = text[i].slice(2, -1);
-            const user = await (await ctx.guilds.fetch(guildId)).members.fetch(userId);
-            const name = user.displayName ? user.displayName : user.nickname || user.user.username;
-            if (user) {
-                if (text[i][1] === '!') {
-                    text[i] = `<span class="mention" data-user-id="${name}">@${name}</span>`;
-                } else {
-                    text[i] = `<span class="mention" data-user-id="${name}">@${name}</span>`;
-                }
-            }
-        }
-    }
-
-    return text;
-}
+import { Listener } from './Listener';
 
 export default class MessageReactionAddListener extends Listener<'messageReactionAdd'> {
-    private templateCache: TemplateCache = {
-        html: '',
-        browser: null,
-        pages: [],
-        maxPages: 3,
-        operationQueue: Promise.resolve(),
-        lastCleanup: Date.now(),
-    };
-    private deviceScaleFactor: number;
-    private html: string;
+    private messageTemplate: string;
 
     constructor(ctx: Context) {
         super(ctx, 'messageReactionAdd');
-        this.deviceScaleFactor = 4;
-        this.html = `<!DOCTYPE html>
+        this.messageTemplate = `<!DOCTYPE html>
 <html>
     <head>
         <style>
@@ -169,7 +72,9 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
 
             .message-container {
                 padding: 14px;
-                width: 520px;
+                min-width: 520px;
+                max-width: 800px;
+                width: fit-content;
                 margin-top: 24px;
                 box-sizing: border-box;
                 position: relative;
@@ -197,6 +102,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
             .message-content {
                 flex: 1;
                 min-width: 0;
+                flex-wrap: wrap;
                 display: flex;
                 flex-direction: column;
             }
@@ -229,7 +135,11 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                 color: #dcddde;
                 top: 3px;
                 font-size: 13px;
-                line-height: 15px;
+                line-height: 18px;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                max-width: 760px;
             }
 
             .mention {
@@ -290,7 +200,6 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
             .reply-message {
                 display: inline;
                 margin-left: -4px;
-
                 flex-wrap: wrap;
                 max-width: 400px;
                 font-size: 12px;
@@ -303,23 +212,29 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                 font-size: 12px;
             }
 
-            .no-reply .reply-container {
-                display: none;
-            }
+.message-content.no-reply .reply-container {
+    display: none;
+}
+
         </style>
     </head>
     <body>
-        <div class="message-container">
-            <div class="message-content no-reply">
+<div class="message-container">
+  <div
+    class="message-content"
+    data-exists-then-display="replyContent"
+    data-toggle-class="no-reply"
+  >
                 <div class="reply-container">
                     <img
                         class="reply-avatar"
                         src="https://cdn.discordapp.com/avatars/419958345487745035/a_4613f8763f6b3a1107b83c5497a606bd.gif?size=1024"
                         alt="reply-avatar"
+                        data-bind="replyAvatar"
                     />
                     <div class="reply-message">
-                        <span class="reply-username">@AnotherUser</span>
-                        <span>This is the replied message</span>
+                        <span class="reply-username" data-bind="replyUsername">@AnotherUser</span>
+                        <span data-bind="replyContent">This is the replied message</span>
                     </div>
                 </div>
                 <div class="message-wrapper">
@@ -327,430 +242,27 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                         class="avatar"
                         src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/jasper.png?raw=true"
                         alt="avatar"
+                        data-bind="avatar"
                     />
                     <div>
                         <div class="username-row">
-                            <span class="username">Username</span>
+                            <span class="username" data-bind="username">Username</span>
                             <img
                                 class="icon"
                                 src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/jasper.png?raw=true"
                                 alt="icon"
+                                data-bind="roleIcon"
                             />
-                            <span class="message-time">Today at 12:34 PM</span>
+                            <span class="message-time" data-bind="timestamp">Today at 12:34 PM</span>
                         </div>
-                        <div class="message-text">Message text here</div>
-                        <div class="image-container"></div>
+                        <div class="message-text" data-bind="content">Message text here</div>
+                        <div class="image-container" data-bind="attachments"></div>
                     </div>
                 </div>
             </div>
         </div>
     </body>
-</html>
-`;
-        this.initializeCache();
-    }
-
-    private async initializeCache(retryCount = 0) {
-        try {
-            if (this.templateCache.browser) {
-                try {
-                    await this.cleanupCache();
-                } catch (error) {
-                    console.error('Error cleaning up existing cache:', error);
-                }
-            }
-
-            this.templateCache.html = this.html;
-            const browser = await chromium.launch({
-                args: [
-                    '--disable-gpu',
-                    '--disable-dev-shm-usage',
-                    '--js-flags=--noexpose_wasm',
-                    '--disable-background-networking',
-                    '--disable-default-apps',
-                    '--disable-extensions',
-                    '--disable-sync',
-                    '--disable-translate',
-                    '--hide-scrollbars',
-                    '--metrics-recording-only',
-                    '--mute-audio',
-                    '--no-first-run',
-                    '--safebrowsing-disable-auto-update',
-                ],
-            });
-
-            this.templateCache.browser = browser;
-
-            for (let i = 0; i < this.templateCache.maxPages; i++) {
-                const context = await browser.newContext({
-                    viewport: {
-                        width: 480,
-                        height: 150,
-                    },
-                    deviceScaleFactor: this.deviceScaleFactor,
-                });
-                const page = await context.newPage();
-
-                await page.route('**/*', (route) => {
-                    const headers = { ...route.request().headers() };
-                    if (route.request().resourceType() === 'document') {
-                        headers['Content-Security-Policy'] =
-                            "default-src 'self' cdn.discordapp.com media.discordapp.net i.imgur.com; img-src 'self' cdn.discordapp.com media.discordapp.net i.imgur.com; font-src 'self' data:";
-                    }
-                    return route.continue({ headers });
-                });
-
-                await Promise.race([
-                    page.setContent(this.templateCache.html, {
-                        waitUntil: 'networkidle',
-                        timeout: PAGE_OPERATION_TIMEOUT,
-                    }),
-                    new Promise((_, reject) =>
-                        setTimeout(
-                            () => reject(new Error('Page load timeout')),
-                            PAGE_OPERATION_TIMEOUT,
-                        ),
-                    ),
-                ]);
-
-                this.templateCache.pages.push({ page, context, lastUsed: Date.now() });
-            }
-        } catch (error) {
-            console.error(
-                `Failed to initialize template cache (attempt ${retryCount + 1}):`,
-                error,
-            );
-            if (retryCount < 2) {
-                console.log('Retrying initialization...');
-                await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
-                return this.initializeCache(retryCount + 1);
-            }
-            throw error;
-        }
-    }
-
-    private async queueOperation<T>(operation: () => Promise<T>): Promise<T> {
-        const currentOperation = this.templateCache.operationQueue.then(() => operation());
-        this.templateCache.operationQueue = currentOperation.then(() => {});
-        return currentOperation;
-    }
-
-    private async ensureBrowserHealth() {
-        if (!this.templateCache.browser) {
-            await this.initializeCache();
-            return;
-        }
-
-        try {
-            const testContext = await this.templateCache.browser.newContext();
-            await testContext.close();
-        } catch (error) {
-            console.error('Browser health check failed:', error);
-            await this.initializeCache();
-        }
-    }
-
-    private async generateMessageImage(options: GenerateMessageOptions): Promise<Buffer> {
-        await this.ensureBrowserHealth();
-
-        if (Date.now() - this.templateCache.lastCleanup > 5 * 60 * 1000) {
-            await this.cleanupOldPages();
-        }
-
-        const pageInfo = this.templateCache.pages.pop();
-        let page = pageInfo?.page;
-        if (!page && this.templateCache.browser) {
-            page = await this.templateCache.browser.newPage();
-        }
-        if (!page) throw new Error('Failed to get a browser page');
-
-        return this.queueOperation(async () => {
-            try {
-                let retries = 0;
-                const maxRetries = 2;
-                while (retries <= maxRetries) {
-                    try {
-                        await page.setContent(this.templateCache.html, {
-                            waitUntil: 'networkidle',
-                            timeout: PAGE_OPERATION_TIMEOUT,
-                        });
-                        break;
-                    } catch (error) {
-                        console.error(`Page setup failed (attempt ${retries + 1}):`, error);
-                        if (retries === maxRetries) throw error;
-                        retries++;
-                        await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
-                    }
-                }
-
-                const username = sanitize(options.username);
-                const nickname = sanitize(options.nickname);
-                const parsedContent = (
-                    await parseMentions(
-                        this.ctx,
-                        options.message.guild.id,
-                        options.content.split(' '),
-                    )
-                ).join(' ');
-                const content = DOMPurify.sanitize(parsedContent, {
-                    ...sanitizerConfig,
-                    ALLOWED_TAGS: [...sanitizerConfig.ALLOWED_TAGS, 'span'],
-                    ALLOWED_ATTR: [...sanitizerConfig.ALLOWED_ATTR, 'data-user-id'],
-                });
-                const timestamp = sanitize(options.timestamp);
-
-                let parsedReplyContent = '';
-                if (options.repliedToMessage && options.repliedToMessage.content) {
-                    const parsedReplyArray = await parseMentions(
-                        this.ctx,
-                        options.repliedToMessage.guild.id,
-                        options.repliedToMessage.content.split(' '),
-                    );
-                    parsedReplyContent = sanitize(parsedReplyArray.join(' '));
-                }
-
-                await page.evaluate(
-                    (data: MessageData) => {
-                        return new Promise<boolean>((resolve, reject) => {
-                            let totalImageCount = 2;
-                            let loadedImageCount = 0;
-                            const usernameEl: HTMLElement = document.querySelector('.username');
-                            const messageEl: HTMLElement = document.querySelector('.message-text');
-                            const timeEl: HTMLElement = document.querySelector('.message-time');
-                            const avatarEl: HTMLImageElement = document.querySelector('.avatar');
-                            const roleIconEl: HTMLImageElement = document.querySelector('.icon');
-                            const imageContainer: HTMLElement =
-                                document.querySelector('.image-container');
-
-                            if (
-                                !usernameEl ||
-                                !messageEl ||
-                                !timeEl ||
-                                !avatarEl ||
-                                !roleIconEl ||
-                                !imageContainer
-                            ) {
-                                reject(new Error('Required elements not found in template'));
-                                return;
-                            }
-
-                            const onImageLoad = () => {
-                                loadedImageCount++;
-                                if (loadedImageCount === totalImageCount) {
-                                    resolve(true);
-                                }
-                            };
-
-                            const onImageError = (e: ErrorEvent) => {
-                                console.error('Failed to load image:', e);
-                                loadedImageCount++;
-                                if (loadedImageCount === totalImageCount) {
-                                    resolve(true);
-                                }
-                            };
-
-                            avatarEl.onload = onImageLoad;
-                            avatarEl.onerror = onImageError;
-                            roleIconEl.onload = onImageLoad;
-                            roleIconEl.onerror = onImageError;
-
-                            usernameEl.textContent = `${data.username} (${data.nickname})`;
-                            usernameEl.style.color = data.roleColor;
-                            messageEl.innerHTML = data.content;
-                            timeEl.textContent = 'Today at ' + data.timestamp;
-
-                            avatarEl.src = data.avatarUrl;
-                            roleIconEl.src = data.roleIconUrl;
-
-                            if (data.reply) {
-                                const replyContainer: HTMLElement =
-                                    document.querySelector('.reply-container');
-                                const replyAvatarEl: HTMLImageElement =
-                                    document.querySelector('.reply-avatar');
-                                const replyUsernameEl: HTMLElement =
-                                    document.querySelector('.reply-username');
-                                const messageContainer: HTMLElement =
-                                    document.querySelector('.message-container');
-
-                                if (replyContainer && replyUsernameEl && replyAvatarEl) {
-                                    messageContainer.classList.remove('no-reply');
-                                    replyContainer.style.display = 'block';
-
-                                    replyAvatarEl.onload = onImageLoad;
-                                    replyAvatarEl.onerror = onImageError;
-                                    totalImageCount++;
-
-                                    setTimeout(() => {
-                                        replyAvatarEl.src = data.reply.avatarUrl;
-                                    }, 0);
-                                    replyUsernameEl.textContent = `@${data.reply.username}`;
-                                    const replyColor = data.reply.roleColor || '#FFFFFF';
-                                    replyUsernameEl.style.color = replyColor;
-
-                                    const range = document.createRange();
-                                    range.selectNodeContents(replyContainer);
-                                    range.setStartAfter(replyUsernameEl);
-                                    range.deleteContents();
-
-                                    replyContainer.innerHTML += data.reply.content;
-                                }
-                            }
-
-                            if (data.attachments.length > 0) {
-                                imageContainer.style.display = 'grid';
-                                const imageElements: HTMLImageElement[] = [];
-                                data.attachments.forEach((attachment) => {
-                                    const img = document.createElement('img');
-                                    img.onload = onImageLoad;
-                                    img.onerror = onImageError;
-                                    setTimeout(() => {
-                                        img.src = attachment;
-                                    }, 0);
-                                    img.alt = 'attachment';
-                                    imageElements.push(img);
-                                    totalImageCount++;
-                                });
-                                imageElements.forEach((img) => imageContainer.appendChild(img));
-                            } else {
-                                imageContainer.style.display = 'none';
-                                imageContainer.innerHTML = '';
-                            }
-                        });
-                    },
-                    {
-                        username,
-                        nickname,
-                        content,
-                        timestamp,
-                        avatarUrl: options.avatarUrl,
-                        roleColor: options.roleColor,
-                        roleIconUrl: options.roleIconUrl,
-                        attachments: Array.from(options.message.attachments.values()).map(
-                            (a) => a.url,
-                        ),
-                        reply:
-                            options.repliedToMessage && options.repliedToMember
-                                ? {
-                                      username: options.repliedToMessage.author.username,
-                                      content: parsedReplyContent,
-                                      avatarUrl: options.repliedToMessage.author.displayAvatarURL(),
-                                      member: options.repliedToMember,
-                                      roleColor: (() => {
-                                          const roleColor =
-                                              options.repliedToMember.roles.cache
-                                                  .filter((role) => role.color !== 0)
-                                                  .sort((a, b) => b.position - a.position)
-                                                  .first()?.hexColor || '#FFFFFF';
-                                          return roleColor;
-                                      })(),
-                                  }
-                                : null,
-                    },
-                );
-
-                const messageContainer = await page.$('.message-container');
-                if (!messageContainer) {
-                    throw new Error('Could not find message container');
-                }
-
-                await page.evaluate(() => {
-                    document.body.style.background = '#36393f';
-                    document.body.style.margin = '0';
-                    document.body.style.padding = '0';
-                });
-
-                const buffer = (await messageContainer.screenshot({
-                    type: 'png',
-                    omitBackground: false,
-                })) as Buffer;
-
-                return buffer;
-            } catch (error) {
-                console.error('Error during page operations:', error);
-                throw error;
-            } finally {
-                if (this.templateCache.pages.length < this.templateCache.maxPages) {
-                    const context = page.context();
-                    this.templateCache.pages.push({ page, context, lastUsed: Date.now() });
-                } else {
-                    await page.close();
-                }
-            }
-        });
-    }
-
-    private async cleanupOldPages(): Promise<void> {
-        const now = Date.now();
-        this.templateCache.lastCleanup = now;
-        const FIVE_MINUTES = 5 * 60 * 1000;
-
-        try {
-            if (this.templateCache.pages.length > this.templateCache.maxPages * 2) {
-                console.warn('Too many pages open, forcing cleanup');
-                const pagesToRemove = this.templateCache.pages.slice(this.templateCache.maxPages);
-                await Promise.all(pagesToRemove.map((p) => p.page.close()));
-                this.templateCache.pages = this.templateCache.pages.slice(
-                    0,
-                    this.templateCache.maxPages,
-                );
-                return;
-            }
-
-            const oldPages = this.templateCache.pages.filter(
-                (p) => now - p.lastUsed > FIVE_MINUTES,
-            );
-            await Promise.all(
-                oldPages.map(async (p) => {
-                    try {
-                        await p.context.clearCookies();
-                        await p.page.close();
-                        await p.context.close();
-                    } catch (error) {
-                        console.error('Error cleaning up page:', error);
-                    }
-                }),
-            );
-
-            this.templateCache.pages = this.templateCache.pages.filter(
-                (p) => now - p.lastUsed <= FIVE_MINUTES,
-            );
-
-            if (this.templateCache.browser) {
-                if (this.templateCache.pages.length > this.templateCache.maxPages * 3) {
-                    console.warn('Browser has too many pages, restarting...');
-                    await this.cleanupCache();
-                    await this.initializeCache();
-                }
-            }
-        } catch (error) {
-            console.error('Error during page cleanup:', error);
-        }
-    }
-
-    private async cleanupCache(): Promise<void> {
-        try {
-            await Promise.all(
-                this.templateCache.pages.map(async (pageInfo) => {
-                    try {
-                        await pageInfo.page.close();
-                    } catch (error) {
-                        console.error('Error closing page:', error);
-                    }
-                }),
-            );
-            this.templateCache.pages = [];
-
-            if (this.templateCache.browser) {
-                await this.templateCache.browser.close();
-                this.templateCache.browser = null;
-            }
-        } catch (error) {
-            console.error('Error during cleanup:', error);
-        }
-    }
-
-    public async onUnload(): Promise<void> {
-        await this.cleanupCache();
+</html>`;
     }
 
     public async execute(reaction: MessageReaction | PartialMessageReaction): Promise<void> {
@@ -771,11 +283,14 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                 if (fetchedChannel?.isTextBased()) {
                     const message = await fetchedChannel.messages.fetch(reaction.message.id);
                     const member = message.guild.members.resolve(message.author.id);
+                    if (!member) {
+                        throw new Error('Could not resolve message author as guild member');
+                    }
 
                     try {
                         const timestamp = new Date(message.createdTimestamp).toLocaleTimeString(
                             'en-US',
-                            { hour: 'numeric', minute: '2-digit', hour12: true },
+                            { hour: 'numeric', hour12: true, minute: '2-digit' },
                         );
 
                         const repliedToMessage = message.reference
@@ -783,97 +298,149 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             : null;
 
                         const repliedToMember = repliedToMessage
-                            ? await message.guild.members.fetch(repliedToMessage.author.id)
+                            ? await message.guild.members
+                                  .fetch(repliedToMessage.author.id)
+                                  .catch(() => null)
                             : null;
 
                         const coloredRole =
-                            member.roles.cache
-                                .filter((role) => role.color !== 0)
-                                .sort((a, b) => b.position - a.position)
-                                .first() || '#FFFFFF';
+                            member?.roles?.cache
+                                ?.filter((role) => role.color !== 0)
+                                ?.sort((a, b) => b.position - a.position)
+                                ?.first() || '#FFFFFF';
+
+                        const repliedColorRole =
+                            repliedToMember?.roles?.cache
+                                ?.filter((role) => role.color !== 0)
+                                ?.sort((a, b) => b.position - a.position)
+                                ?.first() || '#FFFFFF';
 
                         const avatarUrl = member.user.displayAvatarURL({
                             forceStatic: true,
                             size: 1024,
                         });
                         const roleIconUrl =
-                            member.roles.highest.iconURL() || message.guild.iconURL();
+                            member?.roles?.highest?.iconURL() || message.guild.iconURL();
 
-                        if (!isValidUrl(avatarUrl) || (roleIconUrl && !isValidUrl(roleIconUrl))) {
+                        if (
+                            !playwright.isValidUrl(avatarUrl) ||
+                            (roleIconUrl && !playwright.isValidUrl(roleIconUrl))
+                        ) {
                             throw new Error('Invalid avatar or role icon URL');
                         }
 
-                        const imageBuffer = await this.generateMessageImage({
-                            username: sanitize(message.author?.username || 'Unknown User'),
-                            nickname: sanitize(
-                                message.member.nickname || message.author?.globalName || '',
-                            ),
-                            content: message.content || '',
-                            timestamp: sanitize(timestamp),
-                            avatarUrl: member.user.displayAvatarURL({
-                                forceStatic: true,
-                                size: 1024,
-                            }),
-                            roleColor:
-                                typeof coloredRole === 'string'
-                                    ? coloredRole
-                                    : String(coloredRole.hexColor),
-                            roleIconUrl:
-                                roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
-                            message,
-                            repliedToMessage,
-                            repliedToMember,
+                        const content = message.content || '';
+                        const parsedContent = (
+                            await playwright.parseMentions(
+                                this.ctx,
+                                message.guild.id,
+                                content.split(' '),
+                            )
+                        ).join(' ');
+
+                        let parsedReplyContent = '';
+                        if (repliedToMessage?.content) {
+                            const parsedReplyArray = await playwright.parseMentions(
+                                this.ctx,
+                                repliedToMessage.guild.id,
+                                repliedToMessage.content.split(' '),
+                            );
+                            parsedReplyContent = parsedReplyArray.join(' ');
+                        }
+
+                        const images = [];
+                        if (message.attachments.size > 0) {
+                            message.attachments.forEach((attachment) => {
+                                if (attachment.url) {
+                                    images.push(`<img src="${attachment.url}" alt="attachment" />`);
+                                }
+                            });
+                        }
+
+                        const imageBuffer = await playwright.generateImage({
+                            data: {
+                                attachments: images.join(' '),
+                                avatar: member.user.displayAvatarURL({
+                                    forceStatic: true,
+                                    size: 1024,
+                                }),
+                                content: parsedContent,
+                                roleIcon:
+                                    roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+                                timestamp: playwright.sanitize(timestamp),
+                                username: `<span style="color: ${typeof coloredRole === 'string' ? coloredRole : String(coloredRole.hexColor)}">${playwright.sanitize(message.author?.username || 'Unknown User')}${
+                                    message.member
+                                        ? ` (${playwright.sanitize(
+                                              message.member.nickname ||
+                                                  message.author?.globalName ||
+                                                  '',
+                                          )})`
+                                        : ''
+                                }</span>`,
+                                ...(repliedToMessage && repliedToMember
+                                    ? {
+                                          replyAvatar: repliedToMessage.author.displayAvatarURL(),
+                                          replyContent: parsedReplyContent,
+                                          replyUsername: `<span style="color: ${typeof repliedColorRole === 'string' ? repliedColorRole : String(repliedColorRole.hexColor)}">@${playwright.sanitize(
+                                              repliedToMember.user.username || 'Unknown User',
+                                          )}</span>`,
+                                      }
+                                    : {}),
+                            },
+                            html: this.messageTemplate,
+                            selector: '.message-container',
+                            viewport: { height: 200, width: 520 },
                         });
 
                         const attachment = new AttachmentBuilder(imageBuffer, {
                             name: 'screenshot.png',
                         });
                         await skullboardChannel.send({
-                            files: [attachment],
                             embeds: [
                                 {
-                                    title: `${message.author?.username} (${message.author?.id})`,
+                                    color: global.embedColor,
+                                    fields: [
+                                        {
+                                            inline: true,
+                                            name: 'Author',
+                                            value: `<@${message.author?.id}>`,
+                                        },
+                                    ],
                                     image: {
                                         url: 'attachment://screenshot.png',
                                     },
-                                    fields: [
-                                        {
-                                            name: 'Author',
-                                            value: `<@${message.author?.id}>`,
-                                            inline: true,
-                                        },
-                                    ],
-                                    color: global.embedColor,
                                     timestamp: new Date().toISOString(),
+                                    title: `${message.author?.username} (${message.author?.id})`,
                                 },
                             ],
+                            files: [attachment],
                         });
                     } catch (error) {
                         console.error('Error generating message image:', error);
                         await skullboardChannel.send({
                             embeds: [
                                 {
-                                    title: `${message.author?.username} (${message.author?.id})`,
+                                    color: global.embedColor,
                                     description: `${message.content}`,
                                     fields: [
                                         {
+                                            inline: true,
                                             name: 'Author',
                                             value: `<@${message.author?.id}>`,
-                                            inline: true,
                                         },
                                         {
+                                            inline: true,
                                             name: 'Channel',
                                             value: `<#${message.channel.id}>`,
-                                            inline: true,
                                         },
                                         {
+                                            inline: true,
                                             name: 'Message Link',
                                             value: `[Jump to message](https://discord.com/channels/${message.guildId}/${message.channel.id}/${message.id})`,
-                                            inline: true,
                                         },
                                     ],
-                                    color: global.embedColor,
                                     timestamp: new Date().toISOString(),
+                                    title: `${message.author?.username} (${message.author?.id})`,
                                 },
                             ],
                         });
@@ -882,14 +449,6 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
             }
         } catch (error) {
             console.error('Error in execute:', error);
-            if (this.templateCache.browser) {
-                try {
-                    await this.cleanupCache();
-                    await this.initializeCache();
-                } catch (cleanupError) {
-                    console.error('Error during cleanup after failure:', cleanupError);
-                }
-            }
         }
     }
 

@@ -1,7 +1,8 @@
-import { Listener } from './Listener';
+import { defineEvent } from '../Common/define';
 import { updateSubCountChannel } from '../Common/youtube';
 import { Context } from '../Source/Context';
-import { defineEvent } from '../Common/define';
+
+import { Listener } from './Listener';
 
 export default class ReadyListener extends Listener<'ready'> {
     constructor(ctx: Context) {

@@ -1,10 +1,12 @@
-import { Context } from '../Source/Context';
-import { sync } from 'glob';
 import path from 'path';
+
 import { ICommand } from '@antibot/interactions';
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
-import { Combine } from '../Common/types';
+import { sync } from 'glob';
+
 import { Command, Plugin } from '../Common/define';
+import { Combine } from '../Common/types';
+import { Context } from '../Source/Context';
 
 export default function (ctx: Context): void {
     let commands: string[] = [];

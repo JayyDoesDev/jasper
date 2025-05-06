@@ -1,17 +1,17 @@
 import { Nullable } from '../Common/types';
 
 interface EnvToken {
-    env: string;
     aliases: string[];
-    required?: boolean;
     default?: string;
+    env: string;
+    required?: boolean;
     validate?: (value: string) => boolean;
 }
 
 interface EnvValidationResult {
-    status: 'Valid' | 'Invalid' | 'Missing' | 'ValidationFailed';
     env: string;
     message?: string;
+    status: 'Invalid' | 'Missing' | 'Valid' | 'ValidationFailed';
 }
 
 export class Env {
@@ -46,9 +46,9 @@ export class Env {
 
             if (!value && token.required) {
                 results.push({
-                    status: 'Missing',
                     env: token.env,
                     message: 'Required variable is not set',
+                    status: 'Missing',
                 });
                 errors.push(`Missing required environment variable: ${token.env}`);
                 continue;
@@ -56,18 +56,18 @@ export class Env {
 
             if (value && token.validate && !token.validate(value)) {
                 results.push({
-                    status: 'ValidationFailed',
                     env: token.env,
                     message: 'Failed validation check',
+                    status: 'ValidationFailed',
                 });
                 errors.push(`Environment variable ${token.env} failed validation`);
                 continue;
             }
 
             results.push({
-                status: value ? 'Valid' : 'Invalid',
                 env: token.env,
                 message: value ? undefined : 'No value set',
+                status: value ? 'Valid' : 'Invalid',
             });
         }
 
@@ -75,8 +75,8 @@ export class Env {
         console.table(
             results.map((r) => ({
                 Env: r.env,
-                Status: r.status,
                 Message: r.message || '',
+                Status: r.status,
             })),
         );
         console.groupEnd();

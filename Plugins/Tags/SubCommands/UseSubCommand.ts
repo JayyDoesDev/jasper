@@ -1,19 +1,24 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction } from 'discord.js';
+
+import { ConfigurationRoles } from '../../../Common/container';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, TagResponse } from '../../../Services/TagService';
-import { ConfigurationRoles } from '../../../Common/container';
+import { Context } from '../../../Source/Context';
 
 export const UseSubCommand = defineSubCommand({
-    name: 'use',
-    restrictToConfigRoles: [
-        ConfigurationRoles.SupportRoles,
-        ConfigurationRoles.StaffRoles,
-        ConfigurationRoles.AdminRoles,
-        ConfigurationRoles.TagAdminRoles,
-        ConfigurationRoles.TagRoles,
-    ],
+    autocomplete: async (ctx: Context, interaction) => {
+        const guildId = interaction.guildId!;
+        const query = interaction.options.getString('tag-name') || '';
+
+        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
+        const filtered = tags
+            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 25)
+            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
+
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name', true);
@@ -30,47 +35,43 @@ export const UseSubCommand = defineSubCommand({
         }
 
         const embed = {
-            title: tag.TagEmbedTitle,
             color: global.embedColor,
             description: tag.TagEmbedDescription,
-            image: { url: tag.TagEmbedImageURL },
             footer: { text: tag.TagEmbedFooter },
+            image: { url: tag.TagEmbedImageURL },
+            title: tag.TagEmbedTitle,
         };
 
         const content = mention ? `${mention}` : undefined;
         await interaction.editReply({ content, embeds: [embed] });
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const guildId = interaction.guildId!;
-        const query = interaction.options.getString('tag-name') || '';
-
-        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
-        const filtered = tags
-            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 25)
-            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
-
-        await interaction.respond(filtered);
-    },
+    name: 'use',
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
 });
 
 export const commandOptions = {
-    name: UseSubCommand.name,
     description: "Display a tag's content",
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: UseSubCommand.name,
     options: [
         {
-            name: 'tag-name',
-            description: 'The name of the tag to use',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'The name of the tag to use',
+            name: 'tag-name',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
         {
-            name: 'mention',
             description: 'The user to mention with the tag',
-            type: ApplicationCommandOptionType.USER,
+            name: 'mention',
             required: false,
+            type: ApplicationCommandOptionType.USER,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

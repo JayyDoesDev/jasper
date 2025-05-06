@@ -1,28 +1,38 @@
-/* eslint @typescript-eslint/no-explicit-any: "off" */
-import { Context } from '../Source/Context';
 import numeral from 'numeral';
 
-export async function getYoutubeChannel<T>(youtubeId: string, apiKey: string): Promise<T> {
-    return (await fetch(
-        `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${youtubeId}&key=${apiKey}`,
-    )) as T;
-}
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+import { Context } from '../Source/Context';
 
 export async function getLatestYoutubeVideo(
     youtubeId: string,
     apiKey: string,
-): Promise<{ id: string; title: string; description: string; thumbnail: string; channel: string }> {
+): Promise<{ channel: string; description: string; id: string; thumbnail: string; title: string; }> {
     const data = await fetch(
         `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${youtubeId}&maxResults=1&order=date&type=video&key=${apiKey}`,
     );
     const json = await data.json();
     return {
-        id: json.items[0].id.videoId,
-        title: json.items[0].snippet.title,
-        description: json.items[0].snippet.description,
-        thumbnail: json.items[0].snippet.thumbnails.high.url,
         channel: json.items[0].snippet.channelTitle,
+        description: json.items[0].snippet.description,
+        id: json.items[0].id.videoId,
+        thumbnail: json.items[0].snippet.thumbnails.high.url,
+        title: json.items[0].snippet.title,
     };
+}
+
+// Not random
+export function getRandomYoutubeAPIKey(ctx: Context): string {
+    return [
+        ctx.env.get('youtube_key_one'),
+        ctx.env.get('youtube_key_two'),
+        ctx.env.get('youtube_key_three'),
+    ][Math.floor(Math.random() * 3)] as string;
+}
+
+export async function getYoutubeChannel<T>(youtubeId: string, apiKey: string): Promise<T> {
+    return (await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${youtubeId}&key=${apiKey}`,
+    )) as T;
 }
 
 export async function updateSubCountChannel(ctx: Context): Promise<void> {
@@ -39,13 +49,4 @@ export async function updateSubCountChannel(ctx: Context): Promise<void> {
     if (channel) {
         void channel.setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
     }
-}
-
-// Not random
-export function getRandomYoutubeAPIKey(ctx: Context): string {
-    return [
-        ctx.env.get('youtube_key_one'),
-        ctx.env.get('youtube_key_two'),
-        ctx.env.get('youtube_key_three'),
-    ][Math.floor(Math.random() * 3)] as string;
 }

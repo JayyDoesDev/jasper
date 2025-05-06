@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
 const { config } = require('dotenv');
+const mongoose = require('mongoose');
+
 const GuildModel = require('../Models/GuildSchema');
 const schema = GuildModel.default;
 config();

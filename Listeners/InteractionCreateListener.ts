@@ -1,3 +1,4 @@
+import { PermissionsToHuman, PlantPermission } from '@antibot/interactions';
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import {
     ButtonInteraction,
@@ -9,13 +10,14 @@ import {
     MessageFlags,
     ModalSubmitInteraction,
 } from 'discord.js';
-import { Context } from '../Source/Context';
-import { Listener } from './Listener';
-import { Command, defineEvent, message } from '../Common/define';
-import { PermissionsToHuman, PlantPermission } from '@antibot/interactions';
+
 import { withConfigurationRoles } from '../Common/db';
-import { Options, Tag, TagResponse } from '../Services/TagService';
+import { Command, defineEvent, message } from '../Common/define';
 import { Emojis } from '../Common/enums';
+import { Options, Tag, TagResponse } from '../Services/TagService';
+import { Context } from '../Source/Context';
+
+import { Listener } from './Listener';
 
 export default class InteractionCreateListener extends Listener<'interactionCreate'> {
     constructor(ctx: Context) {
@@ -24,11 +26,11 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
     public async execute<
         Interaction extends
-            | InteractionEvent
+            | ButtonInteraction
             | ChatInputCommandInteraction
             | ContextMenuCommandInteraction
-            | ModalSubmitInteraction
-            | ButtonInteraction,
+            | InteractionEvent
+            | ModalSubmitInteraction,
     >(interaction: Interaction): Promise<void> {
         await this.handleCommands(interaction);
         if (interaction.isButton()) {
@@ -43,130 +45,18 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         }
     }
 
-    private async handleModalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
-        if (!interaction.isModalSubmit()) return;
-
-        // Handle Tag Create Modal
-        if (interaction.customId === `tag_create_${interaction.user.id}`) {
-            const name = interaction.fields.getTextInputValue('tag_create_embed_name');
-            const title = interaction.fields.getTextInputValue('tag_create_embed_title');
-            const author = interaction.user.id;
-            const description =
-                interaction.fields.getTextInputValue('tag_create_embed_description') ?? null;
-            const image_url =
-                interaction.fields.getTextInputValue('tag_create_embed_image_url') ?? null;
-            const footer = interaction.fields.getTextInputValue('tag_create_embed_footer') ?? null;
-
-            if (!interaction.guild) return;
-
-            this.ctx.services.tags.configure<Options>({
-                guildId: interaction.guild.id,
-                name,
-                tag: { name, title, author, description, image_url, footer },
-            });
-
-            if (await this.ctx.services.tags.itemExists<Options>()) {
-                await interaction.reply({
-                    content: `> The support tag \`${name}\` already exists!`,
-                    flags: MessageFlags.Ephemeral,
-                });
-                return;
-            }
-
-            if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
-                await interaction.reply({
-                    content: `> The provided image link is not a valid image URL!`,
-                    flags: MessageFlags.Ephemeral,
-                });
-            } else {
-                await this.ctx.services.tags.create<Options & { tag: Tag }, void>();
-
-                await interaction.reply({
-                    content: `${Emojis.CHECK_MARK} Successfully created \`${name}\`!`,
-                    embeds: [
-                        {
-                            title: title,
-                            color: 0x323338,
-                            description: description,
-                            image: image_url ? { url: image_url } : undefined,
-                            footer: { text: footer },
-                        },
-                    ],
-                    flags: MessageFlags.Ephemeral,
-                });
-            }
-        }
-
-        // Handle Tag Edit Modal
-        if (interaction.customId === `tag_edit_${interaction.user.id}`) {
-            try {
-                const name = interaction.fields.getTextInputValue('tag_edit_embed_name');
-                const title =
-                    interaction.fields.getTextInputValue('tag_edit_embed_title').trim() ||
-                    undefined;
-                const editedBy = interaction.user.id;
-                const description =
-                    interaction.fields.getTextInputValue('tag_edit_embed_description').trim() ||
-                    null;
-                const image_url =
-                    interaction.fields.getTextInputValue('tag_edit_embed_image_url').trim() || null;
-                const footer =
-                    interaction.fields.getTextInputValue('tag_edit_embed_footer').trim() || null;
-
-                if (!interaction.guild) return;
-                const guildId = interaction.guild.id;
-
-                if (!(await this.ctx.services.tags.itemExists<Options>({ guildId, name }))) {
-                    await interaction.reply({
-                        content: `> The support tag \`${name}\` doesn't exist!`,
-                        flags: MessageFlags.Ephemeral,
-                    });
-                    return;
-                }
-
-                if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
-                    await interaction.reply({
-                        content: `> The provided image link is not a valid image URL!`,
-                        flags: MessageFlags.Ephemeral,
-                    });
-                    return;
-                }
-
-                this.ctx.services.tags.configure<Options>({
-                    guildId,
-                    name,
-                    tag: { name, title, editedBy, description, image_url, footer },
-                });
-
-                await this.ctx.services.tags.modify<Options & { tag: Tag }, void>();
-
-                const { TagEmbedTitle, TagEmbedDescription, TagEmbedImageURL, TagEmbedFooter } =
-                    await this.ctx.services.tags.getValues<Options, TagResponse>({
-                        guildId,
-                        name,
-                    });
-
-                await interaction.reply({
-                    content: `${Emojis.CHECK_MARK} Successfully edited \`${name}\`!`,
-                    embeds: [
-                        {
-                            title: TagEmbedTitle,
-                            color: 0x323338,
-                            description: TagEmbedDescription,
-                            image: { url: TagEmbedImageURL ?? undefined },
-                            footer: { text: TagEmbedFooter },
-                        },
-                    ],
-                    flags: MessageFlags.Ephemeral,
-                });
-            } catch (error) {
-                throw 'Error on TagEditModal ' + error.stack || error;
-            }
-        }
+    public toEvent() {
+        return defineEvent({
+            event: {
+                name: this.name,
+                once: this.once,
+            },
+            on: (interaction: InteractionEvent) => this.execute(interaction),
+        });
     }
 
     private async handleCommands(
-        interaction: InteractionEvent | ChatInputCommandInteraction | ContextMenuCommandInteraction,
+        interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction | InteractionEvent,
     ): Promise<void> {
         switch (true) {
             case interaction.isChatInputCommand() || interaction.isContextMenuCommand(): {
@@ -175,7 +65,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 > = this.ctx.interactions.get(interaction.commandName);
                 if (command) {
                     if (command.restrictToConfigRoles?.length) {
-                        const { noRolesWithConfig, noRolesNoConfig } = await withConfigurationRoles(
+                        const { noRolesNoConfig, noRolesWithConfig } = await withConfigurationRoles(
                             this.ctx,
                             interaction,
                             ...command.restrictToConfigRoles,
@@ -237,96 +127,126 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         }
     }
 
-    private async onListSubCommandButtons(interaction: ButtonInteraction): Promise<void> {
-        if (!interaction.isButton()) return;
+    private async handleModalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
+        if (!interaction.isModalSubmit()) return;
 
-        const author = interaction.user.id;
-        const title = 'Server Tag List';
-        if (!interaction.guild) return;
-        const thumbnail = { url: interaction.guild.iconURL() ?? '' };
-        const color = global.embedColor;
-        const description = '';
-        const footer = { text: '' };
+        // Handle Tag Create Modal
+        if (interaction.customId === `tag_create_${interaction.user.id}`) {
+            const name = interaction.fields.getTextInputValue('tag_create_embed_name');
+            const title = interaction.fields.getTextInputValue('tag_create_embed_title');
+            const author = interaction.user.id;
+            const description =
+                interaction.fields.getTextInputValue('tag_create_embed_description') ?? null;
+            const image_url =
+                interaction.fields.getTextInputValue('tag_create_embed_image_url') ?? null;
+            const footer = interaction.fields.getTextInputValue('tag_create_embed_footer') ?? null;
 
-        const currentUserState = this.ctx.pagination.get(author);
-        if (!currentUserState) return;
+            if (!interaction.guild) return;
 
-        const embedBase = {
-            thumbnail,
-            title,
-            color,
-            description,
-            footer,
-        };
-
-        const updateEmbed = async () => {
-            embedBase.description = currentUserState.tagPages[currentUserState.page]
-                .map(
-                    (e, i) =>
-                        `> **${currentUserState.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${
-                            e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
-                        }`,
-                )
-                .join('\n');
-
-            embedBase.footer.text = `Page: ${currentUserState.page + 1}/${
-                currentUserState.tagPages.length
-            } • emojis by AnThOnY & deussa`;
-
-            const row = {
-                type: ComponentType.ActionRow,
-                components: [
-                    {
-                        type: ComponentType.Button,
-                        customId: `list_subcommand_button_previous_${interaction.user.id}`,
-                        style: ButtonStyle.Primary,
-                        label: 'Previous',
-                        disabled: currentUserState.page === 0,
-                    } as const,
-                    {
-                        type: ComponentType.Button,
-                        customId: `list_subcommand_button_home_${interaction.user.id}`,
-                        style: ButtonStyle.Secondary,
-                        label: 'Home',
-                    } as const,
-                    {
-                        type: ComponentType.Button,
-                        customId: `list_subcommand_button_next_${interaction.user.id}`,
-                        style: ButtonStyle.Primary,
-                        label: 'Next',
-                        disabled: currentUserState.page === currentUserState.tagPages.length - 1,
-                    } as const,
-                ],
-            } as const;
-
-            await interaction.update({
-                embeds: [embedBase],
-                components: [row],
+            this.ctx.services.tags.configure<Options>({
+                guildId: interaction.guild.id,
+                name,
+                tag: { author, description, footer, image_url, name, title },
             });
-        };
 
-        switch (interaction.customId) {
-            case `list_subcommand_button_home_${author}`:
-                currentUserState.page = 0;
-                break;
+            if (await this.ctx.services.tags.itemExists<Options>()) {
+                await interaction.reply({
+                    content: `> The support tag \`${name}\` already exists!`,
+                    flags: MessageFlags.Ephemeral,
+                });
+                return;
+            }
 
-            case `list_subcommand_button_next_${author}`:
-                currentUserState.page =
-                    (currentUserState.page + 1) % currentUserState.tagPages.length;
-                break;
+            if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
+                await interaction.reply({
+                    content: `> The provided image link is not a valid image URL!`,
+                    flags: MessageFlags.Ephemeral,
+                });
+            } else {
+                await this.ctx.services.tags.create<Options & { tag: Tag }, void>();
 
-            case `list_subcommand_button_previous_${author}`:
-                currentUserState.page =
-                    (currentUserState.page - 1 + currentUserState.tagPages.length) %
-                    currentUserState.tagPages.length;
-                break;
-
-            default:
-                break;
+                await interaction.reply({
+                    content: `${Emojis.CHECK_MARK} Successfully created \`${name}\`!`,
+                    embeds: [
+                        {
+                            color: 0x323338,
+                            description: description,
+                            footer: { text: footer },
+                            image: image_url ? { url: image_url } : undefined,
+                            title: title,
+                        },
+                    ],
+                    flags: MessageFlags.Ephemeral,
+                });
+            }
         }
 
-        this.ctx.pagination.set(author, currentUserState);
-        await updateEmbed();
+        // Handle Tag Edit Modal
+        if (interaction.customId === `tag_edit_${interaction.user.id}`) {
+            try {
+                const name = interaction.fields.getTextInputValue('tag_edit_embed_name');
+                const title =
+                    interaction.fields.getTextInputValue('tag_edit_embed_title').trim() ||
+                    undefined;
+                const editedBy = interaction.user.id;
+                const description =
+                    interaction.fields.getTextInputValue('tag_edit_embed_description').trim() ||
+                    null;
+                const image_url =
+                    interaction.fields.getTextInputValue('tag_edit_embed_image_url').trim() || null;
+                const footer =
+                    interaction.fields.getTextInputValue('tag_edit_embed_footer').trim() || null;
+
+                if (!interaction.guild) return;
+                const guildId = interaction.guild.id;
+
+                if (!(await this.ctx.services.tags.itemExists<Options>({ guildId, name }))) {
+                    await interaction.reply({
+                        content: `> The support tag \`${name}\` doesn't exist!`,
+                        flags: MessageFlags.Ephemeral,
+                    });
+                    return;
+                }
+
+                if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
+                    await interaction.reply({
+                        content: `> The provided image link is not a valid image URL!`,
+                        flags: MessageFlags.Ephemeral,
+                    });
+                    return;
+                }
+
+                this.ctx.services.tags.configure<Options>({
+                    guildId,
+                    name,
+                    tag: { description, editedBy, footer, image_url, name, title },
+                });
+
+                await this.ctx.services.tags.modify<Options & { tag: Tag }, void>();
+
+                const { TagEmbedDescription, TagEmbedFooter, TagEmbedImageURL, TagEmbedTitle } =
+                    await this.ctx.services.tags.getValues<Options, TagResponse>({
+                        guildId,
+                        name,
+                    });
+
+                await interaction.reply({
+                    content: `${Emojis.CHECK_MARK} Successfully edited \`${name}\`!`,
+                    embeds: [
+                        {
+                            color: 0x323338,
+                            description: TagEmbedDescription,
+                            footer: { text: TagEmbedFooter },
+                            image: { url: TagEmbedImageURL ?? undefined },
+                            title: TagEmbedTitle,
+                        },
+                    ],
+                    flags: MessageFlags.Ephemeral,
+                });
+            } catch (error) {
+                throw 'Error on TagEditModal ' + error.stack || error;
+            }
+        }
     }
 
     private async onAddTopicSubCommandButtons(interaction: ButtonInteraction): Promise<void> {
@@ -343,11 +263,11 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         if (!currentUserState) return;
 
         const embedBase = {
-            thumbnail,
-            title,
             color,
             description,
             footer,
+            thumbnail,
+            title,
         };
 
         const updateEmbed = async () => {
@@ -372,36 +292,36 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             }`;
 
             const row = {
-                type: ComponentType.ActionRow,
                 components: [
                     {
-                        type: ComponentType.Button,
                         customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        style: ButtonStyle.Primary,
-                        label: 'Previous',
                         disabled: currentUserState.addTopicPages.page === 0,
-                    } as const,
-                    {
-                        type: ComponentType.Button,
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
-                        style: ButtonStyle.Secondary,
-                        label: 'Home',
-                    } as const,
-                    {
-                        type: ComponentType.Button,
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                        label: 'Previous',
                         style: ButtonStyle.Primary,
-                        label: 'Next',
+                        type: ComponentType.Button,
+                    } as const,
+                    {
+                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        label: 'Home',
+                        style: ButtonStyle.Secondary,
+                        type: ComponentType.Button,
+                    } as const,
+                    {
+                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
                         disabled:
                             currentUserState.addTopicPages.page ===
                             currentUserState.addTopicPages.pages.length - 1,
+                        label: 'Next',
+                        style: ButtonStyle.Primary,
+                        type: ComponentType.Button,
                     } as const,
                 ],
+                type: ComponentType.ActionRow,
             } as const;
 
             await interaction.update({
-                embeds: [embedBase],
                 components: [row],
+                embeds: [embedBase],
             });
         };
 
@@ -432,13 +352,95 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         await updateEmbed();
     }
 
-    public toEvent() {
-        return defineEvent({
-            event: {
-                name: this.name,
-                once: this.once,
-            },
-            on: (interaction: InteractionEvent) => this.execute(interaction),
-        });
+    private async onListSubCommandButtons(interaction: ButtonInteraction): Promise<void> {
+        if (!interaction.isButton()) return;
+
+        const author = interaction.user.id;
+        const title = 'Server Tag List';
+        if (!interaction.guild) return;
+        const thumbnail = { url: interaction.guild.iconURL() ?? '' };
+        const color = global.embedColor;
+        const description = '';
+        const footer = { text: '' };
+
+        const currentUserState = this.ctx.pagination.get(author);
+        if (!currentUserState) return;
+
+        const embedBase = {
+            color,
+            description,
+            footer,
+            thumbnail,
+            title,
+        };
+
+        const updateEmbed = async () => {
+            embedBase.description = currentUserState.tagPages[currentUserState.page]
+                .map(
+                    (e, i) =>
+                        `> **${currentUserState.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${
+                            e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
+                        }`,
+                )
+                .join('\n');
+
+            embedBase.footer.text = `Page: ${currentUserState.page + 1}/${
+                currentUserState.tagPages.length
+            } • emojis by AnThOnY & deussa`;
+
+            const row = {
+                components: [
+                    {
+                        customId: `list_subcommand_button_previous_${interaction.user.id}`,
+                        disabled: currentUserState.page === 0,
+                        label: 'Previous',
+                        style: ButtonStyle.Primary,
+                        type: ComponentType.Button,
+                    } as const,
+                    {
+                        customId: `list_subcommand_button_home_${interaction.user.id}`,
+                        label: 'Home',
+                        style: ButtonStyle.Secondary,
+                        type: ComponentType.Button,
+                    } as const,
+                    {
+                        customId: `list_subcommand_button_next_${interaction.user.id}`,
+                        disabled: currentUserState.page === currentUserState.tagPages.length - 1,
+                        label: 'Next',
+                        style: ButtonStyle.Primary,
+                        type: ComponentType.Button,
+                    } as const,
+                ],
+                type: ComponentType.ActionRow,
+            } as const;
+
+            await interaction.update({
+                components: [row],
+                embeds: [embedBase],
+            });
+        };
+
+        switch (interaction.customId) {
+            case `list_subcommand_button_home_${author}`:
+                currentUserState.page = 0;
+                break;
+
+            case `list_subcommand_button_next_${author}`:
+                currentUserState.page =
+                    (currentUserState.page + 1) % currentUserState.tagPages.length;
+                break;
+
+            case `list_subcommand_button_previous_${author}`:
+                currentUserState.page =
+                    (currentUserState.page - 1 + currentUserState.tagPages.length) %
+                    currentUserState.tagPages.length;
+                break;
+
+            default:
+                break;
+        }
+
+        this.ctx.pagination.set(author, currentUserState);
+        await updateEmbed();
     }
 }

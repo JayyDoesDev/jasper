@@ -1,19 +1,24 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, codeBlock, MessageFlags } from 'discord.js';
+
+import { ConfigurationRoles } from '../../../Common/container';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, TagResponse } from '../../../Services/TagService';
-import { ConfigurationRoles } from '../../../Common/container';
+import { Context } from '../../../Source/Context';
 
 export const RawSubCommand = defineSubCommand({
-    name: 'raw',
-    restrictToConfigRoles: [
-        ConfigurationRoles.SupportRoles,
-        ConfigurationRoles.StaffRoles,
-        ConfigurationRoles.AdminRoles,
-        ConfigurationRoles.TagAdminRoles,
-        ConfigurationRoles.TagRoles,
-    ],
+    autocomplete: async (ctx: Context, interaction) => {
+        const guildId = interaction.guildId!;
+        const query = interaction.options.getString('tag-name') || '';
+
+        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
+        const filtered = tags
+            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 25)
+            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
+
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name', true);
@@ -29,42 +34,38 @@ export const RawSubCommand = defineSubCommand({
         }
 
         const rawContent = {
+            description: tag.TagEmbedDescription,
+            footer: tag.TagEmbedFooter,
+            imageUrl: tag.TagEmbedImageURL,
             name: tag.TagName,
             title: tag.TagEmbedTitle,
-            description: tag.TagEmbedDescription,
-            imageUrl: tag.TagEmbedImageURL,
-            footer: tag.TagEmbedFooter,
         };
 
         await interaction.editReply({
             content: codeBlock('json', JSON.stringify(rawContent, null, 2)),
         });
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const guildId = interaction.guildId!;
-        const query = interaction.options.getString('tag-name') || '';
-
-        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
-        const filtered = tags
-            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 25)
-            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
-
-        await interaction.respond(filtered);
-    },
+    name: 'raw',
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
 });
 
 export const commandOptions = {
-    name: RawSubCommand.name,
     description: 'Show the raw content of a tag',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: RawSubCommand.name,
     options: [
         {
-            name: 'tag-name',
-            description: 'The name of the tag to show raw content for',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'The name of the tag to show raw content for',
+            name: 'tag-name',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

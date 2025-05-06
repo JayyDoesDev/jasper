@@ -1,17 +1,24 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { defineSubCommand } from '../../../Common/define';
-import { Options, SetUsersOptions } from '../../../Services/SettingsService';
+
 import { getUserConfigurationContainer } from '../../../Common/container';
-import { Settings } from '../../../Models/GuildSchema';
+import { defineSubCommand } from '../../../Common/define';
 import {
     createConfigurationExistsEmbed,
     createConfigurationUpdateEmbed,
 } from '../../../Common/embeds';
+import { Settings } from '../../../Models/GuildSchema';
+import { Options, SetUsersOptions } from '../../../Services/SettingsService';
+import { Context } from '../../../Source/Context';
 
 export const AddUserSubCommand = defineSubCommand({
-    name: 'add_user',
+    autocomplete: async (ctx: Context, interaction) => {
+        const query = interaction.options.getString('config') || '';
+        const filtered = getUserConfigurationContainer()
+            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
+            .map((key) => ({ name: key as string, value: key as string }));
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Users'];
@@ -72,32 +79,26 @@ export const AddUserSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('config') || '';
-        const filtered = getUserConfigurationContainer()
-            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
-            .map((key) => ({ name: key as string, value: key as string }));
-        await interaction.respond(filtered);
-    },
+    name: 'add_user',
 });
 
 export const commandOptions = {
-    name: 'add_user',
     description: 'Add a user to a configuration',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'add_user',
     options: [
         {
-            name: 'config',
-            description: 'The configuration to add the user to',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'The configuration to add the user to',
+            name: 'config',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
         {
-            name: 'user',
             description: 'The user to add to the configuration',
-            type: ApplicationCommandOptionType.USER,
+            name: 'user',
             required: true,
+            type: ApplicationCommandOptionType.USER,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

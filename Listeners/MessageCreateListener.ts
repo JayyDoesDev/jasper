@@ -1,14 +1,16 @@
 import { Message, TextChannel } from 'discord.js';
-import { Context } from '../Source/Context';
-import { Listener } from './Listener';
-import { Options } from '../Services/SettingsService';
+
 import { defineEvent } from '../Common/define';
+import { Options } from '../Services/SettingsService';
+import { Context } from '../Source/Context';
+
+import { Listener } from './Listener';
 
 interface ChannelState {
     active: boolean;
+    lastSlowmodeChange: number;
     messageCount: number;
     messageWindowStart: number;
-    lastSlowmodeChange: number;
 }
 
 const channelStates = new Map<string, ChannelState>();
@@ -17,9 +19,9 @@ const getChannelState = (channelId: string): ChannelState => {
     if (!channelStates.has(channelId)) {
         channelStates.set(channelId, {
             active: false,
+            lastSlowmodeChange: 0,
             messageCount: 0,
             messageWindowStart: Date.now(),
-            lastSlowmodeChange: 0,
         });
     }
     return channelStates.get(channelId)!;

@@ -1,3 +1,9 @@
+export enum ConfigurationChannels {
+    AllowedTagChannels,
+    AllowedSnipeChannels,
+    AutomaticSlowmodeChannels,
+}
+
 export enum ConfigurationRoles {
     SupportRoles,
     TagRoles,
@@ -5,12 +11,6 @@ export enum ConfigurationRoles {
     AdminRoles,
     StaffRoles,
     IgnoredSnipedRoles,
-}
-
-export enum ConfigurationChannels {
-    AllowedTagChannels,
-    AllowedSnipeChannels,
-    AutomaticSlowmodeChannels,
 }
 
 export enum ConfigurationUsers {
@@ -38,7 +38,7 @@ export const configurationUsersContainer = [
 
 export function filterContainer<R extends []>(
     container: ReadonlyArray<
-        readonly [ConfigurationRoles | ConfigurationChannels | ConfigurationUsers, string]
+        readonly [ConfigurationChannels | ConfigurationRoles | ConfigurationUsers, string]
     >,
 ): R {
     const array = [];
@@ -50,12 +50,12 @@ export function filterContainer<R extends []>(
     return array as R;
 }
 
-export function getRoleConfigurationContainer<R extends Array<R>>(): R {
-    return filterContainer(configurationRolesContainer) as unknown as R;
-}
-
 export function getChannelConfigurationContainer<R extends Array<R>>(): R {
     return filterContainer(configurationChannelsContainer) as unknown as R;
+}
+
+export function getRoleConfigurationContainer<R extends Array<R>>(): R {
+    return filterContainer(configurationRolesContainer) as unknown as R;
 }
 
 export function getUserConfigurationContainer<R extends Array<R>>(): R {

@@ -7,12 +7,13 @@ import {
     Message,
     Role,
 } from 'discord.js';
+
 import type { Snowflake } from '@antibot/interactions';
 
 type Interaction =
+    | AutocompleteInteraction
     | ChatInputCommandInteraction
     | ContextMenuCommandInteraction
-    | AutocompleteInteraction
     | Message;
 
 export function checkForRoles(interaction: Interaction, ...roles: Snowflake[]): boolean {

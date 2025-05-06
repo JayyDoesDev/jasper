@@ -1,17 +1,17 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+
 import { defineSubCommand } from '../../../Common/define';
 import {
     createConfigurationExistsEmbed,
     createConfigurationUpdateEmbed,
 } from '../../../Common/embeds';
-import { Options } from '../../../Services/TagService';
-import { GuildSnowflake } from '../../../Services/SettingsService';
 import { validateEmoji } from '../../../Common/regex';
+import { GuildSnowflake } from '../../../Services/SettingsService';
+import { Options } from '../../../Services/TagService';
+import { Context } from '../../../Source/Context';
 
 export const SetSkullboardEmojiSubCommand = defineSubCommand({
-    name: 'set_skullboard_emoji',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const emoji = interaction.options.getString('emoji')!;
@@ -43,8 +43,8 @@ export const SetSkullboardEmojiSubCommand = defineSubCommand({
         }
 
         await ctx.services.settings.setSkullboard<GuildSnowflake>({
-            guildId,
             emoji: emoji,
+            guildId,
         });
 
         await interaction.reply({
@@ -59,18 +59,19 @@ export const SetSkullboardEmojiSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
+    name: 'set_skullboard_emoji',
 });
 
 export const commandOptions = {
-    name: 'set_skullboard_emoji',
     description: 'Set the emoji for the skullboard',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'set_skullboard_emoji',
     options: [
         {
-            name: 'emoji',
             description: 'The emoji to set for the skullboard',
-            type: ApplicationCommandOptionType.STRING,
+            name: 'emoji',
             required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

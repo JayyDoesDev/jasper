@@ -1,18 +1,19 @@
-import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
-import { ChatInputCommandInteraction, MessageFlags, TextChannel } from 'discord.js';
 import fs from 'fs/promises';
 import path from 'path';
+
+import { ApplicationCommandOptionType } from '@antibot/interactions';
+import { ChatInputCommandInteraction, MessageFlags, TextChannel } from 'discord.js';
+
 import { defineSubCommand } from '../../../Common/define';
 import { getLatestYoutubeVideo, getRandomYoutubeAPIKey } from '../../../Common/youtube';
+import { Context } from '../../../Source/Context';
 
 const paths = {
-    latestVideo: path.join(process.cwd(), 'latestvideo.json'),
     latestThread: path.join(process.cwd(), 'latestthread.json'),
+    latestVideo: path.join(process.cwd(), 'latestvideo.json'),
 };
 
 export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
-    name: 'notify_video_discussions',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         try {
             const latest = await getLatestYoutubeVideo(
@@ -57,13 +58,13 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
             }
 
             const message = await channel.send({
-                content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${latest.description}\nhttps://www.youtube.com/watch?v=${latest.id}`,
                 allowedMentions: { roles: [ctx.env.get('youtube_video_discussions_role')] },
+                content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${latest.description}\nhttps://www.youtube.com/watch?v=${latest.id}`,
             });
 
             const thread = await message.startThread({
-                name: latest.title,
                 autoArchiveDuration: 1440,
+                name: latest.title,
             });
 
             await thread.send('# Reminder to follow the rules and to stay on topic!');
@@ -75,9 +76,9 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
                     const previousThread = channel.threads.resolve(previousThreadId);
                     if (previousThread) {
                         await previousThread.edit({
+                            archived: true,
                             locked: true,
                             name: `[Closed] ${previousThread.name}`,
-                            archived: true,
                         });
                     }
                 }
@@ -102,11 +103,12 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
             });
         }
     },
+    name: 'notify_video_discussions',
 });
 
 export const commandOptions = {
-    name: NotifyVideoDiscussionsSubCommand.name,
     description: 'Notify about video discussions!',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: NotifyVideoDiscussionsSubCommand.name,
     options: [],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

@@ -1,12 +1,12 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from 'discord.js';
+
+import { chunk } from '../../../Common/array';
 import { defineSubCommand } from '../../../Common/define';
 import { Options } from '../../../Services/SettingsService';
-import { chunk } from '../../../Common/array';
+import { Context } from '../../../Source/Context';
 
 export const ViewTopicsSubCommand = defineSubCommand({
-    name: 'view_topics',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         await ctx.services.settings.configure<Options>({ guildId });
@@ -28,37 +28,37 @@ export const ViewTopicsSubCommand = defineSubCommand({
 
         const components = [
             {
-                type: ComponentType.ActionRow as const,
                 components: [
                     {
-                        type: ComponentType.Button as const,
                         customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        style: ButtonStyle.Primary as const,
-                        label: 'Previous',
                         disabled: state.addTopicPages.page === 0,
-                    },
-                    {
-                        type: ComponentType.Button as const,
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
-                        style: ButtonStyle.Secondary as const,
-                        label: 'Home',
-                    },
-                    {
-                        type: ComponentType.Button as const,
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                        label: 'Previous',
                         style: ButtonStyle.Primary as const,
-                        label: 'Next',
+                        type: ComponentType.Button as const,
+                    },
+                    {
+                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        label: 'Home',
+                        style: ButtonStyle.Secondary as const,
+                        type: ComponentType.Button as const,
+                    },
+                    {
+                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
                         disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                        label: 'Next',
+                        style: ButtonStyle.Primary as const,
+                        type: ComponentType.Button as const,
                     },
                 ],
+                type: ComponentType.ActionRow as const,
             },
         ];
 
         await interaction.reply({
+            components,
             embeds: [
                 {
-                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Topics in Configuration',
+                    color: global.embedColor,
                     description:
                         state.addTopicPages.pages[state.addTopicPages.page]
                             .map(
@@ -69,17 +69,18 @@ export const ViewTopicsSubCommand = defineSubCommand({
                     footer: {
                         text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${topicsExistInDB.length}`,
                     },
-                    color: global.embedColor,
+                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
+                    title: 'Current Topics in Configuration',
                 },
             ],
-            components,
         });
     },
+    name: 'view_topics',
 });
 
 export const commandOptions = {
-    name: 'view_topics',
     description: 'View the current topics in the configuration',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'view_topics',
     options: [],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

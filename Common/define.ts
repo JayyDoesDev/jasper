@@ -1,3 +1,4 @@
+import { ICommand, Snowflake } from '@antibot/interactions';
 import {
     AutocompleteInteraction,
     ChatInputCommandInteraction,
@@ -7,29 +8,21 @@ import {
     PermissionResolvable,
     PermissionsBitField,
 } from 'discord.js';
-import { Context } from '../Source/Context';
-import { ICommand, Snowflake } from '@antibot/interactions';
-import { checkForRoles } from './roles';
-import { withConfigurationRoles } from './db';
-import { ConfigurationRoles } from './container';
 
-export interface SubCommand {
-    name: string;
-    allowedRoles?: Snowflake[];
-    restrictToConfigRoles?: ConfigurationRoles[];
-    permissions?: PermissionsBitField[] | PermissionResolvable[];
-    handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
-    autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => Promise<void>;
-}
+import { Context } from '../Source/Context';
+
+import { ConfigurationRoles } from './container';
+import { withConfigurationRoles } from './db';
+import { checkForRoles } from './roles';
 
 export interface Command<
     Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
 > {
-    command: ICommand;
-    permissions?: PermissionsBitField[] | PermissionResolvable[];
-    restrictToConfigRoles?: ConfigurationRoles[];
-    on: (ctx: Context, interaction: Interaction) => void;
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => void;
+    command: ICommand;
+    on: (ctx: Context, interaction: Interaction) => void;
+    permissions?: PermissionResolvable[] | PermissionsBitField[];
+    restrictToConfigRoles?: ConfigurationRoles[];
     subCommands?: { [key: string]: SubCommand };
 }
 
@@ -43,45 +36,26 @@ export interface Event<
 }
 
 export type Plugin = {
-    name: string;
-    description: string;
     commands: Command<ChatInputCommandInteraction | ContextMenuCommandInteraction>[];
+    description: string;
     events?: Event[];
+    name: string;
     public_plugin: boolean;
 };
+
+export interface SubCommand {
+    allowedRoles?: Snowflake[];
+    autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => Promise<void>;
+    handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
+    name: string;
+    permissions?: PermissionResolvable[] | PermissionsBitField[];
+    restrictToConfigRoles?: ConfigurationRoles[];
+}
 
 export const message = {
     content: "Sorry but you can't use this command.",
     flags: MessageFlags.Ephemeral,
 } as { content: string; flags: MessageFlags.Ephemeral };
-
-function isCommand<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction>(
-    options: unknown,
-): options is Command<Interaction> {
-    return (
-        typeof options === 'object' && options !== null && 'command' in options && 'on' in options
-    );
-}
-
-function isEvent<T>(options: unknown): options is Event<T> {
-    return typeof options === 'object' && options !== null && 'event' in options && 'on' in options;
-}
-
-function isPlugin(options: unknown): options is Plugin {
-    return (
-        typeof options === 'object' &&
-        options !== null &&
-        'name' in options &&
-        'commands' in options
-    );
-}
-
-export function defineSubCommand(options: SubCommand): SubCommand {
-    if (!options.name || !options.handler) {
-        throw new Error('SubCommand must have name and handler');
-    }
-    return options;
-}
 
 export function defineCommand<
     Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
@@ -115,7 +89,7 @@ export function defineCommand<
                     }
 
                     if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
-                        const { noRolesWithConfig, noRolesNoConfig } = await withConfigurationRoles(
+                        const { noRolesNoConfig, noRolesWithConfig } = await withConfigurationRoles(
                             ctx,
                             interaction,
                             ...options.subCommands[subCommandName].restrictToConfigRoles,
@@ -174,7 +148,7 @@ export function defineCommand<
                         }
 
                         if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
-                            const { noRolesWithConfig, noRolesNoConfig } =
+                            const { noRolesNoConfig, noRolesWithConfig } =
                                 await withConfigurationRoles(
                                     ctx,
                                     interaction,
@@ -216,4 +190,32 @@ export function defineEvent<T>(options: Event<T>): Event<T> {
 export function definePlugin(options: Plugin): Plugin {
     if (isPlugin(options)) return options;
     throw new Error('Invalid Plugin options');
+}
+
+export function defineSubCommand(options: SubCommand): SubCommand {
+    if (!options.name || !options.handler) {
+        throw new Error('SubCommand must have name and handler');
+    }
+    return options;
+}
+
+function isCommand<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction>(
+    options: unknown,
+): options is Command<Interaction> {
+    return (
+        typeof options === 'object' && options !== null && 'command' in options && 'on' in options
+    );
+}
+
+function isEvent<T>(options: unknown): options is Event<T> {
+    return typeof options === 'object' && options !== null && 'event' in options && 'on' in options;
+}
+
+function isPlugin(options: unknown): options is Plugin {
+    return (
+        typeof options === 'object' &&
+        options !== null &&
+        'name' in options &&
+        'commands' in options
+    );
 }

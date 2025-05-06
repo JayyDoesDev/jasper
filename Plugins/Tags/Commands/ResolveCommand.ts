@@ -4,40 +4,33 @@ import {
     ApplicationCommandType,
     PermissionsBitField,
 } from '@antibot/interactions';
-import { defineCommand } from '../../../Common/define';
 import { ChannelType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+
 import { ConfigurationRoles } from '../../../Common/container';
+import { defineCommand } from '../../../Common/define';
 import { Options } from '../../../Services/SettingsService';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
         command: {
-            name: 'resolve',
-            type: ApplicationCommandType.CHAT_INPUT,
             description: 'Marks post as resolved and sends a message to inform OP',
+            name: 'resolve',
             options: [
                 {
-                    type: ApplicationCommandOptionType.STRING,
-                    name: 'original_question',
                     description: 'Original Question asked by OP',
+                    name: 'original_question',
                     required: false,
+                    type: ApplicationCommandOptionType.STRING,
                 },
                 {
-                    type: ApplicationCommandOptionType.STRING,
-                    name: 'summarized_answer',
                     description: "Summarization of the answer to the OP's original question",
+                    name: 'summarized_answer',
                     required: false,
+                    type: ApplicationCommandOptionType.STRING,
                 },
             ],
+            type: ApplicationCommandType.CHAT_INPUT,
         },
-        restrictToConfigRoles: [
-            ConfigurationRoles.SupportRoles,
-            ConfigurationRoles.StaffRoles,
-            ConfigurationRoles.AdminRoles,
-            ConfigurationRoles.TagAdminRoles,
-            ConfigurationRoles.TagRoles,
-        ],
-        permissions: [PermissionsBitField.ManageThreads],
         on: async (ctx, interaction) => {
             const finalReply: Record<'content', string> = {
                 content: `Post marked as Resolved by <@${interaction.user.id}>`,
@@ -45,10 +38,10 @@ export = {
             const originalQuestion: string = interaction.options.getString('original_question');
             const summarizedAnswer: string = interaction.options.getString('summarized_answer');
             const embeds: {
-                title: string;
-                fields: { name: string; value: string }[];
                 color: number;
-            }[] = [{ title: 'Overview', fields: [], color: global.embedColor }];
+                fields: { name: string; value: string }[];
+                title: string;
+            }[] = [{ color: global.embedColor, fields: [], title: 'Overview' }];
 
             const appliedTags = (interaction.channel as any).appliedTags;
             if (interaction.channel.type == ChannelType.PublicThread) {
@@ -112,5 +105,13 @@ export = {
                 });
             }
         },
+        permissions: [PermissionsBitField.ManageThreads],
+        restrictToConfigRoles: [
+            ConfigurationRoles.SupportRoles,
+            ConfigurationRoles.StaffRoles,
+            ConfigurationRoles.AdminRoles,
+            ConfigurationRoles.TagAdminRoles,
+            ConfigurationRoles.TagRoles,
+        ],
     }),
 };

@@ -1,5 +1,6 @@
 import { Snowflake } from '@antibot/interactions';
-import { model, Schema, Document } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
+
 import { Nullable } from '../Common/types';
 
 export interface GuildDocument extends Document {
@@ -15,12 +16,18 @@ export type Settings = {
         AutomaticSlowmodeChannels: Snowflake[];
     };
     Roles: {
-        SupportRoles: Snowflake[];
-        AllowedTagRoles: Snowflake[];
-        AllowedTagAdminRoles: Snowflake[];
         AllowedAdminRoles: Snowflake[];
         AllowedStaffRoles: Snowflake[];
+        AllowedTagAdminRoles: Snowflake[];
+        AllowedTagRoles: Snowflake[];
         IgnoredSnipedRoles: Snowflake[];
+        SupportRoles: Snowflake[];
+    };
+    Skullboard: {
+        SkullboardBoolean: boolean;
+        SkullboardChannel: Nullable<Snowflake>;
+        SkullboardEmoji: string;
+        SkullboardReactionThreshold: number;
     };
     Text: {
         Topics: string[];
@@ -28,23 +35,17 @@ export type Settings = {
     Users: {
         IgnoreSnipedUsers: Snowflake[];
     };
-    Skullboard: {
-        SkullboardChannel: Nullable<Snowflake>;
-        SkullboardEmoji: string;
-        SkullboardReactionThreshold: number;
-        SkullboardBoolean: boolean;
-    };
 };
 
 export type Tag = {
-    TagName: string;
     TagAuthor: Snowflake;
     TagEditedBy: Nullable<Snowflake>;
+    TagName: string;
     TagResponse: {
-        TagEmbedTitle: string;
         TagEmbedDescription: Nullable<string>;
-        TagEmbedImageURL: Nullable<string>;
         TagEmbedFooter: Nullable<string>;
+        TagEmbedImageURL: Nullable<string>;
+        TagEmbedTitle: string;
     };
 };
 
@@ -55,21 +56,26 @@ export default model<GuildDocument>(
             _id: String,
             GuildSettings: {
                 Channels: {
-                    AllowedSnipeChannels: { type: [], default: [] },
-                    AllowedTagChannels: { type: [], default: [] },
-                    AutomaticSlowmodeChannels: { type: [], default: [] },
+                    AllowedSnipeChannels: { default: [], type: [] },
+                    AllowedTagChannels: { default: [], type: [] },
+                    AutomaticSlowmodeChannels: { default: [], type: [] },
                 },
                 Roles: {
-                    SupportRoles: { type: [], default: [] },
-                    AllowedTagRoles: { type: [], default: [] },
-                    AllowedTagAdminRoles: { type: [], default: [] },
-                    AllowedAdminRoles: { type: [], default: [] },
-                    AllowedStaffRoles: { type: [], default: [] },
-                    IgnoredSnipedRoles: { type: [], default: [] },
+                    AllowedAdminRoles: { default: [], type: [] },
+                    AllowedStaffRoles: { default: [], type: [] },
+                    AllowedTagAdminRoles: { default: [], type: [] },
+                    AllowedTagRoles: { default: [], type: [] },
+                    IgnoredSnipedRoles: { default: [], type: [] },
+                    SupportRoles: { default: [], type: [] },
+                },
+                Skullboard: {
+                    SkullboardBoolean: { default: false, type: Boolean },
+                    SkullboardChannel: { default: null, type: String },
+                    SkullboardEmoji: { default: '💀', type: String },
+                    SkullboardReactionThreshold: { default: 4, type: Number },
                 },
                 Text: {
                     Topics: {
-                        type: [],
                         default: [
                             'If you could have any superpower, what would it be and why?',
                             'What would you do if you woke up one day and could talk to animals?',
@@ -123,35 +129,30 @@ export default model<GuildDocument>(
                             'What would you do if you could make anything you draw come to life?',
                             'If you could build your own dream house, what crazy features would it have?',
                         ],
+                        type: [],
                     },
                 },
                 Users: {
-                    IgnoreSnipedUsers: { type: [], default: [] },
-                },
-                Skullboard: {
-                    SkullboardChannel: { type: String, default: null },
-                    SkullboardEmoji: { type: String, default: '💀' },
-                    SkullboardReactionThreshold: { type: Number, default: 4 },
-                    SkullboardBoolean: { type: Boolean, default: false },
+                    IgnoreSnipedUsers: { default: [], type: [] },
                 },
             },
             Tags: {
+                default: [],
                 type: [
                     {
-                        TagName: String,
                         TagAuthor: String,
-                        TagEditedBy: { type: String, default: null },
+                        TagEditedBy: { default: null, type: String },
+                        TagName: String,
                         TagResponse: {
-                            TagEmbedTitle: { type: String, default: undefined, required: true },
-                            TagEmbedDescription: { type: String, default: null },
-                            TagEmbedImageURL: { type: String, default: null },
-                            TagEmbedFooter: { type: String, default: null },
+                            TagEmbedDescription: { default: null, type: String },
+                            TagEmbedFooter: { default: null, type: String },
+                            TagEmbedImageURL: { default: null, type: String },
+                            TagEmbedTitle: { default: undefined, required: true, type: String },
                         },
                     },
                 ],
-                default: [],
             },
         },
-        { versionKey: false, timestamps: true },
+        { timestamps: true, versionKey: false },
     ),
 );

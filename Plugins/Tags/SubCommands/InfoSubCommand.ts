@@ -1,20 +1,25 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { defineSubCommand } from '../../../Common/define';
-import { Options, TagResponse } from '../../../Services/TagService';
-import { Emojis } from '../../../Common/enums';
+
 import { ConfigurationRoles } from '../../../Common/container';
+import { defineSubCommand } from '../../../Common/define';
+import { Emojis } from '../../../Common/enums';
+import { Options, TagResponse } from '../../../Services/TagService';
+import { Context } from '../../../Source/Context';
 
 export const InfoSubCommand = defineSubCommand({
-    name: 'info',
-    restrictToConfigRoles: [
-        ConfigurationRoles.SupportRoles,
-        ConfigurationRoles.StaffRoles,
-        ConfigurationRoles.AdminRoles,
-        ConfigurationRoles.TagAdminRoles,
-        ConfigurationRoles.TagRoles,
-    ],
+    autocomplete: async (ctx: Context, interaction) => {
+        const guildId = interaction.guildId!;
+        const query = interaction.options.getString('tag-name') || '';
+
+        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
+        const filtered = tags
+            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 25)
+            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
+
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name');
@@ -35,54 +40,50 @@ export const InfoSubCommand = defineSubCommand({
             value ? Emojis.CHECK_MARK : Emojis.CROSS_MARK;
 
         const embed = {
-            thumbnail: { url: ctx.user.displayAvatarURL() },
-            title: `Tag Info: ${tag.TagName}`,
             color: global.embedColor,
             fields: [
                 {
+                    inline: true,
                     name: 'Author',
                     value: tag.TagAuthor ? `<@${tag.TagAuthor}>` : 'Unknown',
-                    inline: true,
                 },
                 {
+                    inline: true,
                     name: 'Edited by',
                     value: tag.TagEditedBy ? `<@${tag.TagEditedBy}>` : 'Orignal Author',
-                    inline: true,
                 },
-                { name: 'Title', value: tag.TagEmbedTitle || 'No title', inline: true },
-                { name: 'Has Description', value: exists(tag.TagEmbedDescription), inline: true },
-                { name: 'Has Image', value: exists(tag.TagEmbedImageURL), inline: true },
-                { name: 'Has Footer', value: exists(tag.TagEmbedFooter), inline: true },
+                { inline: true, name: 'Title', value: tag.TagEmbedTitle || 'No title' },
+                { inline: true, name: 'Has Description', value: exists(tag.TagEmbedDescription) },
+                { inline: true, name: 'Has Image', value: exists(tag.TagEmbedImageURL) },
+                { inline: true, name: 'Has Footer', value: exists(tag.TagEmbedFooter) },
             ],
+            thumbnail: { url: ctx.user.displayAvatarURL() },
+            title: `Tag Info: ${tag.TagName}`,
         };
 
         await interaction.editReply({ embeds: [embed] });
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const guildId = interaction.guildId!;
-        const query = interaction.options.getString('tag-name') || '';
-
-        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
-        const filtered = tags
-            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 25)
-            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
-
-        await interaction.respond(filtered);
-    },
+    name: 'info',
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
 });
 
 export const commandOptions = {
-    name: InfoSubCommand.name,
     description: 'Show information about a tag',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: InfoSubCommand.name,
     options: [
         {
-            name: 'tag-name',
-            description: 'The name of the tag to get info for',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'The name of the tag to get info for',
+            name: 'tag-name',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

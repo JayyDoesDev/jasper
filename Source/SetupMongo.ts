@@ -1,8 +1,8 @@
 import mongoose, { ConnectOptions } from 'mongoose';
 
 export type Mongo = {
-    uri: string;
     config?: ConnectOptions;
+    uri: string;
 };
 
 export function SetupMongo(options: Mongo): void {

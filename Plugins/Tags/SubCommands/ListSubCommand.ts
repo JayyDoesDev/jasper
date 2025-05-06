@@ -1,22 +1,15 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from 'discord.js';
+
+import { chunk } from '../../../Common/array';
+import { ConfigurationRoles } from '../../../Common/container';
 import { defineSubCommand } from '../../../Common/define';
 import { Tag } from '../../../Models/GuildSchema';
-import { State } from '../../types';
 import { TagResponse } from '../../../Services/TagService';
-import { ConfigurationRoles } from '../../../Common/container';
-import { chunk } from '../../../Common/array';
+import { Context } from '../../../Source/Context';
+import { State } from '../../types';
 
 export const ListSubCommand = defineSubCommand({
-    name: 'list',
-    restrictToConfigRoles: [
-        ConfigurationRoles.SupportRoles,
-        ConfigurationRoles.StaffRoles,
-        ConfigurationRoles.AdminRoles,
-        ConfigurationRoles.TagAdminRoles,
-        ConfigurationRoles.TagRoles,
-    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
 
@@ -33,14 +26,14 @@ export const ListSubCommand = defineSubCommand({
         }
 
         const tags: Tag[] = tagsResponse.map((t) => ({
-            TagName: t.TagName,
             TagAuthor: t.TagAuthor,
             TagEditedBy: t.TagEditedBy,
+            TagName: t.TagName,
             TagResponse: {
-                TagEmbedTitle: t.TagEmbedTitle,
                 TagEmbedDescription: t.TagEmbedDescription,
-                TagEmbedImageURL: t.TagEmbedImageURL,
                 TagEmbedFooter: t.TagEmbedFooter,
+                TagEmbedImageURL: t.TagEmbedImageURL,
+                TagEmbedTitle: t.TagEmbedTitle,
             },
         }));
 
@@ -59,10 +52,36 @@ export const ListSubCommand = defineSubCommand({
         }
 
         await interaction.reply({
+            components: [
+                {
+                    components: [
+                        {
+                            customId: `list_subcommand_button_previous_${interaction.user.id}`,
+                            disabled: state.page === 0,
+                            label: 'Previous',
+                            style: ButtonStyle.Primary,
+                            type: ComponentType.Button,
+                        },
+                        {
+                            customId: `list_subcommand_button_home_${interaction.user.id}`,
+                            label: 'Home',
+                            style: ButtonStyle.Secondary,
+                            type: ComponentType.Button,
+                        },
+                        {
+                            customId: `list_subcommand_button_next_${interaction.user.id}`,
+                            disabled: state.page === state.tagPages.length - 1,
+                            label: 'Next',
+                            style: ButtonStyle.Primary,
+                            type: ComponentType.Button,
+                        },
+                    ],
+                    type: ComponentType.ActionRow,
+                },
+            ],
             embeds: [
                 {
-                    thumbnail: { url: interaction.guild?.iconURL() ?? undefined },
-                    title: `Server Tag List`,
+                    color: global.embedColor,
                     description: state.tagPages[state.page]
                         .map(
                             (e, i) =>
@@ -74,51 +93,33 @@ export const ListSubCommand = defineSubCommand({
                     footer: {
                         text: `Page: ${state.page + 1}/${state.tagPages.length} • Total Tags: ${tagsResponse.length}`,
                     },
-                    color: global.embedColor,
-                },
-            ],
-            components: [
-                {
-                    type: ComponentType.ActionRow,
-                    components: [
-                        {
-                            type: ComponentType.Button,
-                            customId: `list_subcommand_button_previous_${interaction.user.id}`,
-                            style: ButtonStyle.Primary,
-                            label: 'Previous',
-                            disabled: state.page === 0,
-                        },
-                        {
-                            type: ComponentType.Button,
-                            customId: `list_subcommand_button_home_${interaction.user.id}`,
-                            style: ButtonStyle.Secondary,
-                            label: 'Home',
-                        },
-                        {
-                            type: ComponentType.Button,
-                            customId: `list_subcommand_button_next_${interaction.user.id}`,
-                            style: ButtonStyle.Primary,
-                            label: 'Next',
-                            disabled: state.page === state.tagPages.length - 1,
-                        },
-                    ],
+                    thumbnail: { url: interaction.guild?.iconURL() ?? undefined },
+                    title: `Server Tag List`,
                 },
             ],
             flags: MessageFlags.Ephemeral,
         });
     },
+    name: 'list',
+    restrictToConfigRoles: [
+        ConfigurationRoles.SupportRoles,
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+        ConfigurationRoles.TagRoles,
+    ],
 });
 
 export const commandOptions = {
-    name: ListSubCommand.name,
     description: 'List all available tags',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: ListSubCommand.name,
     options: [
         {
-            name: 'user',
             description: 'Filter tags by user',
-            type: ApplicationCommandOptionType.USER,
+            name: 'user',
             required: false,
+            type: ApplicationCommandOptionType.USER,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

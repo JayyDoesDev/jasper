@@ -1,14 +1,21 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { defineSubCommand } from '../../../Common/define';
-import { Options, SetUsersOptions } from '../../../Services/SettingsService';
+
 import { getUserConfigurationContainer } from '../../../Common/container';
-import { Settings } from '../../../Models/GuildSchema';
+import { defineSubCommand } from '../../../Common/define';
 import { createConfigurationUpdateEmbed } from '../../../Common/embeds';
+import { Settings } from '../../../Models/GuildSchema';
+import { Options, SetUsersOptions } from '../../../Services/SettingsService';
+import { Context } from '../../../Source/Context';
 
 export const RemoveUserSubCommand = defineSubCommand({
-    name: 'remove_user',
+    autocomplete: async (ctx: Context, interaction) => {
+        const query = interaction.options.getString('config') || '';
+        const filtered = getUserConfigurationContainer()
+            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
+            .map((key) => ({ name: key as string, value: key as string }));
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Users'];
@@ -67,32 +74,26 @@ export const RemoveUserSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('config') || '';
-        const filtered = getUserConfigurationContainer()
-            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
-            .map((key) => ({ name: key as string, value: key as string }));
-        await interaction.respond(filtered);
-    },
+    name: 'remove_user',
 });
 
 export const commandOptions = {
-    name: 'remove_user',
     description: 'Remove a user from a configuration',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'remove_user',
     options: [
         {
-            name: 'config',
-            description: 'Remove a user from the configuration',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'Remove a user from the configuration',
+            name: 'config',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
         {
-            name: 'user',
             description: 'The user to remove from the configuration',
-            type: ApplicationCommandOptionType.USER,
+            name: 'user',
             required: true,
+            type: ApplicationCommandOptionType.USER,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

@@ -1,5 +1,4 @@
 import { ApplicationCommandType } from '@antibot/interactions';
-import { defineCommand } from '../../../Common/define';
 import {
     APIEmbed,
     ChatInputCommandInteraction,
@@ -7,18 +6,19 @@ import {
     MessageFlags,
     TextChannel,
 } from 'discord.js';
-import { Context } from '../../../Source/Context';
+
 import { ConfigurationRoles } from '../../../Common/container';
+import { defineCommand } from '../../../Common/define';
+import { Context } from '../../../Source/Context';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
         command: {
-            name: 'snipe',
-            type: ApplicationCommandType.CHAT_INPUT,
             description: 'Snipe a message!',
+            name: 'snipe',
             options: [],
+            type: ApplicationCommandType.CHAT_INPUT,
         },
-        restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
         on: (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const snipe = ctx.snipe.get(interaction.channelId) as Message<true> | undefined;
 
@@ -40,12 +40,12 @@ export = {
             if (snipe.embeds.length > 0) {
                 const originalEmbeds = snipe.embeds.map((embed) => {
                     const embedData: APIEmbed = {
-                        title: embed.title || '',
+                        color: embed.color || global.embedColor,
                         description: embed.description,
                         fields: embed.fields || [],
-                        color: embed.color || global.embedColor,
-                        url: embed.url || '',
                         timestamp: embed.timestamp,
+                        title: embed.title || '',
+                        url: embed.url || '',
                     };
 
                     if (embed.thumbnail) embedData.thumbnail = embed.thumbnail;
@@ -57,19 +57,19 @@ export = {
                 });
 
                 const metadataEmbed: APIEmbed = {
-                    title: '',
+                    author: {
+                        icon_url: snipe.author.displayAvatarURL(),
+                        name: snipe.author.tag,
+                    },
+                    color: global.embedColor,
                     description: messageContent,
                     fields: [],
-                    color: global.embedColor,
-                    url: '',
-                    author: {
-                        name: snipe.author.tag,
-                        icon_url: snipe.author.displayAvatarURL(),
-                    },
                     footer: {
                         text: `#${(snipe.channel as TextChannel).name}`,
                     },
                     timestamp: snipe.createdAt.toISOString(),
+                    title: '',
+                    url: '',
                 };
 
                 if (attachment) {
@@ -81,19 +81,19 @@ export = {
             }
 
             const baseEmbed: APIEmbed = {
-                title: '',
+                author: {
+                    icon_url: snipe.author.displayAvatarURL(),
+                    name: snipe.author.tag,
+                },
+                color: global.embedColor,
                 description: messageContent,
                 fields: [],
-                color: global.embedColor,
-                url: '',
-                author: {
-                    name: snipe.author.tag,
-                    icon_url: snipe.author.displayAvatarURL(),
-                },
                 footer: {
                     text: `#${(snipe.channel as TextChannel).name}`,
                 },
                 timestamp: snipe.createdAt.toISOString(),
+                title: '',
+                url: '',
             };
 
             if (attachment) {
@@ -104,5 +104,6 @@ export = {
                 embeds: [baseEmbed],
             });
         },
+        restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
     }),
 };

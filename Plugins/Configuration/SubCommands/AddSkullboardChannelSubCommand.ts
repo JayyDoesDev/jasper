@@ -1,16 +1,16 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+
 import { defineSubCommand } from '../../../Common/define';
 import {
     createConfigurationExistsEmbed,
     createConfigurationUpdateEmbed,
 } from '../../../Common/embeds';
-import { Options } from '../../../Services/TagService';
 import { GuildSnowflake } from '../../../Services/SettingsService';
+import { Options } from '../../../Services/TagService';
+import { Context } from '../../../Source/Context';
 
 export const AddSkullboardChannelSubCommand = defineSubCommand({
-    name: 'add_skullboard_channel',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const channel = interaction.options.getChannel('channel')!;
@@ -34,8 +34,8 @@ export const AddSkullboardChannelSubCommand = defineSubCommand({
         }
 
         await ctx.services.settings.setSkullboard<GuildSnowflake>({
-            guildId,
             channel: channel.id,
+            guildId,
         });
 
         await interaction.reply({
@@ -50,18 +50,19 @@ export const AddSkullboardChannelSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
+    name: 'add_skullboard_channel',
 });
 
 export const commandOptions = {
-    name: 'add_skullboard_channel',
     description: 'Add a channel to the skullboard',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'add_skullboard_channel',
     options: [
         {
-            name: 'channel',
             description: 'The channel to add to the skullboard',
-            type: ApplicationCommandOptionType.CHANNEL,
+            name: 'channel',
             required: true,
+            type: ApplicationCommandOptionType.CHANNEL,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

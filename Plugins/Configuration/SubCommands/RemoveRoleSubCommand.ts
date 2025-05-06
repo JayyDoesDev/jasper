@@ -1,14 +1,22 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { defineSubCommand } from '../../../Common/define';
-import { Options, SetRoleOptions } from '../../../Services/SettingsService';
-import { Settings } from '../../../Models/GuildSchema';
+
 import { getRoleConfigurationContainer } from '../../../Common/container';
+import { defineSubCommand } from '../../../Common/define';
 import { createConfigurationUpdateEmbed } from '../../../Common/embeds';
+import { Settings } from '../../../Models/GuildSchema';
+import { Options, SetRoleOptions } from '../../../Services/SettingsService';
+import { Context } from '../../../Source/Context';
 
 export const RemoveRoleSubCommand = defineSubCommand({
-    name: 'remove_role',
+    autocomplete: async (ctx: Context, interaction) => {
+        const query = interaction.options.getString('config') || '';
+        const filtered = getRoleConfigurationContainer()
+            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
+            .map((key) => ({ name: key as string, value: key as string }));
+
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Roles'];
@@ -67,33 +75,26 @@ export const RemoveRoleSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('config') || '';
-        const filtered = getRoleConfigurationContainer()
-            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
-            .map((key) => ({ name: key as string, value: key as string }));
-
-        await interaction.respond(filtered);
-    },
+    name: 'remove_role',
 });
 
 export const commandOptions = {
-    name: 'remove_role',
     description: 'Add a role to the configuration',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'remove_role',
     options: [
         {
-            name: 'config',
-            description: 'Remove a role from the configuration',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'Remove a role from the configuration',
+            name: 'config',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
         {
-            name: 'role',
             description: 'The role to remove',
-            type: ApplicationCommandOptionType.ROLE,
+            name: 'role',
             required: true,
+            type: ApplicationCommandOptionType.ROLE,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

@@ -1,8 +1,10 @@
-import { Context } from '../Source/Context';
-import { sync } from 'glob';
 import path from 'path';
-import { Listener } from '../Listeners/Listener';
+
 import { ClientEvents } from 'discord.js';
+import { sync } from 'glob';
+
+import { Listener } from '../Listeners/Listener';
+import { Context } from '../Source/Context';
 
 export default function (ctx: Context): void {
     try {

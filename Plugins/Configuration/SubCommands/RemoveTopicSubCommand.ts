@@ -1,12 +1,23 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from 'discord.js';
+
+import { chunk } from '../../../Common/array';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, SetTopicOptions } from '../../../Services/SettingsService';
-import { chunk } from '../../../Common/array';
+import { Context } from '../../../Source/Context';
 
 export const RemoveTopicSubCommand = defineSubCommand({
-    name: 'remove_topic',
+    autocomplete: async (ctx: Context, interaction) => {
+        const query = interaction.options.getString('topic') || '';
+        const filtered = (
+            await ctx.services.settings.getTopics<string>(interaction.guildId!, 'Topics')
+        )
+            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 25)
+            .map((key) => ({ name: key as string, value: key as string }));
+
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const input = interaction.options.getString('topic')!;
@@ -30,29 +41,29 @@ export const RemoveTopicSubCommand = defineSubCommand({
 
         const components = [
             {
-                type: ComponentType.ActionRow as const,
                 components: [
                     {
-                        type: ComponentType.Button as const,
                         customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        style: ButtonStyle.Primary as const,
-                        label: 'Previous',
                         disabled: state.addTopicPages.page === 0,
-                    },
-                    {
-                        type: ComponentType.Button as const,
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
-                        style: ButtonStyle.Secondary as const,
-                        label: 'Home',
-                    },
-                    {
-                        type: ComponentType.Button as const,
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                        label: 'Previous',
                         style: ButtonStyle.Primary as const,
-                        label: 'Next',
+                        type: ComponentType.Button as const,
+                    },
+                    {
+                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        label: 'Home',
+                        style: ButtonStyle.Secondary as const,
+                        type: ComponentType.Button as const,
+                    },
+                    {
+                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
                         disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                        label: 'Next',
+                        style: ButtonStyle.Primary as const,
+                        type: ComponentType.Button as const,
                     },
                 ],
+                type: ComponentType.ActionRow as const,
             },
         ];
 
@@ -80,11 +91,11 @@ export const RemoveTopicSubCommand = defineSubCommand({
         const updatedTopics = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
 
         await interaction.reply({
+            components,
             content: `I've removed **${topic}** from the topics list.`,
             embeds: [
                 {
-                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Topics in Configuration',
+                    color: global.embedColor,
                     description:
                         state.addTopicPages.pages[state.addTopicPages.page]
                             .map(
@@ -95,38 +106,28 @@ export const RemoveTopicSubCommand = defineSubCommand({
                     footer: {
                         text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${updatedTopics.length}`,
                     },
-                    color: global.embedColor,
+                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
+                    title: 'Current Topics in Configuration',
                 },
             ],
-            components,
             flags: MessageFlags.Ephemeral,
         });
     },
 
-    autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('topic') || '';
-        const filtered = (
-            await ctx.services.settings.getTopics<string>(interaction.guildId!, 'Topics')
-        )
-            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 25)
-            .map((key) => ({ name: key as string, value: key as string }));
-
-        await interaction.respond(filtered);
-    },
+    name: 'remove_topic',
 });
 
 export const commandOptions = {
-    name: 'remove_topic',
     description: 'Remove a topic from the configuration',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'remove_topic',
     options: [
         {
-            name: 'topic',
-            description: 'Provide either the index position or name of the topic to remove',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'Provide either the index position or name of the topic to remove',
+            name: 'topic',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
 const { config } = require('dotenv');
+const mongoose = require('mongoose');
+
 const GuildModel = require('../Models/GuildSchema');
 const schema = GuildModel.default;
 config();
@@ -13,12 +14,6 @@ async function ensureSkullEmoji() {
             $set: {
                 'GuildSettings.Skullboard': {
                     $cond: {
-                        if: { $eq: ['$GuildSettings.Skullboard', undefined] },
-                        then: {
-                            SkullboardChannel: null,
-                            SkullboardEmoji: '💀',
-                            SkullboardReactionThreshold: 4,
-                        },
                         else: {
                             SkullboardChannel: {
                                 $ifNull: ['$GuildSettings.Skullboard.SkullboardChannel', null],
@@ -32,6 +27,12 @@ async function ensureSkullEmoji() {
                                     4,
                                 ],
                             },
+                        },
+                        if: { $eq: ['$GuildSettings.Skullboard', undefined] },
+                        then: {
+                            SkullboardChannel: null,
+                            SkullboardEmoji: '💀',
+                            SkullboardReactionThreshold: 4,
                         },
                     },
                 },

@@ -1,39 +1,22 @@
 import { ApplicationCommandType } from '@antibot/interactions';
-import { defineCommand } from '../../../Common/define';
 import { ChatInputCommandInteraction } from 'discord.js';
+
+import { defineCommand } from '../../../Common/define';
 import {
-    subCommandOptions,
     CreateSubCommand,
     DeleteSubCommand,
-    ShowSubCommand,
-    ListSubCommand,
-    InfoSubCommand,
-    RawSubCommand,
-    UseSubCommand,
     EditSubCommand,
     ImportSubCommand,
+    InfoSubCommand,
+    ListSubCommand,
+    RawSubCommand,
+    ShowSubCommand,
+    subCommandOptions,
+    UseSubCommand,
 } from '../SubCommands';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
-        command: {
-            name: 'tag',
-            type: ApplicationCommandType.CHAT_INPUT,
-            description: 'Create, list, edit, and delete tags!',
-            options: subCommandOptions,
-        },
-        subCommands: {
-            create: CreateSubCommand,
-            delete: DeleteSubCommand,
-            show: ShowSubCommand,
-            list: ListSubCommand,
-            info: InfoSubCommand,
-            raw: RawSubCommand,
-            use: UseSubCommand,
-            edit: EditSubCommand,
-            import: ImportSubCommand,
-        },
-        on: async () => {},
         autocomplete: async (ctx, interaction) => {
             const subCommand = interaction.options.getSubcommand(false);
             if (!subCommand) {
@@ -43,12 +26,12 @@ export = {
 
             const subCommandHandler = {
                 delete: DeleteSubCommand,
-                show: ShowSubCommand,
-                info: InfoSubCommand,
-                raw: RawSubCommand,
-                use: UseSubCommand,
                 edit: EditSubCommand,
                 import: ImportSubCommand,
+                info: InfoSubCommand,
+                raw: RawSubCommand,
+                show: ShowSubCommand,
+                use: UseSubCommand,
             }[subCommand];
 
             if (!subCommandHandler) {
@@ -57,6 +40,24 @@ export = {
             }
 
             await subCommandHandler.autocomplete(ctx, interaction);
+        },
+        command: {
+            description: 'Create, list, edit, and delete tags!',
+            name: 'tag',
+            options: subCommandOptions,
+            type: ApplicationCommandType.CHAT_INPUT,
+        },
+        on: async () => {},
+        subCommands: {
+            create: CreateSubCommand,
+            delete: DeleteSubCommand,
+            edit: EditSubCommand,
+            import: ImportSubCommand,
+            info: InfoSubCommand,
+            list: ListSubCommand,
+            raw: RawSubCommand,
+            show: ShowSubCommand,
+            use: UseSubCommand,
         },
     }),
 };

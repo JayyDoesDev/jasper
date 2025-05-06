@@ -1,14 +1,15 @@
-import { Redis } from 'ioredis';
-import { Context } from './Context';
 import { Snowflake } from '@antibot/interactions';
+import { Redis } from 'ioredis';
+
+import { Context } from './Context';
 
 type GuildSnowflake = Record<'guild', Snowflake>;
 
 type UserSnowflake = Record<'user', Snowflake>;
 
 export class Store extends Redis {
-    #ctx: Context;
     #connected: boolean = false;
+    #ctx: Context;
 
     constructor(protected ctx: Context) {
         super({
@@ -32,17 +33,19 @@ export class Store extends Redis {
         });
     }
 
-    private async ensureConnection(): Promise<void> {
-        if (!this.#connected) {
-            console.log('Waiting for Redis connection...');
-            await new Promise<void>((resolve) => {
-                if (this.#connected) resolve();
-                else this.once('connect', () => resolve());
-            });
-        }
+    public deleteGuild(options: GuildSnowflake | UserSnowflake): void {
+        this.del(JSON.stringify(options));
     }
 
-    public async getGuild<T>(options: GuildSnowflake): Promise<T | null> {
+    public async findGuild(options: GuildSnowflake): Promise<boolean> {
+        return (await this.getGuild(options)) !== null;
+    }
+
+    public async findUser(options: UserSnowflake): Promise<boolean> {
+        return (await this.getUser(options)) !== null;
+    }
+
+    public async getGuild<T>(options: GuildSnowflake): Promise<null | T> {
         await this.ensureConnection();
 
         try {
@@ -73,7 +76,7 @@ export class Store extends Redis {
         }
     }
 
-    public async getUser<T>(options: UserSnowflake): Promise<T | null> {
+    public async getUser<T>(options: UserSnowflake): Promise<null | T> {
         await this.ensureConnection();
         try {
             const raw = await this.get(JSON.stringify(options));
@@ -85,19 +88,19 @@ export class Store extends Redis {
         }
     }
 
-    public async findGuild(options: GuildSnowflake): Promise<boolean> {
-        return (await this.getGuild(options)) !== null;
+    public async guildExists(options: GuildSnowflake | UserSnowflake): Promise<number> {
+        await this.ensureConnection();
+        return this.exists(JSON.stringify(options));
     }
 
-    public async findUser(options: UserSnowflake): Promise<boolean> {
-        return (await this.getUser(options)) !== null;
+    public async setForeignKey<T>(options: GuildSnowflake | UserSnowflake, data: T): Promise<void> {
+        await this.ensureConnection();
+        const key = JSON.stringify(options);
+
+        await this.set(key, JSON.stringify(data));
     }
 
-    public deleteGuild(options: GuildSnowflake | UserSnowflake): void {
-        this.del(JSON.stringify(options));
-    }
-
-    public setKey<T>(options: GuildSnowflake | UserSnowflake, ...keys: T[] | []): void {
+    public setKey<T>(options: GuildSnowflake | UserSnowflake, ...keys: [] | T[]): void {
         const key = JSON.stringify(options);
 
         this.set(key, JSON.stringify(keys || []));
@@ -110,15 +113,13 @@ export class Store extends Redis {
         await this.set(key, JSON.stringify(data));
     }
 
-    public async setForeignKey<T>(options: GuildSnowflake | UserSnowflake, data: T): Promise<void> {
-        await this.ensureConnection();
-        const key = JSON.stringify(options);
-
-        await this.set(key, JSON.stringify(data));
-    }
-
-    public async guildExists(options: GuildSnowflake | UserSnowflake): Promise<number> {
-        await this.ensureConnection();
-        return this.exists(JSON.stringify(options));
+    private async ensureConnection(): Promise<void> {
+        if (!this.#connected) {
+            console.log('Waiting for Redis connection...');
+            await new Promise<void>((resolve) => {
+                if (this.#connected) resolve();
+                else this.once('connect', () => resolve());
+            });
+        }
     }
 }

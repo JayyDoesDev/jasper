@@ -1,9 +1,10 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction } from 'discord.js';
+
 import { defineSubCommand } from '../../../Common/define';
-import { Options } from '../../../Services/SettingsService';
 import { Emojis } from '../../../Common/enums';
+import { Options } from '../../../Services/SettingsService';
+import { Context } from '../../../Source/Context';
 
 const createTable = (table: string, fields: string[], locked: boolean) => {
     if (fields.length === 0) return '';
@@ -13,7 +14,7 @@ const createTable = (table: string, fields: string[], locked: boolean) => {
 const createField = (
     field: string,
     data: Snowflake[],
-    options: { isChannel: boolean; isUser: boolean; isRole: boolean },
+    options: { isChannel: boolean; isRole: boolean; isUser: boolean; },
 ) => {
     if (!data || data.length === 0) {
         return `   * **${field}:** None\n`;
@@ -35,32 +36,30 @@ const createField = (
 };
 
 export const ViewChannelSubCommand = defineSubCommand({
-    name: 'view',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await ctx.services.settings.configure<Options>({ guildId: interaction.guildId! });
-        const { Channels, Roles, Users, Skullboard } = ctx.services.settings.getSettings();
+        const { Channels, Roles, Skullboard, Users } = ctx.services.settings.getSettings();
 
         await interaction.reply({
             embeds: [
                 {
-                    thumbnail: { url: interaction.guild?.iconURL() },
-                    title: `${interaction.guild?.name} Configuration`,
+                    color: global.embedColor,
                     description:
                         createTable(
                             'Channels',
                             [
                                 createField('Allowed Tag Channels', Channels.AllowedTagChannels, {
                                     isChannel: true,
-                                    isUser: false,
                                     isRole: false,
+                                    isUser: false,
                                 }),
                                 createField(
                                     'Allowed Snipe Channels',
                                     Channels.AllowedSnipeChannels,
                                     {
                                         isChannel: true,
-                                        isUser: false,
                                         isRole: false,
+                                        isUser: false,
                                     },
                                 ),
                             ],
@@ -71,33 +70,33 @@ export const ViewChannelSubCommand = defineSubCommand({
                             [
                                 createField('Support Roles', Roles.SupportRoles, {
                                     isChannel: false,
-                                    isUser: false,
                                     isRole: true,
+                                    isUser: false,
                                 }),
                                 createField('Allowed Tag Roles', Roles.AllowedTagRoles, {
                                     isChannel: false,
-                                    isUser: false,
                                     isRole: true,
+                                    isUser: false,
                                 }),
                                 createField('Allowed Tag Admin Roles', Roles.AllowedTagAdminRoles, {
                                     isChannel: false,
-                                    isUser: false,
                                     isRole: true,
+                                    isUser: false,
                                 }),
                                 createField('Allowed Admin Roles', Roles.AllowedAdminRoles, {
                                     isChannel: false,
-                                    isUser: false,
                                     isRole: true,
+                                    isUser: false,
                                 }),
                                 createField('Allowed Staff Roles', Roles.AllowedStaffRoles, {
                                     isChannel: false,
-                                    isUser: false,
                                     isRole: true,
+                                    isUser: false,
                                 }),
                                 createField('Ignored Sniped Roles', Roles.IgnoredSnipedRoles, {
                                     isChannel: false,
-                                    isUser: false,
                                     isRole: true,
+                                    isUser: false,
                                 }),
                             ],
                             false,
@@ -107,8 +106,8 @@ export const ViewChannelSubCommand = defineSubCommand({
                             [
                                 createField('Ignored Sniped Users', Users.IgnoreSnipedUsers, {
                                     isChannel: false,
-                                    isUser: true,
                                     isRole: false,
+                                    isUser: true,
                                 }),
                             ],
                             false,
@@ -130,8 +129,8 @@ export const ViewChannelSubCommand = defineSubCommand({
                                     Channels.AutomaticSlowmodeChannels,
                                     {
                                         isChannel: true,
-                                        isUser: false,
                                         isRole: false,
+                                        isUser: false,
                                     },
                                 ),
                                 `   * **Cooldown:** ${global.slowmodeCooldown}s\n`,
@@ -140,20 +139,22 @@ export const ViewChannelSubCommand = defineSubCommand({
                             ],
                             true,
                         ),
-                    color: global.embedColor,
                     footer: {
                         icon_url: interaction.user.displayAvatarURL(),
                         text: `Locked = Locked Configuration | Unlocked = Configurable Configuration`,
                     },
+                    thumbnail: { url: interaction.guild?.iconURL() },
+                    title: `${interaction.guild?.name} Configuration`,
                 },
             ],
         });
     },
+    name: 'view',
 });
 
 export const commandOptions = {
-    name: 'view',
     description: 'View the current configuration of the guild',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'view',
     options: [],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

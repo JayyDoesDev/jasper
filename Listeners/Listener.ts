@@ -1,4 +1,5 @@
 import { ClientEvents } from 'discord.js';
+
 import { Context } from '../Source/Context';
 
 export abstract class Listener<K extends keyof ClientEvents> {

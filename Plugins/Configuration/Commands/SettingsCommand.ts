@@ -1,50 +1,26 @@
 import { ApplicationCommandType, PermissionBitToString, Permissions } from '@antibot/interactions';
-import { defineCommand } from '../../../Common/define';
 import { ChatInputCommandInteraction } from 'discord.js';
+
+import { defineCommand } from '../../../Common/define';
 import {
-    subCommandOptions,
     AddChannelSubCommand,
-    RemoveChannelSubCommand,
     AddRoleSubCommand,
-    RemoveRoleSubCommand,
-    ViewChannelSubCommand,
-    AddTopicSubCommand,
-    RemoveTopicSubCommand,
-    ViewTopicsSubCommand,
-    AddUserSubCommand,
-    RemoveUserSubCommand,
     AddSkullboardChannelSubCommand,
+    AddTopicSubCommand,
+    AddUserSubCommand,
+    RemoveChannelSubCommand,
+    RemoveRoleSubCommand,
+    RemoveTopicSubCommand,
+    RemoveUserSubCommand,
     SetSkullboardEmojiSubCommand,
     SetSkullboardReactionThresholdSubCommand,
+    subCommandOptions,
+    ViewChannelSubCommand,
+    ViewTopicsSubCommand,
 } from '../SubCommands';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
-        command: {
-            name: 'settings',
-            type: ApplicationCommandType.CHAT_INPUT,
-            description: 'Configure the settings',
-            default_member_permissions: PermissionBitToString(
-                Permissions({ ManageChannels: true }),
-            ),
-            options: subCommandOptions,
-        },
-        subCommands: {
-            add_channel: AddChannelSubCommand,
-            remove_channel: RemoveChannelSubCommand,
-            add_role: AddRoleSubCommand,
-            remove_role: RemoveRoleSubCommand,
-            view: ViewChannelSubCommand,
-            add_topic: AddTopicSubCommand,
-            remove_topic: RemoveTopicSubCommand,
-            view_topics: ViewTopicsSubCommand,
-            add_user: AddUserSubCommand,
-            remove_user: RemoveUserSubCommand,
-            add_skullboard_channel: AddSkullboardChannelSubCommand,
-            set_skullboard_emoji: SetSkullboardEmojiSubCommand,
-            set_skullboard_reaction_thres: SetSkullboardReactionThresholdSubCommand,
-        },
-        on: async () => {},
         autocomplete: async (ctx, interaction) => {
             const subCommand = interaction.options.getSubcommand(false);
             if (!subCommand) {
@@ -54,15 +30,15 @@ export = {
 
             const subCommandHandler = {
                 add_channel: AddChannelSubCommand,
-                remove_channel: RemoveChannelSubCommand,
                 add_role: AddRoleSubCommand,
+                add_topic: AddTopicSubCommand,
+                add_user: AddUserSubCommand,
+                remove_channel: RemoveChannelSubCommand,
                 remove_role: RemoveRoleSubCommand,
+                remove_topic: RemoveTopicSubCommand,
+                remove_user: RemoveUserSubCommand,
                 view: ViewChannelSubCommand,
                 view_topics: ViewTopicsSubCommand,
-                add_topic: AddTopicSubCommand,
-                remove_topic: RemoveTopicSubCommand,
-                add_user: AddUserSubCommand,
-                remove_user: RemoveUserSubCommand,
             }[subCommand];
 
             if (!subCommandHandler) {
@@ -71,6 +47,31 @@ export = {
             }
 
             await subCommandHandler.autocomplete(ctx, interaction);
+        },
+        command: {
+            default_member_permissions: PermissionBitToString(
+                Permissions({ ManageChannels: true }),
+            ),
+            description: 'Configure the settings',
+            name: 'settings',
+            options: subCommandOptions,
+            type: ApplicationCommandType.CHAT_INPUT,
+        },
+        on: async () => {},
+        subCommands: {
+            add_channel: AddChannelSubCommand,
+            add_role: AddRoleSubCommand,
+            add_skullboard_channel: AddSkullboardChannelSubCommand,
+            add_topic: AddTopicSubCommand,
+            add_user: AddUserSubCommand,
+            remove_channel: RemoveChannelSubCommand,
+            remove_role: RemoveRoleSubCommand,
+            remove_topic: RemoveTopicSubCommand,
+            remove_user: RemoveUserSubCommand,
+            set_skullboard_emoji: SetSkullboardEmojiSubCommand,
+            set_skullboard_reaction_thres: SetSkullboardReactionThresholdSubCommand,
+            view: ViewChannelSubCommand,
+            view_topics: ViewTopicsSubCommand,
         },
     }),
 };

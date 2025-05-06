@@ -1,7 +1,9 @@
 import { ClientEvents } from 'discord.js';
-import { Listener } from './Listener';
-import { Context } from '../Source/Context';
+
 import { defineEvent } from '../Common/define';
+import { Context } from '../Source/Context';
+
+import { Listener } from './Listener';
 
 interface NetworkError extends Error {
     method?: string;

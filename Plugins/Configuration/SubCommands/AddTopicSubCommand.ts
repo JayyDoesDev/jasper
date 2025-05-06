@@ -1,12 +1,12 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from 'discord.js';
+
+import { chunk } from '../../../Common/array';
 import { defineSubCommand } from '../../../Common/define';
 import { Options, SetTopicOptions } from '../../../Services/SettingsService';
-import { chunk } from '../../../Common/array';
+import { Context } from '../../../Source/Context';
 
 export const AddTopicSubCommand = defineSubCommand({
-    name: 'add_topic',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const topic = interaction.options.getString('topic')!;
@@ -30,39 +30,39 @@ export const AddTopicSubCommand = defineSubCommand({
 
         const components = [
             {
-                type: ComponentType.ActionRow as const,
                 components: [
                     {
-                        type: ComponentType.Button as const,
                         customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        style: ButtonStyle.Primary as const,
-                        label: 'Previous',
                         disabled: state.addTopicPages.page === 0,
-                    },
-                    {
-                        type: ComponentType.Button as const,
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
-                        style: ButtonStyle.Secondary as const,
-                        label: 'Home',
-                    },
-                    {
-                        type: ComponentType.Button as const,
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                        label: 'Previous',
                         style: ButtonStyle.Primary as const,
-                        label: 'Next',
+                        type: ComponentType.Button as const,
+                    },
+                    {
+                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        label: 'Home',
+                        style: ButtonStyle.Secondary as const,
+                        type: ComponentType.Button as const,
+                    },
+                    {
+                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
                         disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                        label: 'Next',
+                        style: ButtonStyle.Primary as const,
+                        type: ComponentType.Button as const,
                     },
                 ],
+                type: ComponentType.ActionRow as const,
             },
         ];
 
         if (topicsExistInDB.includes(topic)) {
             await interaction.reply({
+                components,
                 content: `For the record, **${topic}** is already in the topics list.`,
                 embeds: [
                     {
-                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                        title: 'Current Topics in Configuration',
+                        color: global.embedColor,
                         description:
                             state.addTopicPages.pages[state.addTopicPages.page]
                                 .map(
@@ -73,10 +73,10 @@ export const AddTopicSubCommand = defineSubCommand({
                         footer: {
                             text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${topicsExistInDB.length}`,
                         },
-                        color: global.embedColor,
+                        thumbnail: { url: interaction.guild.iconURL() ?? '' },
+                        title: 'Current Topics in Configuration',
                     },
                 ],
-                components,
                 flags: MessageFlags.Ephemeral,
             });
             return;
@@ -92,11 +92,11 @@ export const AddTopicSubCommand = defineSubCommand({
         state.addTopicPages.pages = updatedPages;
 
         await interaction.reply({
+            components,
             content: `I've added **${topic}** to the topics list.`,
             embeds: [
                 {
-                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Topics in Configuration',
+                    color: global.embedColor,
                     description:
                         state.addTopicPages.pages[state.addTopicPages.page]
                             .map(
@@ -107,25 +107,26 @@ export const AddTopicSubCommand = defineSubCommand({
                     footer: {
                         text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${updatedTopics.length}`,
                     },
-                    color: global.embedColor,
+                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
+                    title: 'Current Topics in Configuration',
                 },
             ],
-            components,
             flags: MessageFlags.Ephemeral,
         });
     },
+    name: 'add_topic',
 });
 
 export const commandOptions = {
-    name: 'add_topic',
     description: 'Add a new topic to the list of topics.',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'add_topic',
     options: [
         {
-            name: 'topic',
             description: 'The topic you want to add to the list.',
-            type: ApplicationCommandOptionType.STRING,
+            name: 'topic',
             required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

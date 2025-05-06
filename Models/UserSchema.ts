@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+
 import { UserDocument } from './UserDocument';
 
 export default model<UserDocument>(
@@ -7,10 +8,10 @@ export default model<UserDocument>(
         {
             _id: String,
             Incognito: {
-                ShowCommands: { type: Boolean, default: false },
-                ShowCommandAuthor: { type: Boolean, default: false },
+                ShowCommandAuthor: { default: false, type: Boolean },
+                ShowCommands: { default: false, type: Boolean },
             },
         },
-        { versionKey: false, timestamps: true },
+        { timestamps: true, versionKey: false },
     ),
 );

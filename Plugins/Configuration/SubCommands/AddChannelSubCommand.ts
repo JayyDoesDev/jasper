@@ -1,17 +1,25 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { defineSubCommand } from '../../../Common/define';
-import { Options, SetChannelOptions } from '../../../Services/SettingsService';
-import { Settings } from '../../../Models/GuildSchema';
+
 import { getChannelConfigurationContainer } from '../../../Common/container';
+import { defineSubCommand } from '../../../Common/define';
 import {
     createConfigurationExistsEmbed,
     createConfigurationUpdateEmbed,
 } from '../../../Common/embeds';
+import { Settings } from '../../../Models/GuildSchema';
+import { Options, SetChannelOptions } from '../../../Services/SettingsService';
+import { Context } from '../../../Source/Context';
 
 export const AddChannelSubCommand = defineSubCommand({
-    name: 'add_channel',
+    autocomplete: async (ctx: Context, interaction) => {
+        const query = interaction.options.getString('config') || '';
+        const filtered = getChannelConfigurationContainer()
+            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
+            .map((key) => ({ name: key as string, value: key as string }));
+
+        await interaction.respond(filtered);
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Channels'];
@@ -49,7 +57,7 @@ export const AddChannelSubCommand = defineSubCommand({
 
         await ctx.services.settings.setChannels<SetChannelOptions>({
             guildId,
-            ...{ key: config, channels: channel.id },
+            ...{ channels: channel.id, key: config },
         });
 
         const updatedChannels = await ctx.services.settings.getChannels<Snowflake>(guildId, config);
@@ -67,33 +75,26 @@ export const AddChannelSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
-    autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('config') || '';
-        const filtered = getChannelConfigurationContainer()
-            .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
-            .map((key) => ({ name: key as string, value: key as string }));
-
-        await interaction.respond(filtered);
-    },
+    name: 'add_channel',
 });
 
 export const commandOptions = {
-    name: 'add_channel',
     description: 'Add a channel to the configuration',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'add_channel',
     options: [
         {
-            name: 'config',
-            description: 'The configuration to add the channel to',
-            type: ApplicationCommandOptionType.STRING,
-            required: true,
             autocomplete: true,
+            description: 'The configuration to add the channel to',
+            name: 'config',
+            required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
         {
-            name: 'channel',
             description: 'The channel to add',
-            type: ApplicationCommandOptionType.CHANNEL,
+            name: 'channel',
             required: true,
+            type: ApplicationCommandOptionType.CHANNEL,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

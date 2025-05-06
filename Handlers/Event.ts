@@ -1,8 +1,10 @@
-import { Context } from '../Source/Context';
-import { sync } from 'glob';
 import path from 'path';
-import { Combine } from '../Common/types';
+
+import { sync } from 'glob';
+
 import { Plugin } from '../Common/define';
+import { Combine } from '../Common/types';
+import { Context } from '../Source/Context';
 
 export default function (ctx: Context): void {
     try {

@@ -1,13 +1,14 @@
-const { defineCommand } = require('../Common/define');
-const { MessageFlags } = require('discord.js');
 const { ApplicationCommandType } = require('@antibot/interactions');
+const { MessageFlags } = require('discord.js');
+
+const { defineCommand } = require('../Common/define');
 
 exports.Command = defineCommand({
     command: {
-        name: 'ping',
-        type: ApplicationCommandType.CHAT_INPUT,
         description: 'test',
+        name: 'ping',
         options: [],
+        type: ApplicationCommandType.CHAT_INPUT,
     },
     on: (ctx, interaction) => {
         return interaction.reply({

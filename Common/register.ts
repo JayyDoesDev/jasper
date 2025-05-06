@@ -1,7 +1,21 @@
 import * as Path from 'path';
-import { sync } from 'glob';
-import { Command, Event } from './define';
+
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
+import { sync } from 'glob';
+
+import { Command, Event } from './define';
+
+export function massRegisterCommands<
+    T extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
+>(dir: string, paths: string[]): Command<T>[] {
+    return massRegister<T, { Command: Command<T> }>(dir, paths, 'Command');
+}
+
+export function massRegisterEvents<
+    T extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
+>(dir: string, paths: string[]): Event<T>[] {
+    return massRegister<T, { Event: Event<T> }>(dir, paths, 'Event');
+}
 
 function massRegister<
     T extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
@@ -25,16 +39,4 @@ function massRegister<
     }
 
     return <U extends { Command: Command<T> } ? Command<T>[] : Event<T>[]>items;
-}
-
-export function massRegisterCommands<
-    T extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
->(dir: string, paths: string[]): Command<T>[] {
-    return massRegister<T, { Command: Command<T> }>(dir, paths, 'Command');
-}
-
-export function massRegisterEvents<
-    T extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
->(dir: string, paths: string[]): Event<T>[] {
-    return massRegister<T, { Event: Event<T> }>(dir, paths, 'Event');
 }

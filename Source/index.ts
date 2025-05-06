@@ -1,15 +1,18 @@
-/* eslint @typescript-eslint/no-explicit-any: "off" */
-import { Context } from './Context';
-import { config } from 'dotenv';
-import { SetupMongo } from './SetupMongo';
 import fs from 'fs/promises';
 import path from 'path';
+
 import { TextChannel } from 'discord.js';
+import { config } from 'dotenv';
+
 import {
     getLatestYoutubeVideo,
     getRandomYoutubeAPIKey,
     updateSubCountChannel,
 } from '../Common/youtube';
+
+/* eslint @typescript-eslint/no-explicit-any: "off" */
+import { Context } from './Context';
+import { SetupMongo } from './SetupMongo';
 
 config();
 
@@ -18,15 +21,15 @@ ctx.env.validate();
 
 // Application configuration
 const CONFIG = {
-    slowmode: {
-        cooldown: ctx.env.get('slowmode_cooldown'),
-        messageTimeWindow: ctx.env.get('slowmode_msg_time'),
-        messageThreshold: ctx.env.get('slowmode_msg_threshold'),
-    },
     embedColor: 0x323338,
     paths: {
-        latestVideo: path.join(process.cwd(), 'latestvideo.json'),
         latestThread: path.join(process.cwd(), 'latestthread.json'),
+        latestVideo: path.join(process.cwd(), 'latestvideo.json'),
+    },
+    slowmode: {
+        cooldown: ctx.env.get('slowmode_cooldown'),
+        messageThreshold: ctx.env.get('slowmode_msg_threshold'),
+        messageTimeWindow: ctx.env.get('slowmode_msg_time'),
     },
 } as const;
 
@@ -34,6 +37,29 @@ global.slowmodeCooldown = CONFIG.slowmode.cooldown;
 global.messageTimeWindow = CONFIG.slowmode.messageTimeWindow;
 global.messageThreshold = CONFIG.slowmode.messageThreshold;
 global.embedColor = CONFIG.embedColor;
+
+async function main() {
+    try {
+        await Promise.all(
+            ['Command', 'Event', 'Listener'].map(async (x) => {
+                const handlerModule = await import(`../Handlers/${x}`);
+                return handlerModule.default(ctx);
+            }),
+        );
+
+        await SetupMongo({ uri: ctx.env.get('db') });
+        setInterval(postNewVideo, ctx.env.get('youtube_post_timer'));
+
+        if (ctx.env.get('sub_update') === '1') {
+            setInterval(updateSubCountChannel, ctx.env.get('sub_timer'));
+        }
+
+        await ctx.login(ctx.env.get('botToken'));
+    } catch (error) {
+        console.error('Error in main:', error);
+        process.exit(1);
+    }
+}
 
 async function postNewVideo(): Promise<void> {
     if (ctx.env.get('youtube_post_update') === '0') return;
@@ -69,13 +95,13 @@ async function postNewVideo(): Promise<void> {
         }
 
         const message = await channel.send({
-            content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${latest.description}\nhttps://www.youtube.com/watch?v=${latest.id}`,
             allowedMentions: { roles: [ctx.env.get('youtube_video_discussions_role')] },
+            content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${latest.description}\nhttps://www.youtube.com/watch?v=${latest.id}`,
         });
 
         const thread = await message.startThread({
-            name: latest.title,
             autoArchiveDuration: 1440,
+            name: latest.title,
         });
 
         await thread.send('# Reminder to follow the rules and to stay on topic!');
@@ -87,9 +113,9 @@ async function postNewVideo(): Promise<void> {
                 const previousThread = channel.threads.resolve(previousThreadId);
                 if (previousThread) {
                     await previousThread.edit({
+                        archived: true,
                         locked: true,
                         name: `[Closed] ${previousThread.name}`,
-                        archived: true,
                     });
                 }
             }
@@ -103,29 +129,6 @@ async function postNewVideo(): Promise<void> {
         ]);
     } catch (error) {
         console.error('Error in postNewVideo:', error);
-    }
-}
-
-async function main() {
-    try {
-        await Promise.all(
-            ['Command', 'Event', 'Listener'].map(async (x) => {
-                const handlerModule = await import(`../Handlers/${x}`);
-                return handlerModule.default(ctx);
-            }),
-        );
-
-        await SetupMongo({ uri: ctx.env.get('db') });
-        setInterval(postNewVideo, ctx.env.get('youtube_post_timer'));
-
-        if (ctx.env.get('sub_update') === '1') {
-            setInterval(updateSubCountChannel, ctx.env.get('sub_timer'));
-        }
-
-        await ctx.login(ctx.env.get('botToken'));
-    } catch (error) {
-        console.error('Error in main:', error);
-        process.exit(1);
     }
 }
 

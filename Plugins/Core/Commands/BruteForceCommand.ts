@@ -4,29 +4,30 @@ import {
     Permissions,
     PermissionsBitField,
 } from '@antibot/interactions';
+import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+
 import { defineCommand } from '../../../Common/define';
 import { Context } from '../../../Source/Context';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { subCommandOptions, NotifyVideoDiscussionsSubCommand } from '../SubCommands';
+import { NotifyVideoDiscussionsSubCommand, subCommandOptions } from '../SubCommands';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
         command: {
-            name: 'bruteforce',
-            type: ApplicationCommandType.CHAT_INPUT,
-            description: 'Force Jasper to do something.',
             default_member_permissions: PermissionBitToString(Permissions({ Administrator: true })),
+            description: 'Force Jasper to do something.',
+            name: 'bruteforce',
             options: subCommandOptions,
+            type: ApplicationCommandType.CHAT_INPUT,
         },
-        subCommands: {
-            notify_video_discussions: NotifyVideoDiscussionsSubCommand,
-        },
-        permissions: [PermissionsBitField.SendMessages],
         on: async (ctx: Context, interaction) => {
             await interaction.reply({
                 content: 'This command or subcommand is not properly configured.',
                 flags: MessageFlags.Ephemeral,
             });
+        },
+        permissions: [PermissionsBitField.SendMessages],
+        subCommands: {
+            notify_video_discussions: NotifyVideoDiscussionsSubCommand,
         },
     }),
 };

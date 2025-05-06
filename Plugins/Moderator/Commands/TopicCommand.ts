@@ -1,21 +1,20 @@
 import { ApplicationCommandType, PermissionsBitField } from '@antibot/interactions';
-import { defineCommand } from '../../../Common/define';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { ConfigurationRoles } from '../../../Common/container';
-import { Context } from '../../../Source/Context';
-import { Options } from '../../../Services/TagService';
+
 import { shuffle } from '../../../Common/array';
+import { ConfigurationRoles } from '../../../Common/container';
+import { defineCommand } from '../../../Common/define';
+import { Options } from '../../../Services/TagService';
+import { Context } from '../../../Source/Context';
 
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
         command: {
-            name: 'topic',
-            type: ApplicationCommandType.CHAT_INPUT,
             description: 'Suggest a new topic!',
+            name: 'topic',
             options: [],
+            type: ApplicationCommandType.CHAT_INPUT,
         },
-        restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
-        permissions: [PermissionsBitField.SendMessages],
         on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             await ctx.services.settings.configure<Options>({ guildId: interaction.guildId });
             const { Text } = ctx.services.settings.getSettings();
@@ -36,5 +35,7 @@ export = {
 
             return interaction.reply({ content: 'Topic sent!', flags: MessageFlags.Ephemeral });
         },
+        permissions: [PermissionsBitField.SendMessages],
+        restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
     }),
 };

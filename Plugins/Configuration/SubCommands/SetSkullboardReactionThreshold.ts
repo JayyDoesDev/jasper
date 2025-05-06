@@ -1,16 +1,16 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+
 import { defineSubCommand } from '../../../Common/define';
 import {
     createConfigurationExistsEmbed,
     createConfigurationUpdateEmbed,
 } from '../../../Common/embeds';
-import { Options } from '../../../Services/TagService';
 import { GuildSnowflake } from '../../../Services/SettingsService';
+import { Options } from '../../../Services/TagService';
+import { Context } from '../../../Source/Context';
 
 export const SetSkullboardReactionThresholdSubCommand = defineSubCommand({
-    name: 'set_skullboard_reaction_threshold',
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const threshold = interaction.options.getInteger('threshold')!;
@@ -50,18 +50,19 @@ export const SetSkullboardReactionThresholdSubCommand = defineSubCommand({
             flags: MessageFlags.Ephemeral,
         });
     },
+    name: 'set_skullboard_reaction_threshold',
 });
 
 export const commandOptions = {
-    name: 'set_skullboard_reaction_thres',
     description: 'Set the skullboard reaction threshold',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: 'set_skullboard_reaction_thres',
     options: [
         {
-            name: 'threshold',
             description: 'The threshold for the skullboard reaction',
-            type: ApplicationCommandOptionType.INTEGER,
+            name: 'threshold',
             required: true,
+            type: ApplicationCommandOptionType.INTEGER,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };

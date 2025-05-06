@@ -3,20 +3,20 @@ import { Context } from '../Source/Context';
 import { Store } from '../Source/Store';
 
 export type CommonCondition<R> =
-    R extends Nullable<string | number | boolean> ? R : R extends object ? Nullable<R> : void;
+    R extends Nullable<boolean | number | string> ? R : R extends object ? Nullable<R> : void;
 
 interface IService {
-    configure<T>(config: T): this | Promise<this>;
-    itemExists?<T>(exists?: T): CommonCondition<boolean> | Promise<CommonCondition<boolean>>;
-    getValues?<T, R>(get?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
-    create?<T, R>(create?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
-    modify?<T, R>(mod?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    configure<T>(config: T): Promise<this> | this;
+    create?<T, R>(create?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
+    deleteValue?<T, R>(d?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
     getMultiValues?<T, R>(
         getMultiValues?: T,
     ):
         | CommonCondition<R extends R[] ? R[] : R extends null | undefined ? [] : R[]>
         | Promise<CommonCondition<R>>;
-    deleteValue?<T, R>(d?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    getValues?<T, R>(get?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
+    itemExists?<T>(exists?: T): CommonCondition<boolean> | Promise<CommonCondition<boolean>>;
+    modify?<T, R>(mod?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
 }
 
 export abstract class Service implements IService {
@@ -26,16 +26,16 @@ export abstract class Service implements IService {
         this.store = ctx.store;
     }
 
-    public abstract configure<T>(config: T): this | Promise<this>;
+    public abstract configure<T>(config: T): Promise<this> | this;
 
-    public itemExists?<T>(exists?: T): CommonCondition<boolean> | Promise<CommonCondition<boolean>>;
-    public getValues?<T, R>(get?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
-    public create?<T, R>(create?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
-    public modify?<T, R>(mod?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    public create?<T, R>(create?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
+    public deleteValue?<T, R>(d?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
     public getMultiValues?<T, R>(
         getMultiValues?: T,
     ):
         | CommonCondition<R extends R[] ? R[] : R extends null | undefined ? [] : R[]>
         | Promise<CommonCondition<R>>;
-    public deleteValue?<T, R>(d?: T): Promise<CommonCondition<R>> | CommonCondition<R>;
+    public getValues?<T, R>(get?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
+    public itemExists?<T>(exists?: T): CommonCondition<boolean> | Promise<CommonCondition<boolean>>;
+    public modify?<T, R>(mod?: T): CommonCondition<R> | Promise<CommonCondition<R>>;
 }

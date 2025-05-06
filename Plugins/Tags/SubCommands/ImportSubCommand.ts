@@ -1,17 +1,18 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { Context } from '../../../Source/Context';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
-import { defineSubCommand } from '../../../Common/define';
-import { Options, Tag } from '../../../Services/TagService';
-import { Emojis } from '../../../Common/enums';
+
 import { ConfigurationRoles } from '../../../Common/container';
+import { defineSubCommand } from '../../../Common/define';
+import { Emojis } from '../../../Common/enums';
+import { Options, Tag } from '../../../Services/TagService';
+import { Context } from '../../../Source/Context';
 
 interface TagImportData {
+    description?: null | string;
+    footer?: null | string;
+    imageUrl?: null | string;
     name: string;
     title: string;
-    description?: string | null;
-    imageUrl?: string | null;
-    footer?: string | null;
 }
 
 function checkRequiredVariables(obj: unknown): obj is TagImportData {
@@ -21,12 +22,6 @@ function checkRequiredVariables(obj: unknown): obj is TagImportData {
 }
 
 export const ImportSubCommand = defineSubCommand({
-    name: 'import',
-    restrictToConfigRoles: [
-        ConfigurationRoles.StaffRoles,
-        ConfigurationRoles.AdminRoles,
-        ConfigurationRoles.TagAdminRoles,
-    ],
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guild.id;
         const jsonString = interaction.options.getString('json', true);
@@ -36,7 +31,7 @@ export const ImportSubCommand = defineSubCommand({
         let data: unknown;
         try {
             data = JSON.parse(jsonString);
-        } catch (error) {
+        } catch {
             await interaction.editReply('> The JSON provided is invalid.');
             return;
         }
@@ -63,12 +58,12 @@ export const ImportSubCommand = defineSubCommand({
         }
 
         const tagData: Tag = {
-            name: nameInput,
-            title: titleInput,
             author: interaction.user.id,
             description: tagDataInput.description ?? null,
-            image_url: tagDataInput.imageUrl ?? null,
             footer: tagDataInput.footer ?? null,
+            image_url: tagDataInput.imageUrl ?? null,
+            name: nameInput,
+            title: titleInput,
         };
 
         await ctx.services.tags.configure<Options>({ guildId, name: tagData.name, tag: tagData });
@@ -91,27 +86,33 @@ export const ImportSubCommand = defineSubCommand({
             content: `${Emojis.CHECK_MARK} Successfully imported the tag \`${tagData.name}\`!`,
             embeds: [
                 {
-                    title: tagData.title,
                     color: 0x323338,
                     description: tagData.description,
-                    image: tagData.image_url ? { url: tagData.image_url } : undefined,
                     footer: { text: tagData.footer ?? '' },
+                    image: tagData.image_url ? { url: tagData.image_url } : undefined,
+                    title: tagData.title,
                 },
             ],
         });
     },
+    name: 'import',
+    restrictToConfigRoles: [
+        ConfigurationRoles.StaffRoles,
+        ConfigurationRoles.AdminRoles,
+        ConfigurationRoles.TagAdminRoles,
+    ],
 });
 
 export const commandOptions = {
-    name: ImportSubCommand.name,
     description: 'Import a tag from a JSON file',
-    type: ApplicationCommandOptionType.SUB_COMMAND,
+    name: ImportSubCommand.name,
     options: [
         {
-            name: 'json',
             description: 'The JSON string containing tag data',
-            type: ApplicationCommandOptionType.STRING,
+            name: 'json',
             required: true,
+            type: ApplicationCommandOptionType.STRING,
         },
     ],
+    type: ApplicationCommandOptionType.SUB_COMMAND,
 };
