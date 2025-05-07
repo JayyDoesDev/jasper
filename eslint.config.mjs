@@ -6,7 +6,7 @@ import perfectionist from 'eslint-plugin-perfectionist';
 export default [
   {
     files: ['**/*'],
-    ignores: ['.httpbot/Test/**/*'],
+    ignores: ['.worker/Test/**/*'],
     plugins: {
       perfectionist,
     },
@@ -45,12 +45,12 @@ export default [
 
   {
     files: ['**/*.ts', '**/*.tsx'],
-    ignores: ['.httpbot/Test/**/*'],
+    ignores: ['.worker/Test/**/*'],
     languageOptions: {
       parser: parserTypescript,
       parserOptions: {
         ecmaVersion: 'latest',
-        project: ['./.httpbot/tsconfig.json', './tsconfig.json'],
+        project: ['./.worker/tsconfig.json', './tsconfig.json'],
         sourceType: 'module',
         tsconfigRootDir: '.',
       },
