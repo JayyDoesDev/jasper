@@ -63,6 +63,16 @@
 - `yarn deploy` - Deploys to Cloudflare Workers
 - `yarn typecheck` - Runs TypeScript type checking
 
+## Setting Cloudflare Worker Secrets
+
+# Production Environment Variables
+- `npx wrangler secrets put --env production BOT_TOKEN` - Set the bot token
+- `npx wrangler secrets put --env production PUBLIC_KEY` - Set the public key
+
+# Development Environment Variables
+- `npx wrangler secrets put --env dev BOT_TOKEN` - Set the bot token
+- `npx wrangler secrets put --env dev PUBLIC_KEY` - Set the public key
+
 ## Type Safety
 
 The project is written in TypeScript and includes proper type definitions for:

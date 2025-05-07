@@ -8,6 +8,7 @@ import {
     createPongResponse, 
     createUnauthorizedResponse 
 } from '../utils/responses';
+import { InteractionType } from 'discord-api-types/v10';
 
 const router = AutoRouter();
 
@@ -41,7 +42,7 @@ router.post('/', async (request: Request, env: Env) => {
         return createUnauthorizedResponse();
     }
 
-    if (interaction.type === 1) { // InteractionType.PING
+    if (interaction.type === InteractionType.Ping) {
         return createPongResponse();
     }
 

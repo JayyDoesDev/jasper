@@ -1,3 +1,5 @@
+import { InteractionResponseType, InteractionResponseFlags } from "discord-interactions";
+
 export class JsonResponse extends Response {
     constructor(body: unknown, init?: ResponseInit) {
         const jsonBody = JSON.stringify(body);
@@ -11,15 +13,15 @@ export class JsonResponse extends Response {
 }
 
 export const createPongResponse = (): JsonResponse => new JsonResponse({
-    type: 1 // InteractionResponseType.Pong
+    type: InteractionResponseType.PONG
 });
 
 export const createMessageResponse = (content: string, ephemeral = false): JsonResponse => new JsonResponse({
     data: {
         content,
-        flags: ephemeral ? 64 : undefined, // InteractionResponseFlags.Ephemeral = 64
+        flags: ephemeral ? InteractionResponseFlags.EPHEMERAL : undefined,
     },
-    type: 4 // InteractionResponseType.ChannelMessageWithSource
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
 });
 
 export const createErrorResponse = (message = 'Unknown Type'): JsonResponse => new JsonResponse(
