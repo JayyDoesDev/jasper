@@ -1,8 +1,9 @@
-import { AWW_COMMAND, INVITE_COMMAND } from './definitions';
+import { Command } from '../types';
 
-export const commands = [
-    AWW_COMMAND,
-    INVITE_COMMAND
-] as const;
+import fun from './fun';
+import generic from './generic';
 
-export type CommandName = typeof commands[number]['name'];
+export const commands: Command[] = [
+    ...fun.commands,
+    ...generic.commands
+];

@@ -1,3 +1,4 @@
+import { InteractionType } from 'discord-api-types/v10';
 import { verifyKey } from 'discord-interactions';
 import { AutoRouter } from 'itty-router';
 
@@ -8,7 +9,6 @@ import {
     createPongResponse, 
     createUnauthorizedResponse 
 } from '../utils/responses';
-import { InteractionType } from 'discord-api-types/v10';
 
 const router = AutoRouter();
 

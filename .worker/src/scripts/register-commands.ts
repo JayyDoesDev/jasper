@@ -1,12 +1,13 @@
 import 'dotenv/config';
-import { register } from '../utils/register';
+
 import { Env } from '../types/server';
+import { register } from '../utils/register';
 
 async function registerCommands(): Promise<void> {
     try {
         const env: Env = {
-            BOT_TOKEN: process.env.BOT_TOKEN || process.env.TOKEN,
             BOT_ID: process.env.BOT_ID || process.env.BOTID,
+            BOT_TOKEN: process.env.BOT_TOKEN || process.env.TOKEN,
             PUBLIC_KEY: process.env.PUBLIC_KEY || process.env.PUBLICKEY
         };
         
