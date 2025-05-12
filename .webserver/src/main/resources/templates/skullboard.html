@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
     <head>
         <style>
@@ -37,12 +38,14 @@
                 font-weight: bold;
                 font-style: italic;
             }
+
             body {
                 margin: 0;
                 font-family: 'gg sans', sans-serif;
                 background-color: #313338;
                 color: #dcddde;
             }
+
             .message-container {
                 padding: 14px;
                 min-width: 520px;
@@ -52,14 +55,17 @@
                 box-sizing: border-box;
                 position: relative;
             }
+
             .message-wrapper {
                 display: flex;
                 align-items: flex-start;
                 margin-top: -4px;
             }
+
             .no-reply .message-wrapper {
                 margin-top: 0;
             }
+
             .avatar {
                 width: 40px;
                 height: 40px;
@@ -68,6 +74,7 @@
                 object-fit: cover;
                 flex-shrink: 0;
             }
+
             .message-content {
                 flex: 1;
                 min-width: 0;
@@ -75,26 +82,31 @@
                 display: flex;
                 flex-direction: column;
             }
+
             .username-row {
                 display: flex;
                 align-items: center;
                 gap: 6px;
                 margin-bottom: 2px;
             }
+
             .username {
                 font-weight: 600;
                 color: #f2f3f5;
                 font-size: 14px;
             }
+
             .message-time {
                 top: 2px;
                 color: #949ba4;
                 font-size: 10px;
             }
+
             .icon {
                 width: 16px;
                 height: 16px;
             }
+
             .message-text {
                 color: #dcddde;
                 top: 3px;
@@ -105,22 +117,26 @@
                 overflow-wrap: break-word;
                 max-width: 760px;
             }
+
             .mention {
                 color: #7289da;
                 background-color: rgba(114, 137, 218, 0.1);
                 border-radius: 3px;
                 padding: 0 2px;
             }
+
             .image-container {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 margin-top: 8px;
             }
+
             .image-container img {
                 padding: 2px;
                 width: 130px;
                 height: 130px;
             }
+
             .reply-container {
                 position: relative;
                 display: inline;
@@ -132,6 +148,7 @@
                 margin-left: 56px;
                 padding-left: 8px;
             }
+
             .reply-container::before {
                 content: '';
                 position: absolute;
@@ -145,6 +162,7 @@
                 box-sizing: border-box;
                 pointer-events: none;
             }
+
             .reply-avatar {
                 width: 14px;
                 height: 14px;
@@ -154,6 +172,7 @@
                 margin-left: -4px;
                 margin-right: 6px;
             }
+
             .reply-message {
                 display: inline;
                 margin-left: -4px;
@@ -162,11 +181,13 @@
                 font-size: 12px;
                 word-wrap: break-word;
             }
+
             .reply-username {
                 font-weight: 600;
                 margin-right: 4px;
                 font-size: 12px;
             }
+
             .message-content.no-reply .reply-container {
                 display: none;
             }
@@ -180,38 +201,42 @@
                 data-toggle-class="no-reply"
             >
                 <div class="reply-container">
-                    <img
-                        class="reply-avatar"
-                        src="https://cdn.discordapp.com/avatars/419958345487745035/a_4613f8763f6b3a1107b83c5497a606bd.gif?size=1024"
-                        alt="reply-avatar"
-                        data-bind="replyAvatar"
-                    />
+                    <img class="reply-avatar" data-bind="replyAvatar" alt="reply-avatar" />
                     <div class="reply-message">
-                        <span class="reply-username" data-bind="replyUsername">@AnotherUser</span
-                        ><span data-bind="replyContent">This is the replied message</span>
+                        <span
+                            class="reply-username"
+                            data-color="replyUsernameColor"
+                            data-bind="replyUsername"
+                        ></span>
+                        <span class="message-text" data-bind="replyContent"></span>
                     </div>
                 </div>
+
                 <div class="message-wrapper">
-                    <img
-                        class="avatar"
-                        src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/jasper.png?raw=true"
-                        alt="avatar"
-                        data-bind="avatar"
-                    />
+                    <img class="avatar" data-bind="avatar" alt="avatar" />
                     <div>
                         <div class="username-row">
-                            <span class="username" data-bind="username">Username</span
-                            ><img
+                            <span
+                                class="username"
+                                data-color="usernameColor"
+                                data-bind="username"
+                            ></span>
+                            <img
                                 class="icon"
-                                src="https://raw.githubusercontent.com/JayyDoesDev/jasper/refs/heads/main/.github/assets/jasper.png"
-                                alt="icon"
                                 data-bind="roleIcon"
-                            /><span class="message-time" data-bind="timestamp"
-                                >Today at 12:34 PM</span
-                            >
+                                data-exists-then-display="roleIcon"
+                                data-toggle-class="hidden"
+                                alt="role icon"
+                            />
+                            <span class="message-time" data-bind="timestamp"></span>
                         </div>
-                        <div class="message-text" data-bind="content">Message text here</div>
-                        <div class="image-container" data-bind="attachments"></div>
+                        <div class="message-text" data-bind="content"></div>
+                        <div
+                            class="image-container"
+                            data-bind="attachments"
+                            data-exists-then-display="attachments"
+                            data-toggle-class="hidden"
+                        ></div>
                     </div>
                 </div>
             </div>

@@ -26,6 +26,8 @@ data class RenderData(
         val roleIcon: String? = null,
         val timestamp: String,
         val username: String,
+        val usernameColor: String? = null,
+        val replyUsernameColor: String? = null,
         val customData: Map<String, Any?> = emptyMap()
 )
 
@@ -158,6 +160,14 @@ object Playwright {
                             element.style.cssText += styleValue
                         }
                     })
+
+                    if (entryKey === 'usernameColor' || entryKey === 'replyUsernameColor') {
+                        document.querySelectorAll(`[data-color="${'$'}{entryKey}"]`).forEach(element => {
+                            if (element instanceof HTMLElement) {
+                                element.style.color = String(entryValue || '#FFFFFF')
+                            }
+                        })
+                    }
                 }
 
                 for (let [entryKey, entryValue] of Object.entries(data)) {

@@ -16,7 +16,6 @@ import SettingsService from '../Services/SettingsService';
 import TagService from '../Services/TagService';
 
 import { Env } from './Env';
-import { playwright, TPlaywright } from './Playwright';
 import { Store } from './Store';
 
 class Services {
@@ -36,7 +35,6 @@ export class Context extends Client {
         Command<ChatInputCommandInteraction | ContextMenuCommandInteraction>
     >;
     public readonly pagination!: ZillaCollection<Snowflake, State>;
-    public readonly playwright!: TPlaywright;
     public readonly plugin!: ZillaCollection<string, Plugin>;
     public readonly services!: Services;
     public readonly snipe!: ZillaCollection<Snowflake, Message>;
@@ -142,6 +140,5 @@ export class Context extends Client {
         );
         this.store = new Store(this);
         this.services = new Services(this);
-        this.playwright = playwright;
     }
 }
