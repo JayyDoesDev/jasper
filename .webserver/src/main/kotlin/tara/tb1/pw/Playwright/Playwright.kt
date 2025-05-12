@@ -125,7 +125,7 @@ object Playwright {
                                             "Could not get element dimensions"
                                     )
 
-                    page?.setViewportSize(
+                    page.setViewportSize(
                             maxOf(520, boundingBox.width.toInt()),
                             boundingBox.height.toInt()
                     )
@@ -160,9 +160,9 @@ object Playwright {
 
                     val objectMapper = jacksonObjectMapper()
                     val dataMap: Map<String, Any?> = objectMapper.convertValue(options.data)
-                    page?.evaluate(bindDataFunction, dataMap)
+                    page.evaluate(bindDataFunction, dataMap)
 
-                    page?.evaluate("() => document.fonts?.ready")
+                    page.evaluate("() => document.fonts?.ready")
 
                     val screenshotOptions =
                             ElementHandle.ScreenshotOptions()
