@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: transparent;
+            }
+            .meme-container {
+                position: relative;
+                display: inline-block;
+                max-width: 100%;
+            }
+            .meme-image {
+                max-width: 100%;
+                display: block;
+            }
+            .meme-text {
+                position: absolute;
+                width: 100%;
+                text-align: center;
+                color: white;
+                font-family: Impact, 'Arial Black', sans-serif;
+                font-size: 48px;
+                line-height: 1.2;
+                text-transform: uppercase;
+                text-shadow:
+                    3px 3px 0 #000,
+                    -3px -3px 0 #000,
+                    3px -3px 0 #000,
+                    -3px 3px 0 #000,
+                    0 3px 0 #000,
+                    3px 0 0 #000,
+                    0 -3px 0 #000,
+                    -3px 0 0 #000;
+                padding: 10px;
+                box-sizing: border-box;
+                word-wrap: break-word;
+            }
+            .top-text {
+                top: 0;
+            }
+            .bottom-text {
+                bottom: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="meme-container">
+            <img class="meme-image" data-bind="image" />
+            <div class="meme-text top-text">
+                <span data-bind="topText" data-bind-style="memestyle"></span>
+            </div>
+            <div class="meme-text bottom-text">
+                <span data-bind="bottomText" data-bind-style="memestyle"></span>
+            </div>
+        </div>
+    </body>
+</html>

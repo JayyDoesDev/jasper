@@ -25,7 +25,8 @@ data class RenderData(
         val replyUsername: String? = null,
         val roleIcon: String? = null,
         val timestamp: String,
-        val username: String
+        val username: String,
+        val customData: Map<String, Any?> = emptyMap()
 )
 
 data class RenderOptions(
@@ -55,8 +56,8 @@ object Playwright {
     private val templateCache = TemplateCache()
     private val safeList =
             Safelist.basic()
-                    .addAttributes("div", "class")
-                    .addAttributes("span", "class")
+                    .addAttributes("div", "class", "style")
+                    .addAttributes("span", "class", "style")
                     .addAttributes("img", "src", "alt", "title")
 
     init {
@@ -133,7 +134,7 @@ object Playwright {
                     val bindDataFunction =
                             """
             async function(data) {
-                for (let [entryKey, entryValue] of Object.entries(data)) {
+                const processElements = (entryKey, entryValue) => {
                     document.querySelectorAll(`[data-exists-then-display="${'$'}{entryKey}"]`).forEach(element => {
                         const toggleClass = element.getAttribute('data-toggle-class')
                         if (!toggleClass) return
@@ -150,6 +151,24 @@ object Playwright {
                             element.innerHTML = value.startsWith('<') && value.endsWith('>') ? value : value
                         }
                     })
+                    
+                    document.querySelectorAll(`[data-bind-style="${'$'}{entryKey}"]`).forEach(element => {
+                        if (element instanceof HTMLElement) {
+                            const styleValue = String(entryValue || '')
+                            element.style.cssText += styleValue
+                        }
+                    })
+                }
+
+                for (let [entryKey, entryValue] of Object.entries(data)) {
+                    if (entryKey === 'customData') continue;
+                    processElements(entryKey, entryValue)
+                }
+
+                if (data.customData) {
+                    for (let [entryKey, entryValue] of Object.entries(data.customData)) {
+                        processElements(entryKey, entryValue)
+                    }
                 }
 
                 await Promise.all(Array.from(document.images).map(img =>
