@@ -25,7 +25,8 @@ data class Snippet(
         val description: String,
         val thumbnails: Thumbnails,
         val channelTitle: String,
-        val liveBroadcastContent: String
+        val liveBroadcastContent: String,
+        val publishTime: String
 )
 
 data class Thumbnails(val `default`: Default, val medium: Medium, val high: High)

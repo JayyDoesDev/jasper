@@ -145,10 +145,10 @@ object Playwright {
                         element.classList.toggle(toggleClass, isEmpty)
                     })
                     document.querySelectorAll(`[data-bind-class="${'$'}{entryKey}"]`).forEach(element => {
-    if (element instanceof HTMLElement) {
-        element.className += ` ${'$'}{entryValue}`;
-    }
-});
+                        if (element instanceof HTMLElement) {
+                            element.className += ` ${'$'}{entryValue}`;
+                        }
+                    });
 
                     document.querySelectorAll(`[data-bind="${'$'}{entryKey}"]`).forEach(element => {
                         const value = String(entryValue || '')
