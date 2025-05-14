@@ -5,19 +5,11 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class YoutubeConfig(
-        @Value("\${web.youtube.api.key}") val youtubeApiKey: String,
-        @Value("\${web.youtube.api.key.two}") val youtubeApiKeyTwo: String,
-        @Value("\${web.youtube.api.key.three}") val youtubeApiKeyThree: String
+        @Value("\${web.youtube.api.key}") private val youtubeApiKey: String,
+        @Value("\${web.youtube.api.key.two}") private val youtubeApiKeyTwo: String,
+        @Value("\${web.youtube.api.key.three}") private val youtubeApiKeyThree: String
 ) {
-    fun getYoutubeApiKey(): String {
-        return youtubeApiKey
-    }
-
-    fun getYoutubeApiKeyTwo(): String {
-        return youtubeApiKeyTwo
-    }
-
-    fun getYoutubeApiKeyThree(): String {
-        return youtubeApiKeyThree
-    }
+    fun getYoutubeApiKey(): String = youtubeApiKey
+    fun getYoutubeApiKeyTwo(): String = youtubeApiKeyTwo
+    fun getYoutubeApiKeyThree(): String = youtubeApiKeyThree
 }

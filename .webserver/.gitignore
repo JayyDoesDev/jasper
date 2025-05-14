@@ -4,6 +4,12 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+!**/src/test/**/resources/application.properties
+
+# Application properties
+src/main/resources/application.properties
+!src/main/resources/application.properties.example
+
 jasper_webserver.zip
 
 ### STS ###

@@ -5,7 +5,7 @@ import java.time.Instant
 
 @Entity
 @Table(name = "youtube_videos")
-data class YoutubeVideo(
+data class YoutubeVideoEntity(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long = 0,
         val channelId: String,
         val title: String,
