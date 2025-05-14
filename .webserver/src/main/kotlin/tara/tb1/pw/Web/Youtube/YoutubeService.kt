@@ -1,11 +1,7 @@
 package tara.tb1.pw.Web.Youtube
 
-import java.io.IOException
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import org.springframework.stereotype.Service
+import tara.tb1.pw.Web.WebService
 
 data class YoutubeSearchResponse(
         val kind: String,
@@ -41,7 +37,7 @@ data class Medium(val url: String, val width: Int, val height: Int)
 data class High(val url: String, val width: Int, val height: Int)
 
 @Service
-class YoutubeService(private val youtubeConfig: YoutubeConfig) {
+class YoutubeService(private val youtubeConfig: YoutubeConfig, private val webService: WebService) {
 
     fun getYoutubeApiKey(): String {
         return youtubeConfig.getYoutubeApiKey()
@@ -56,30 +52,10 @@ class YoutubeService(private val youtubeConfig: YoutubeConfig) {
     }
 
     fun getLatestYoutubeVideo(channelId: String, apiKey: String): YoutubeSearchResponse? {
-        val httpClient = HttpClient.newHttpClient()
-        val request =
-                HttpRequest.newBuilder()
-                        .uri(
-                                URI.create(
-                                        "https://www.googleapis.com/youtube/v3/search?key=$apiKey&channelId=$channelId&part=snippet,id&order=date&maxResults=1"
-                                )
-                        )
-                        .header("Accept", "application/json")
-                        .build()
-        return try {
-            val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
-            if (response.statusCode() == 200) {
-                val responseBody = response.body()
-                val objectMapper = com.fasterxml.jackson.module.kotlin.jacksonObjectMapper()
-                objectMapper.readValue(responseBody, YoutubeSearchResponse::class.java)
-            } else {
-                println("Error: ${response.statusCode()} - ${response.body()}")
-                null
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
-        }
+        return webService.get<YoutubeSearchResponse>(
+                url =
+                        "https://www.googleapis.com/youtube/v3/search?key=$apiKey&channelId=$channelId&part=snippet,id&order=date&maxResults=1"
+        )
     }
 
     fun getRandomYoutubeApiKey(): String {
