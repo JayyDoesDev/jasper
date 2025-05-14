@@ -144,6 +144,11 @@ object Playwright {
                         const isEmpty = !entryValue || (typeof entryValue === 'string' && !entryValue.trim())
                         element.classList.toggle(toggleClass, isEmpty)
                     })
+                    document.querySelectorAll(`[data-bind-class="${'$'}{entryKey}"]`).forEach(element => {
+    if (element instanceof HTMLElement) {
+        element.className += ` ${'$'}{entryValue}`;
+    }
+});
 
                     document.querySelectorAll(`[data-bind="${'$'}{entryKey}"]`).forEach(element => {
                         const value = String(entryValue || '')
