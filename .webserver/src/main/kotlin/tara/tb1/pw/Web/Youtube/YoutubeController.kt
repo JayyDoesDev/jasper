@@ -81,4 +81,19 @@ class YoutubeController(
 
                 return ResponseEntity.ok(ChannelResponse(channelId = channelId, videos = videos))
         }
+
+        @GetMapping("/channel/{channelId}/subscribers")
+        fun getChannelSubscribers(@PathVariable channelId: String): ResponseEntity<Any> {
+                val channel =
+                        youtubeChannelRepository.findByChannelId(channelId)
+                                ?: return ResponseEntity.notFound().build()
+
+                return ResponseEntity.ok(
+                        mapOf(
+                                "channelId" to channel.channelId,
+                                "subscriberCount" to channel.subscriberCount,
+                                "lastUpdated" to channel.lastUpdated.toString()
+                        )
+                )
+        }
 }
