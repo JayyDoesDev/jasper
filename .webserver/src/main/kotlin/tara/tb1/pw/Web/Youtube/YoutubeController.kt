@@ -33,53 +33,52 @@ class YoutubeController(
         private val youtubeRepository: YoutubeRepository,
         private val youtubeChannelRepository: YoutubeChannelRepository
 ) {
-    @PostMapping("/channel")
-    fun addChannel(@RequestBody request: AddChannelRequest): ResponseEntity<Any> {
-        if (youtubeChannelRepository.existsByChannelId(request.channelId)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(mapOf("error" to "Channel already exists"))
+        @PostMapping("/channel")
+        fun addChannel(@RequestBody request: AddChannelRequest): ResponseEntity<Any> {
+                if (youtubeChannelRepository.existsByChannelId(request.channelId)) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(mapOf("error" to "Channel already exists"))
+                }
+
+                val apiKey = youtubeService.getRandomYoutubeApiKey()
+                val response = youtubeService.getLatestYoutubeVideo(request.channelId, apiKey)
+
+                if (response == null || response.items.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(mapOf("error" to "Channel not found or has no videos"))
+                }
+
+                val channel = YoutubeChannelEntity(channelId = request.channelId)
+                youtubeChannelRepository.save(channel)
+                return ResponseEntity.status(HttpStatus.CREATED).body(channel)
         }
 
-        val apiKey = youtubeService.getRandomYoutubeApiKey()
-        val response = youtubeService.getLatestYoutubeVideo(request.channelId, apiKey)
+        @GetMapping("/channel/{channelId}")
+        fun getChannelData(@PathVariable channelId: String): ResponseEntity<ChannelResponse> {
+                val videos =
+                        youtubeRepository
+                                .findByChannelId(channelId)
+                                .map { video ->
+                                        YoutubeResponse(
+                                                channelId = video.channelId,
+                                                title = video.title,
+                                                description = video.description,
+                                                thumbnailUrl = video.thumbnailUrl,
+                                                videoUrl = video.videoUrl,
+                                                publishedAt = video.publishedAt.toString(),
+                                                viewCount = video.viewCount,
+                                                likeCount = video.likeCount,
+                                                dislikeCount = video.dislikeCount,
+                                                commentCount = video.commentCount,
+                                                duration = video.duration
+                                        )
+                                }
+                                .sortedByDescending { Instant.parse(it.publishedAt) }
 
-        if (response == null || response.items.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(mapOf("error" to "Channel not found or has no videos"))
+                if (videos.isEmpty()) {
+                        return ResponseEntity.notFound().build()
+                }
+
+                return ResponseEntity.ok(ChannelResponse(channelId = channelId, videos = videos))
         }
-
-        val channel = YoutubeChannelEntity(channelId = request.channelId)
-        youtubeChannelRepository.save(channel)
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(channel)
-    }
-
-    @GetMapping("/channel/{channelId}")
-    fun getChannelData(@PathVariable channelId: String): ResponseEntity<ChannelResponse> {
-        val videos =
-                youtubeRepository
-                        .findByChannelId(channelId)
-                        .map { video ->
-                            YoutubeResponse(
-                                    channelId = video.channelId,
-                                    title = video.title,
-                                    description = video.description,
-                                    thumbnailUrl = video.thumbnailUrl,
-                                    videoUrl = video.videoUrl,
-                                    publishedAt = video.publishedAt.toString(),
-                                    viewCount = video.viewCount,
-                                    likeCount = video.likeCount,
-                                    dislikeCount = video.dislikeCount,
-                                    commentCount = video.commentCount,
-                                    duration = video.duration
-                            )
-                        }
-                        .sortedByDescending { Instant.parse(it.publishedAt) }
-
-        if (videos.isEmpty()) {
-            return ResponseEntity.notFound().build()
-        }
-
-        return ResponseEntity.ok(ChannelResponse(channelId = channelId, videos = videos))
-    }
 }

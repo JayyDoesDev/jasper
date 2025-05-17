@@ -41,11 +41,20 @@ class YoutubeSchedulerService(
 
     private fun updateChannel(channelId: String) {
         val apiKey = youtubeService.getRandomYoutubeApiKey()
+        var channelData = youtubeService.getYoutubeChannel(channelId, apiKey)
         val response = youtubeService.getLatestYoutubeVideo(channelId, apiKey)
 
         response?.items?.firstOrNull()?.let { videoItem ->
             youtubeChannelRepository.findByChannelId(channelId)?.let { channel ->
                 channel.lastUpdated = Instant.now()
+                channel.subscriberCount =
+                        channelData
+                                ?.items
+                                ?.firstOrNull()
+                                ?.statistics
+                                ?.subscriberCount
+                                ?.toIntOrNull()
+                                ?: 0
                 youtubeChannelRepository.save(channel)
             }
 
