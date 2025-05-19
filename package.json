@@ -38,7 +38,7 @@
         "gulp": "^5.0.0",
         "ioredis": "^5.6.1",
         "isomorphic-dompurify": "^2.24.0",
-        "mongoose": "^8.14.2",
+        "mongoose": "^8.15.0",
         "numeral": "^2.0.6",
         "playwright": "^1.51.1",
         "prettier": "^3.5.3"
