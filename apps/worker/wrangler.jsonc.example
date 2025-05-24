@@ -1,0 +1,36 @@
+{
+  "name": "jasper",
+  "compatibility_date": "2025-05-06",
+  "main": "src/index.ts",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "observability": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "",
+      "custom_domain": true
+    }
+  ],
+  "env": {
+    "dev": {
+      "vars": {
+        "BOT_ID": "",
+        "PUBLIC_KEY": "",
+        "BOT_TOKEN": "",
+        "GUILD_ID": ""
+      }
+    },
+    "production": {
+      "vars": {
+        "BOT_ID": "",
+        "PUBLIC_KEY": "",
+        "BOT_TOKEN": "",
+        "GUILD_ID": ""
+      }
+    }
+  }
+}

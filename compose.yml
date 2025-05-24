@@ -1,6 +1,8 @@
 services:
     bot:
-        build: .
+        build: 
+            context: ./apps/bot
+            dockerfile: Dockerfile
         container_name: jasper-bot
         environment:
             - BOTID=${BOTID}
@@ -32,6 +34,33 @@ services:
         depends_on:
             - mongo
             - redis
+
+    webserver:
+        build:
+            context: ./apps/webserver
+            dockerfile: Dockerfile
+        container_name: jasper-webserver
+        ports:
+            - "8080:8080"
+        environment:
+            - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/jasper
+            - SPRING_REDIS_HOST=redis
+            - SPRING_REDIS_PORT=6379
+        depends_on:
+            - mongo
+            - redis
+
+    worker:
+        build:
+            context: ./apps/worker
+            dockerfile: Dockerfile
+        container_name: jasper-worker
+        environment:
+            - BOTID=${BOTID}
+            - PUBLICKEY=${PUBLICKEY}
+            - TOKEN=${TOKEN}
+        ports:
+            - "8787:8787"
 
     mongo:
         image: mongo:latest

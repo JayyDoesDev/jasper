@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/jasper.png?raw=true" alt="jasper" width="500""></p>
 <h1 align="center">Jasper</h1>
-<h2 align="center">🔍🔨 A multipurpose Discord bot for the No Text To Speech Discord server!</h2>
+<h2 align="center">🔍 🔨 The muiltipurpose Discord bot for No Text To Speech!</h2>
 
 <div>
     <h2 align="center">
@@ -12,79 +12,102 @@
     </h2>
 </div>
 
-## Introduction
+- 🤖 **Bot** - The main Discord bot (Node.js)
+- 🌐 **Webserver** - Spring Boot server providing web functionality 
+- ☁️ **Worker** - Cloudflare Workers instance
 
-Jasper is a Discord bot designed to provide utility features such as tag management and subscriber count tracking for the No Text To Speech
-Discord Server. With Jasper, users can create, edit, delete, and use tags within the server, as well as keep track of the server's
-subscriber count.
+## Project Structure
 
-<p align="center">
-<img src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/Discord_AQ502PtCZj.gif?raw=true" alt="showcase">
-</p>
+```
+.
+├── apps/
+│   ├── bot/         # Discord bot application
+│   ├── webserver/   # Spring Boot server
+│   └── worker/      # Cloudflare Workers
+├── compose.yml      # Docker Compose configuration
+└── .env            # Environment variables
+```
 
-## Features
+## Getting Started
 
-- **Tag Management**: Jasper allows users to create custom tags containing text or embeds, which can be used by other members of the server.
-- **Subscriber Count Tracking**: Jasper tracks the number of subscribers in the server and provides real-time updates.
-- **Flexible Configuration**: Jasper offers various configuration options to tailor its behavior to suit the server's needs.
-- **Easy Integration**: Jasper seamlessly integrates with the No Text To Speech Discord Server and can be easily added to other servers as
-  well.
+1. Clone the repository
+2. Copy `.env.example` to `.env` and fill in required values
+3. Choose your preferred setup method:
 
-## Usage
+### Local Development
 
-To use Jasper, invite the bot to your Discord server and grant it the necessary permissions. Once added, users can interact with Jasper
-using the provided commands to manage tags, track subscriber counts, and more.
+Each application can be run locally:
 
-## Installation
+#### Bot
+```bash
+cd apps/bot
+yarn install
+yarn dev
+```
 
-To host your own instance of Jasper, follow these steps:
+#### Webserver
+```bash
+cd apps/webserver
+./gradlew bootRun
+```
 
-1. Clone this repository to your local machine.
-2. Install the required dependencies using `yarn`.
-3. Configure Jasper by creating a `.env` file in the root directory and adding the following environment variables:
+#### Worker
+```bash
+cd apps/worker
+yarn install
+yarn dev
+```
 
-    - `BOTID`: Your bot's ID.
-    - `PUBLICKEY`: Your bot's public key.
-    - `TOKEN`: Your bot's token.
-    - `MONGODB`: MongoDB connection string.
-    - `PREFIX`: Command prefix for your bot.
-    - `SUPPORT_ROLE`: ID of the role for support members.
-    - `ADMIN_ROLE`: ID of the role for admin members.
-    - `STAFF_ROLE`: ID of the role for staff members.
-    - `GUILD_ONLY_COMMANDS`: Set to `true` if you want some commands to be guild-only.
-    - `GUILD_ONLY_COMMANDS_GUILD_ID`: ID of the guild for guild-only commands.
-    - `YOUTUBE_CHANNEL_ID`: YouTube channel ID for subscriber count tracking.
-    - `YOUTUBE_KEY`: API key for YouTube Data API.
-    - `YOUTUBE_KEY_TWO`: A second API key Youtube Data API (use a second account).
-    - `YOUTUBE_KEY_THREE`: A third API key Youtube Data API (use a third account).
-    - `YOUTUBE_VIDEO_POST_CHANNEL_ID`: Youtube channel ID
-    - `YOUTUBE_VIDEO_POST_TIMER`: Interval in milliseconds for checking YouTube Data API.
-    - `YOUTUBE_VIDEO_POST_UPDATE`: Set to `1` to enable automatic posting for video discussions.
-    - `YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID`: The ping role id for video discussions.
-    - `SUB_COUNT_CHANNEL`: ID of the channel where subscriber count updates will be posted.
-    - `SUB_COUNT_TIMER`: Interval in milliseconds for subscriber count updates.
-    - `SUB_COUNT_UPDATE`: Set to `1` to enable automatic subscriber count updates.
-    - `REDISHOST`: Set your redis host.
-    - `REDISPORT`: Set your redis port.
-    - `SUPPORT_THREAD`: ID of the channel for the tags to be used in.
+### Using Docker
 
-4. Run the bot using `yarn start`.
+The entire ecosystem can be run using Docker Compose:
+
+```bash
+# Build all containers
+docker-compose build
+
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+Individual services can be managed with:
+
+```bash
+# Start/stop specific service
+docker-compose up -d [bot|webserver|worker]
+docker-compose stop [bot|webserver|worker]
+```
+
+## Environment Variables
+
+See the individual README files in each application directory for details on required environment variables:
+
+- [Bot Environment Variables](apps/bot/README.md#environment-variables)
+- [Webserver Environment Variables](apps/webserver/README.md#environment-variables)
+- [Worker Environment Variables](apps/worker/README.md#environment-variables)
+
+## Documentation
+
+Each application has its own README with detailed documentation:
+
+- [Bot Documentation](apps/bot/README.md)
+- [Webserver Documentation](apps/webserver/README.md)
+- [Worker Documentation](apps/worker/README.md)
 
 ## Contributing
 
-Contributions to Jasper are welcome! If you encounter any issues or have ideas for new features, feel free to open an issue or submit a pull
-request. Make sure to follow the contribution guidelines outlined in `CONTRIBUTING.md`.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this project.
 
-## Contributors
+## License
+
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
 <a href="https://github.com/JayyDoesDev/Jasper/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=JayyDoesDev/Jasper" />
 </a>
-
-## License
-
-Jasper is licensed under the MIT License. See `LICENSE` for more information.
-
----
-
-<p align="center">Made with ❤️ by JayyDoesDev</p>
