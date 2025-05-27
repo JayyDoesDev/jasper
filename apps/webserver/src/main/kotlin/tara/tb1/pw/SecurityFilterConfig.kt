@@ -10,7 +10,7 @@ class FilterConfig {
     @Bean
     fun apiKeyFilter(securityConfig: SecurityConfig): FilterRegistrationBean<ApiKeyFilter> {
         val registration = FilterRegistrationBean(ApiKeyFilter(securityConfig))
-        registration.addUrlPatterns("/playwright/*")
+        registration.addUrlPatterns("/playwright/*", "/web/*", "/fun/*")
         return registration
     }
 }

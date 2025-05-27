@@ -13,7 +13,7 @@ class ApiKeyFilter(private val securityConfig: SecurityConfig) : GenericFilterBe
         val httpRequest = request as HttpServletRequest
         val httpResponse = response as HttpServletResponse
 
-        val apiKeyHeader = httpRequest.getHeader("X-API-KEY")
+        val apiKeyHeader = httpRequest.getHeader("JASPER-API-KEY")
 
         if (apiKeyHeader != securityConfig.apiKey) {
             httpResponse.status = HttpServletResponse.SC_UNAUTHORIZED

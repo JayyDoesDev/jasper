@@ -28,7 +28,12 @@ data class RenderData(
         val username: String,
         val usernameColor: String? = null,
         val replyUsernameColor: String? = null,
-        val customData: Map<String, Any?> = emptyMap()
+        val customData: Map<String, Any?> = emptyMap(),
+        val userId: String? = null,
+        val roleId: String? = null,
+        val channelId: String? = null,
+        val roleName: String? = null,
+        val channelName: String? = null
 )
 
 data class RenderOptions(
@@ -118,6 +123,26 @@ object Playwright {
 
                     page?.evaluate("() => document.fonts?.ready")
 
+                    if (!options.data.attachments.isNullOrEmpty()) {
+                        page?.evaluate(
+                                """
+                            async () => {
+                                const images = document.getElementsByTagName('img');
+                                await Promise.all(
+                                    Array.from(images).map(img =>
+                                        img.complete ? 
+                                            Promise.resolve() : 
+                                            new Promise((resolve, reject) => {
+                                                img.onload = resolve;
+                                                img.onerror = reject;
+                                            })
+                                    )
+                                );
+                            }
+                        """.trimIndent()
+                        )
+                    }
+
                     val element =
                             page?.querySelector(options.selector ?: "body")
                                     ?: throw IllegalStateException("Could not find target element")
@@ -137,6 +162,14 @@ object Playwright {
                             """
             async function(data) {
                 const processElements = (entryKey, entryValue) => {
+                    if (entryKey === 'attachments' && Array.isArray(entryValue)) {
+                        const attachmentsDiv = document.querySelector('[data-bind-attachments]');
+                        if (attachmentsDiv && entryValue) {
+                            attachmentsDiv.innerHTML = entryValue.join('\n');
+                            attachmentsDiv.style.display = 'block';
+                        }
+                        return;
+                    }
                     document.querySelectorAll(`[data-exists-then-display="${'$'}{entryKey}"]`).forEach(element => {
                         const toggleClass = element.getAttribute('data-toggle-class')
                         if (!toggleClass) return
@@ -192,8 +225,40 @@ object Playwright {
             }
         """.trimIndent()
 
+                    val processedData =
+                            options.data.copy(
+                                    content =
+                                            if (options.data.userId != null) {
+                                                parseDiscordMentions(
+                                                        options.data.content,
+                                                        options.data.userId,
+                                                        options.data.roleId ?: "",
+                                                        options.data.channelId ?: "",
+                                                        options.data.username,
+                                                        options.data.roleName ?: "Role",
+                                                        options.data.channelName ?: "channel",
+                                                        options.data.customData
+                                                )
+                                            } else options.data.content,
+                                    replyContent =
+                                            if (options.data.userId != null &&
+                                                            options.data.replyContent != null
+                                            ) {
+                                                parseDiscordMentions(
+                                                        options.data.replyContent,
+                                                        options.data.userId,
+                                                        options.data.roleId ?: "",
+                                                        options.data.channelId ?: "",
+                                                        options.data.username,
+                                                        options.data.roleName ?: "Role",
+                                                        options.data.channelName ?: "channel",
+                                                        options.data.customData
+                                                )
+                                            } else options.data.replyContent
+                            )
+
                     val objectMapper = jacksonObjectMapper()
-                    val dataMap: Map<String, Any?> = objectMapper.convertValue(options.data)
+                    val dataMap: Map<String, Any?> = objectMapper.convertValue(processedData)
                     page.evaluate(bindDataFunction, dataMap)
 
                     page.evaluate("() => document.fonts?.ready")
@@ -287,4 +352,57 @@ object Playwright {
                     }
                 }
             }
+
+    fun parseDiscordMentions(
+            text: String,
+            userId: String,
+            roleId: String,
+            channelId: String,
+            userName: String = "User",
+            roleName: String = "Role",
+            channelName: String = "channel",
+            customData: Map<String, Any?> = emptyMap()
+    ): String {
+        val pattern = Regex("<(@!?|@&|#)(\\d+)>")
+
+        val objectMapper = jacksonObjectMapper()
+        val mentionedUsers =
+                customData["mentionedUsers"]?.let {
+                    objectMapper.convertValue<Map<String, String>>(it)
+                }
+                        ?: emptyMap()
+        val mentionedRoles =
+                customData["mentionedRoles"]?.let {
+                    objectMapper.convertValue<Map<String, String>>(it)
+                }
+                        ?: emptyMap()
+        val mentionedChannels =
+                customData["mentionedChannels"]?.let {
+                    objectMapper.convertValue<Map<String, String>>(it)
+                }
+                        ?: emptyMap()
+
+        return pattern.replace(text) { matchResult ->
+            val type = matchResult.groupValues[1]
+            val id = matchResult.groupValues[2]
+
+            when (type) {
+                "@!", "@" -> {
+                    val mentionedName = if (id == userId) userName else mentionedUsers[id] ?: "User"
+                    """<span class="mention user" data-id="$id">@${mentionedName}</span>"""
+                }
+                "@&" -> {
+                    val mentionedRoleName =
+                            if (id == roleId) roleName else mentionedRoles[id] ?: "Role"
+                    """<span class="mention role" data-id="$id">@${mentionedRoleName}</span>"""
+                }
+                "#" -> {
+                    val mentionedChannelName =
+                            if (id == channelId) channelName else mentionedChannels[id] ?: "channel"
+                    """<span class="mention channel" data-id="$id">#${mentionedChannelName}</span>"""
+                }
+                else -> matchResult.value
+            }
+        }
+    }
 }

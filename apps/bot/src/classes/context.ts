@@ -137,6 +137,7 @@ export class Context extends Client {
             { aliases: ['slowmode_msg_threshold'], env: 'SLOWMODE_MESSAGE_THRESHOLD' },
             { aliases: ['slowmode_reset_slowmode'], env: 'SLOWMODE_RESET_SLOWMODE' },
             { aliases: ['slowmode_reset_time'], env: 'SLOWMODE_RESET_TIME' },
+            { aliases: ['jasper_api_key'], env: 'JASPER_API_KEY'}
         );
         this.store = new Store(this);
         this.services = new Services(this);

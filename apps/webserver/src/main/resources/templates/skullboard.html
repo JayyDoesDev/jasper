@@ -119,22 +119,42 @@
             }
 
             .mention {
-                color: #7289da;
-                background-color: rgba(114, 137, 218, 0.1);
                 border-radius: 3px;
                 padding: 0 2px;
+                font-weight: 500;
+                cursor: pointer;
+                background: rgba(88, 101, 242, 0.15);
+                color: #5865f2;
+            }
+
+            .mention.role {
+                background: rgba(88, 101, 242, 0.15);
+                color: #5865f2;
+            }
+
+            .mention.user {
+                background: rgba(88, 101, 242, 0.15);
+                color: #5865f2;
+            }
+
+            .mention.channel {
+                background: rgba(35, 165, 90, 0.15);
+                color: #23a55a;
             }
 
             .image-container {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
                 margin-top: 8px;
+                max-width: 520px;
             }
 
             .image-container img {
-                padding: 2px;
-                width: 130px;
-                height: 130px;
+                border-radius: 8px;
+                max-width: 100%;
+                height: auto;
+                object-fit: contain;
             }
 
             .reply-container {
@@ -233,7 +253,7 @@
                         <div class="message-text" data-bind="content"></div>
                         <div
                             class="image-container"
-                            data-bind="attachments"
+                            data-bind-attachments
                             data-exists-then-display="attachments"
                             data-toggle-class="hidden"
                         ></div>

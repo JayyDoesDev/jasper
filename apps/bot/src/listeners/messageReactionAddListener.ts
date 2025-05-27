@@ -83,45 +83,41 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             throw new Error('Invalid avatar or role icon URL');
                         }
 
-                        const content = message.content || '';
-                        const parsedContent = (
-                            await this.playwright.parseMentions(
-                                this.ctx,
-                                message.guild.id,
-                                content.split(' '),
-                            )
-                        ).join(' ');
+                        const attachmentUrls = Array.from(message.attachments.values())
+                            .filter(attachment => attachment.url)
+                            .map(attachment => `<img src="${attachment.url}" alt="attachment" />`);
 
-                        let parsedReplyContent = '';
-                        if (repliedToMessage?.content) {
-                            const parsedReplyArray = await this.playwright.parseMentions(
-                                this.ctx,
-                                repliedToMessage.guild.id,
-                                repliedToMessage.content.split(' '),
-                            );
-                            parsedReplyContent = parsedReplyArray.join(' ');
-                        }
+                        // Get mentioned users info
+                        const mentionedUsers = new Map<string, string>();
+                        message.mentions.users.forEach(user => {
+                            mentionedUsers.set(user.id, user.username);
+                        });
 
-                        const attachmentHtml = [];
-                        if (message.attachments.size > 0) {
-                            message.attachments.forEach((attachment) => {
-                                if (attachment.url) {
-                                    attachmentHtml.push(`<img src="${attachment.url}" alt="attachment" />`);
-                                }
-                            });
-                        }
+                        // Prepare mentioned roles info
+                        const mentionedRoles = new Map<string, string>();
+                        message.mentions.roles.forEach(role => {
+                            mentionedRoles.set(role.id, role.name);
+                        });
 
                         const response = await fetch('http://localhost:8080/playwright/render', {
                             body: JSON.stringify({
-                                attachments: attachmentHtml.length > 0 ? attachmentHtml.join('\n') : null,
+                                attachments: attachmentUrls.length > 0 ? attachmentUrls : null,
                                 avatar: member.user.displayAvatarURL({
                                     forceStatic: true,
                                     size: 1024,
                                 }),
-                                content: parsedContent,
-                                roleIcon:
-                                    roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+                                channelId: message.channel.id,
+                                channelName: message.channel.isTextBased() && 'name' in message.channel ? message.channel.name : 'channel',
+                                content: message.content || '',
+                                customData: {
+                                    mentionedRoles: Object.fromEntries(mentionedRoles),
+                                    mentionedUsers: Object.fromEntries(mentionedUsers)
+                                },
+                                roleIcon: roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+                                roleId: typeof coloredRole === 'string' ? null : coloredRole.id,
+                                roleName: typeof coloredRole === 'string' ? 'Role' : coloredRole.name,
                                 timestamp: this.playwright.sanitize(timestamp),
+                                userId: message.author?.id,
                                 username: this.playwright.sanitize(message.author?.username || 'Unknown User') +
                                     (message.member
                                         ? ` (${this.playwright.sanitize(
@@ -135,7 +131,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                 ...(repliedToMessage && repliedToMember
                                     ? {
                                           replyAvatar: repliedToMessage.author.displayAvatarURL(),
-                                          replyContent: parsedReplyContent,
+                                          replyContent: repliedToMessage.content || '',
                                           replyUsername: '@' + this.playwright.sanitize(repliedToMember.user.username || 'Unknown User'),
                                           replyUsernameColor: typeof repliedColorRole === 'string' ? repliedColorRole : repliedColorRole.hexColor
                                       }
@@ -143,6 +139,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             }),
                             headers: {
                                 'Content-Type': 'application/json',
+                                'JASPER-API-KEY': this.ctx.env.get('jasper_api_key'),
                             },
                             method: 'POST',
                         });
