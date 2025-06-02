@@ -6,17 +6,38 @@ import {
 } from 'discord.js';
 
 import { Context } from '../classes/context';
-import Playwright from '../classes/playwright';
 import { defineEvent } from '../define';
 import { Options } from '../services/settingsService';
 
 import { Listener } from './listener';
 
+interface PlaywrightRenderRequest {
+    [key: string]: unknown;
+    attachments?: null | string[];
+    avatar: string;
+    channelId: string;
+    channelName: string;
+    content: string;
+    customData?: {
+        mentionedRoles: Record<string, string>;
+        mentionedUsers: Record<string, string>;
+    };
+    replyAvatar?: string;
+    replyContent?: string;
+    replyUsername?: string;
+    replyUsernameColor?: string;
+    roleIcon: string;
+    roleId: null | string;
+    roleName: string;
+    timestamp: string;
+    userId: string;
+    username: string;
+    usernameColor: string;
+}
+
 export default class MessageReactionAddListener extends Listener<'messageReactionAdd'> {
-    private playwright: Playwright;
     constructor(ctx: Context) {
         super(ctx, 'messageReactionAdd');
-        this.playwright = new Playwright();
     }
 
     public async execute(reaction: MessageReaction | PartialMessageReaction): Promise<void> {
@@ -77,76 +98,89 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             member?.roles?.highest?.iconURL() || message.guild.iconURL();
 
                         if (
-                            !this.playwright.isValidUrl(avatarUrl) ||
-                            (roleIconUrl && !this.playwright.isValidUrl(roleIconUrl))
+                            !this.ctx.webserver.isValidUrl(avatarUrl) ||
+                            (roleIconUrl && !this.ctx.webserver.isValidUrl(roleIconUrl))
                         ) {
                             throw new Error('Invalid avatar or role icon URL');
                         }
 
                         const attachmentUrls = Array.from(message.attachments.values())
-                            .filter(attachment => attachment.url)
-                            .map(attachment => `<img src="${attachment.url}" alt="attachment" />`);
+                            .filter((attachment) => attachment.url)
+                            .map(
+                                (attachment) => `<img src="${attachment.url}" alt="attachment" />`,
+                            );
 
                         // Get mentioned users info
                         const mentionedUsers = new Map<string, string>();
-                        message.mentions.users.forEach(user => {
+                        message.mentions.users.forEach((user) => {
                             mentionedUsers.set(user.id, user.username);
                         });
 
                         // Prepare mentioned roles info
                         const mentionedRoles = new Map<string, string>();
-                        message.mentions.roles.forEach(role => {
+                        message.mentions.roles.forEach((role) => {
                             mentionedRoles.set(role.id, role.name);
                         });
 
-                        const response = await fetch('http://localhost:8080/playwright/render', {
-                            body: JSON.stringify({
+                        const response = await this.ctx.webserver.request<PlaywrightRenderRequest>(
+                            'POST',
+                            'playwright/render',
+                            {
                                 attachments: attachmentUrls.length > 0 ? attachmentUrls : null,
                                 avatar: member.user.displayAvatarURL({
                                     forceStatic: true,
                                     size: 1024,
                                 }),
                                 channelId: message.channel.id,
-                                channelName: message.channel.isTextBased() && 'name' in message.channel ? message.channel.name : 'channel',
+                                channelName:
+                                    message.channel.isTextBased() && 'name' in message.channel
+                                        ? message.channel.name
+                                        : 'channel',
                                 content: message.content || '',
                                 customData: {
                                     mentionedRoles: Object.fromEntries(mentionedRoles),
-                                    mentionedUsers: Object.fromEntries(mentionedUsers)
+                                    mentionedUsers: Object.fromEntries(mentionedUsers),
                                 },
-                                roleIcon: roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+                                roleIcon:
+                                    roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
                                 roleId: typeof coloredRole === 'string' ? null : coloredRole.id,
-                                roleName: typeof coloredRole === 'string' ? 'Role' : coloredRole.name,
-                                timestamp: this.playwright.sanitize(timestamp),
+                                roleName:
+                                    typeof coloredRole === 'string' ? 'Role' : coloredRole.name,
+                                timestamp: this.ctx.webserver.sanitize(timestamp),
                                 userId: message.author?.id,
-                                username: this.playwright.sanitize(message.author?.username || 'Unknown User') +
+                                username:
+                                    this.ctx.webserver.sanitize(
+                                        message.author?.username || 'Unknown User',
+                                    ) +
                                     (message.member
-                                        ? ` (${this.playwright.sanitize(
+                                        ? ` (${this.ctx.webserver.sanitize(
                                               message.member.nickname ||
                                                   message.author?.globalName ||
                                                   '',
                                           )})`
-                                        : ''
-                                    ),
-                                usernameColor: typeof coloredRole === 'string' ? coloredRole : coloredRole.hexColor,
+                                        : ''),
+                                usernameColor:
+                                    typeof coloredRole === 'string'
+                                        ? coloredRole
+                                        : coloredRole.hexColor,
                                 ...(repliedToMessage && repliedToMember
                                     ? {
                                           replyAvatar: repliedToMessage.author.displayAvatarURL(),
                                           replyContent: repliedToMessage.content || '',
-                                          replyUsername: '@' + this.playwright.sanitize(repliedToMember.user.username || 'Unknown User'),
-                                          replyUsernameColor: typeof repliedColorRole === 'string' ? repliedColorRole : repliedColorRole.hexColor
+                                          replyUsername:
+                                              '@' +
+                                              this.ctx.webserver.sanitize(
+                                                  repliedToMember.user.username || 'Unknown User',
+                                              ),
+                                          replyUsernameColor:
+                                              typeof repliedColorRole === 'string'
+                                                  ? repliedColorRole
+                                                  : repliedColorRole.hexColor,
                                       }
                                     : {}),
-                            }),
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'JASPER-API-KEY': this.ctx.env.get('jasper_api_key'),
                             },
-                            method: 'POST',
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
+                            true,
+                        );
 
                         const buffer = await response.arrayBuffer();
                         const imageBuffer = Buffer.from(buffer);

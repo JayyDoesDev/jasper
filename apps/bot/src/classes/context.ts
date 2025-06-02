@@ -17,6 +17,7 @@ import TagService from '../services/tagService';
 
 import { Env } from './env';
 import { Store } from './store';
+import WebServer from './webserver';
 
 class Services {
     public readonly settings: SettingsService;
@@ -39,6 +40,7 @@ export class Context extends Client {
     public readonly services!: Services;
     public readonly snipe!: ZillaCollection<Snowflake, Message>;
     public readonly store!: Store;
+    public readonly webserver: WebServer = new WebServer(this);
 
     constructor() {
         super({
@@ -137,8 +139,10 @@ export class Context extends Client {
             { aliases: ['slowmode_msg_threshold'], env: 'SLOWMODE_MESSAGE_THRESHOLD' },
             { aliases: ['slowmode_reset_slowmode'], env: 'SLOWMODE_RESET_SLOWMODE' },
             { aliases: ['slowmode_reset_time'], env: 'SLOWMODE_RESET_TIME' },
-            { aliases: ['jasper_api_key'], env: 'JASPER_API_KEY'}
+            { aliases: ['jasper_api_url'], env: 'JASPER_API_URL' },
+            { aliases: ['jasper_api_key'], env: 'JASPER_API_KEY' },
         );
+        this.webserver = new WebServer(this);
         this.store = new Store(this);
         this.services = new Services(this);
     }

@@ -7,11 +7,7 @@ import mongoose from 'mongoose';
 
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
-import {
-    getLatestYoutubeVideo,
-    getRandomYoutubeAPIKey,
-    updateSubCountChannel,
-} from './youtube';
+import { getLatestYoutubeVideo, getRandomYoutubeAPIKey, updateSubCountChannel } from './youtube';
 
 config();
 

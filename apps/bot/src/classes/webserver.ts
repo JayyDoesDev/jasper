@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { GuildMember, Snowflake } from 'discord.js';
 import DOMPurify, { Config } from 'isomorphic-dompurify';
 
@@ -6,10 +7,12 @@ import { Context } from './context';
 const VALID_URL_PATTERN =
     /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net|i\.imgur\.com)\//;
 
-export default class Playwright {
+export default class WebServer {
+    private ctx: Context;
     private sanitizerConfig: Config;
 
-    public constructor() {
+    public constructor(ctx: Context) {
+        this.ctx = ctx;
         this.sanitizerConfig = {
             ALLOW_ARIA_ATTR: false,
             ALLOW_DATA_ATTR: false,
@@ -49,8 +52,29 @@ export default class Playwright {
         return text;
     }
 
+    public async request<Body extends Record<string, unknown>>(
+        method: string,
+        route: string,
+        body?: Body,
+        raw?: boolean,
+    ): Promise<any> {
+        const response = await fetch(`${this.ctx.env.get('jasper_api_url')}/${route}`, {
+            body: body ? JSON.stringify(body) : undefined,
+            headers: {
+                'Content-Type': 'application/json',
+                'JASPER-API-KEY': this.ctx.env.get('jasper_api_key') || '',
+            },
+            method,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return raw ? response : response.json();
+    }
+
     public sanitize(text: string): string {
         return DOMPurify.sanitize(text, this.sanitizerConfig);
     }
- 
 }
