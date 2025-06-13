@@ -1,10 +1,10 @@
-# JasperExternalDependencies
+# Jasper Databases [MongoDB and Redis]
 
-This project provides the external dependencies infrastructure for the Jasper Bot ecosystem using Docker containers. It sets up MongoDB and Redis services in an isolated Docker network with fixed IP addresses.
+This contains databases infrastructure for the Jasper Bot using Docker containers. It sets up MongoDB and Redis services in an isolated Docker network with fixed IP addresses.
 
 ## 📋 Overview
 
-The JasperExternalDependencies project contains:
+The Jasper Databases [MongoDB and Redis] contains:
 - **MongoDB**: Database service for persistent data storage
 - **Redis**: In-memory cache and session storage
 - **Docker Network**: Isolated network configuration for service communication
@@ -114,7 +114,7 @@ REDISPORT=6379
 ## 📁 Project Structure
 
 ```
-JasperExternalDependencies/
+apps/databases
 ├── docker-compose.yml          # Main Docker Compose configuration
 ├── docker_network.sh          # Network creation script
 ├── README.md                   # This documentation
