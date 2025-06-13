@@ -1,0 +1,32 @@
+networks:
+  jasper_network:
+    name: jasper_network
+    external: true
+
+services:
+  jasper_redis:
+    image: redis:latest
+    container_name: jasper_redis
+    restart: unless-stopped
+    env_file:
+      - ./env/redis.env
+    volumes:
+      - ./volumes/redis_data:/data
+    networks:
+      jasper_network:
+        ipv4_address: 172.30.1.2
+    # ports:
+    #   - "6379:6379"
+  jasper_mongo:
+    image: mongo:8-noble
+    container_name: jasper_mongo
+    restart: unless-stopped
+    env_file:
+      - ./env/mongo.env
+    volumes:
+      - ./volumes/mongodb_data:/data/db
+    networks:
+      jasper_network:
+        ipv4_address: 172.30.1.3
+    # ports:
+    #   - "27017:27017"
