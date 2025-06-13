@@ -22,10 +22,11 @@
 .
 ├── apps/
 │   ├── bot/         # Discord bot application
+|   ├── databases/   # MongoDB and Redis Docker Containers
 │   ├── webserver/   # Spring Boot server
 │   └── worker/      # Cloudflare Workers
 ├── compose.yml      # Docker Compose configuration
-└── .env            # Environment variables
+└── .env             # Environment variables
 ```
 
 ## Getting Started
@@ -44,6 +45,9 @@ cd apps/bot
 yarn install
 yarn dev
 ```
+
+#### Databases
+Follow the setup instructions in [apps/databases/README.md](apps/databases/README.md) to configure and start MongoDB and Redis services. 
 
 #### Webserver
 ```bash
@@ -89,6 +93,7 @@ docker-compose stop [bot|webserver|worker]
 See the individual README files in each application directory for details on required environment variables:
 
 - [Bot Environment Variables](apps/bot/README.md#environment-variables)
+- [Databases Instances Variables](apps/bot/README.md#environment-variables)
 - [Webserver Environment Variables](apps/webserver/README.md#environment-variables)
 - [Worker Environment Variables](apps/worker/README.md#environment-variables)
 
@@ -97,6 +102,7 @@ See the individual README files in each application directory for details on req
 Each application has its own README with detailed documentation:
 
 - [Bot Documentation](apps/bot/README.md)
+- [Databases Instances Documentation](apps/databases/README.md)
 - [Webserver Documentation](apps/webserver/README.md)
 - [Worker Documentation](apps/worker/README.md)
 
