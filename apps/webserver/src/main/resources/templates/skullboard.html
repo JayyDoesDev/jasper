@@ -62,6 +62,13 @@
                 margin-top: -4px;
             }
 
+            .message-wrapper .message-content{
+                margin-top: 2px;
+                margin-left: 6px;
+                display: flex;
+                flex-direction: column;
+            }
+
             .no-reply .message-wrapper {
                 margin-top: 0;
             }
@@ -69,6 +76,7 @@
             .avatar {
                 width: 40px;
                 height: 40px;
+                margin-top: 2px;
                 border-radius: 50%;
                 margin-right: 8px;
                 object-fit: cover;
@@ -76,6 +84,7 @@
             }
 
             .message-content {
+                top: -2px;
                 flex: 1;
                 min-width: 0;
                 flex-wrap: wrap;
@@ -88,17 +97,18 @@
                 align-items: center;
                 gap: 6px;
                 margin-bottom: 2px;
+                margin-left: 1px;
             }
 
             .username {
-                font-weight: 600;
+                font-weight:600;
                 color: #f2f3f5;
-                font-size: 14px;
+                font-size: 16px;
             }
 
             .message-time {
                 top: 2px;
-                color: #949ba4;
+                color: #9b9ca3;
                 font-size: 10px;
             }
 
@@ -108,9 +118,10 @@
             }
 
             .message-text {
-                color: #dcddde;
-                top: 3px;
-                font-size: 13px;
+                color: #dedfe1;
+                margin-top: 2px;
+                font-size: 16px;
+                font-weight: 400;
                 line-height: 18px;
                 white-space: pre-wrap;
                 word-wrap: break-word;
@@ -159,22 +170,24 @@
 
             .reply-container {
                 position: relative;
-                display: inline;
+                display: flex;
+                flex-direction: row;
                 align-items: center;
                 font-size: 13px;
                 line-height: 16px;
                 color: #b5bac1;
-                margin-bottom: 5px;
-                margin-left: 56px;
-                padding-left: 8px;
+                margin-bottom: 8px;
+                margin-left: 52px;
+                padding-left: 4px;
             }
+
 
             .reply-container::before {
                 content: '';
                 position: absolute;
                 top: 7px;
-                left: -36px;
-                width: 36px;
+                left: -33px;
+                width: 33px;
                 height: 60%;
                 border-left: 2px solid #4e5058;
                 border-top: 2px solid #4e5058;
@@ -184,28 +197,40 @@
             }
 
             .reply-avatar {
-                width: 14px;
-                height: 14px;
+                width: 16px;
+                height: 16px;
                 border-radius: 50%;
                 object-fit: cover;
                 flex-shrink: 0;
-                margin-left: -4px;
-                margin-right: 6px;
+                margin-left: -2px;
+                margin-top: -1px;
+                margin-right: 4px;
             }
 
             .reply-message {
-                display: inline;
-                margin-left: -4px;
+                display: flex;
                 flex-wrap: wrap;
                 max-width: 400px;
                 font-size: 12px;
+                margin-top: -1px;
                 word-wrap: break-word;
+                align-items: center;
             }
 
-            .reply-username {
-                font-weight: 600;
+            .reply-message .message-text{
+                font-weight: 300;
                 margin-right: 4px;
                 font-size: 12px;
+                color: #dddee0;
+                margin-top: 0;
+            }
+
+
+            .reply-username {
+                font-weight: 300;
+                margin-right: 4px;
+                font-size: 12px;
+                color: #878d94;
             }
 
             .message-content.no-reply .reply-container {
@@ -234,7 +259,7 @@
 
                 <div class="message-wrapper">
                     <img class="avatar" data-bind="avatar" alt="avatar" />
-                    <div>
+                    <div class="message-content">
                         <div class="username-row">
                             <span
                                 class="username"
