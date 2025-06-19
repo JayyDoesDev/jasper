@@ -1,15 +1,28 @@
 spring.application.name=jasper-webserver
+server.port=8080
 
-# Hikari Connection Pool Configuration
-spring.datasource.hikari.maximum-pool-size=
-spring.datasource.hikari.minimum-idle=
-spring.datasource.hikari.idle-timeout=
-spring.datasource.hikari.connection-timeout=
-spring.datasource.hikari.max-lifetime=
-spring.datasource.hikari.auto-commit=
-spring.datasource.hikari.connection-test-query=
+# H2 Database (File-Based)
+spring.datasource.url=jdbc:h2:file:./data/mydb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=jasper_h2
+spring.datasource.password=jasper
+
+# Hikari Connection Pool
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.max-lifetime=1200000
+spring.datasource.hikari.auto-commit=true
+
+# Hibernate DDL
+spring.jpa.hibernate.ddl-auto=update
+
+# H2 Console
+spring.h2.console.enabled=false
+spring.h2.console.path=/h2-console
 
 security.api-key=your_api_key_here
-web.youtube.api.key=your_api_key_here
-web.youtube.api.key.two=your_api_key_here
-web.youtube.api.key.three=your_api_key_here
+web.youtube.api.key=
+web.youtube.api.key.two=
+web.youtube.api.key.three=
