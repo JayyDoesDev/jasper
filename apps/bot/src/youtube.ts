@@ -3,20 +3,20 @@ import numeral from 'numeral';
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
 
-export interface YoutubeChannelBase {
+export interface YoutubeChannelResponseBase {
     channelId: string;
 }
 
-export interface YoutubeChannelResponse extends YoutubeChannelBase {
+export interface YoutubeChannelResponse extends YoutubeChannelResponseBase {
     videos: YoutubeResponse[];
 }
 
-export interface YoutubeChannelSubscribersResponse extends YoutubeChannelBase {
+export interface YoutubeChannelSubscribersResponse extends YoutubeChannelResponseBase {
     lastUpdated: string;
     subscriberCount: number;
 }
 
-export interface YoutubeResponse extends YoutubeChannelBase {
+export interface YoutubeResponse extends YoutubeChannelResponseBase {
     commentCount: number;
     description: string;
     dislikeCount: number;
