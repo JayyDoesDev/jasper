@@ -35,7 +35,7 @@ export async function getChannel<T = YoutubeChannelResponse>(
 ): Promise<null | T> {
     let data = await context.webserver.request('GET', `/web/youtube/channel/${youtubeId}`);
 
-    if (data.includes('404')) {
+    if (!data || typeof data !== 'object' || !('status' in data)) {
         await context.webserver.request('POST', `/web/youtube/channel`, { channelId: youtubeId });
         data = await context.webserver.request('GET', `/web/youtube/channel/${youtubeId}`);
     }
