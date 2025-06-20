@@ -24,7 +24,16 @@ data class YoutubeResponse(
         val duration: String,
 )
 
-data class ChannelResponse(val channelId: String, val videos: List<YoutubeResponse>)
+data class ChannelResponse(val channelId: String, val videos: List<YoutubeResponse>) {
+        companion object {
+                fun fromEntity(
+                        entity: YoutubeChannelEntity,
+                        videos: List<YoutubeResponse>
+                ): ChannelResponse {
+                        return ChannelResponse(channelId = entity.channelId, videos = videos)
+                }
+        }
+}
 
 @RestController
 @RequestMapping("/web/youtube")
@@ -95,5 +104,41 @@ class YoutubeController(
                                 "lastUpdated" to channel.lastUpdated.toString()
                         )
                 )
+        }
+
+        @GetMapping("/channels")
+        fun getChannels(): ResponseEntity<List<ChannelResponse>> {
+                val channels = youtubeChannelRepository.findAll()
+
+                val response =
+                        channels.map { channel ->
+                                val videos =
+                                        youtubeRepository
+                                                .findByChannelId(channel.channelId)
+                                                .map { video ->
+                                                        YoutubeResponse(
+                                                                channelId = video.channelId,
+                                                                title = video.title,
+                                                                description = video.description,
+                                                                thumbnailUrl = video.thumbnailUrl,
+                                                                videoUrl = video.videoUrl,
+                                                                publishedAt =
+                                                                        video.publishedAt
+                                                                                .toString(),
+                                                                viewCount = video.viewCount,
+                                                                likeCount = video.likeCount,
+                                                                dislikeCount = video.dislikeCount,
+                                                                commentCount = video.commentCount,
+                                                                duration = video.duration
+                                                        )
+                                                }
+                                                .sortedByDescending {
+                                                        Instant.parse(it.publishedAt)
+                                                }
+
+                                ChannelResponse.fromEntity(channel, videos)
+                        }
+
+                return ResponseEntity.ok(response)
         }
 }
