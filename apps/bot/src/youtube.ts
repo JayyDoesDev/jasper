@@ -70,7 +70,7 @@ export async function getLatestYoutubeVideo<T = YoutubeResponse>(
 ): Promise<null | T> {
     const data = await getChannel(context, youtubeId);
 
-    if (!data || !data.videos || data.videos.length === 0) {
+    if (!data || typeof data !== 'object' || !('status' in data) || data.videos.length === 0) {
         return null;
     }
 
