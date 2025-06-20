@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
-import { getLatestYoutubeVideo, getRandomYoutubeAPIKey, updateSubCountChannel } from './youtube';
+import { getChannelSubscribers, getLatestYoutubeVideo, updateSubCountChannel } from './youtube';
 
 config();
 
@@ -69,10 +69,7 @@ async function postNewVideo(): Promise<void> {
     if (ctx.env.get('youtube_post_update') === '0') return;
 
     try {
-        const latest = await getLatestYoutubeVideo(
-            ctx.env.get('youtube_id'),
-            getRandomYoutubeAPIKey(ctx),
-        );
+        const latest = await getLatestYoutubeVideo(ctx, ctx.env.get('youtube_id'));
 
         const channel = ctx.channels.resolve(ctx.env.get('youtube_post_channel')) as TextChannel;
         if (!channel) {
@@ -88,12 +85,12 @@ async function postNewVideo(): Promise<void> {
             console.log(err);
         }
 
-        if (currentVideoId === latest.id) {
+        if (currentVideoId === latest.videoUrl) {
             return;
         }
 
         const messages = await channel.messages.fetch({ limit: 100 });
-        if (messages.some((message) => message.content.includes(latest.id))) {
+        if (messages.some((message) => message.content.includes(latest.videoUrl))) {
             console.log('Latest video already posted.');
             return;
         }
@@ -102,7 +99,7 @@ async function postNewVideo(): Promise<void> {
             allowedMentions: { roles: [ctx.env.get('youtube_video_discussions_role')] },
             content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${
                 latest.description
-            }\nhttps://www.youtube.com/watch?v=${latest.id}`,
+            }\n${latest.videoUrl}`,
         });
 
         const thread = await message.startThread({
@@ -131,7 +128,7 @@ async function postNewVideo(): Promise<void> {
 
         await Promise.all([
             fs.writeFile(CONFIG.paths.latestThread, JSON.stringify({ thread: thread.id })),
-            fs.writeFile(CONFIG.paths.latestVideo, JSON.stringify({ video: latest.id })),
+            fs.writeFile(CONFIG.paths.latestVideo, JSON.stringify({ video: latest.channelId })),
         ]);
     } catch (error) {
         console.error('Error in postNewVideo:', error);

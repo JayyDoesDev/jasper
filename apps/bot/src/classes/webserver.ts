@@ -58,7 +58,7 @@ export default class WebServer {
         body?: Body,
         raw?: boolean,
     ): Promise<any> {
-        const response = await fetch(`${this.ctx.env.get('jasper_api_url')}/${route}`, {
+        const response = await fetch(`${this.ctx.env.get('jasper_api_url')}${route}`, {
             body: body ? JSON.stringify(body) : undefined,
             headers: {
                 'Content-Type': 'application/json',
@@ -67,11 +67,20 @@ export default class WebServer {
             method,
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (raw) return response;
+
+        const contentType = response.headers.get('Content-Type') || '';
+        console.log(response)
+        if (response.status === 204 || !contentType.includes('application/json')) {
+            return null;
         }
 
-        return raw ? response : response.json();
+        try {
+            return await response.json();
+        } catch (err) {
+            console.error('Failed to parse JSON:', err);
+            return null;
+        }
     }
 
     public sanitize(text: string): string {

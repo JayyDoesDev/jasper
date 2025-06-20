@@ -11,7 +11,7 @@ export default class ReadyListener extends Listener<'ready'> {
 
     public execute(): void {
         if (this.ctx.env.get('sub_update') === '1') {
-            updateSubCountChannel(this.ctx);
+            updateSubCountChannel(this.ctx, this.ctx.env.get('youtube_id'));
         }
         console.log(`${this.ctx.user.username} has logged in!`);
     }

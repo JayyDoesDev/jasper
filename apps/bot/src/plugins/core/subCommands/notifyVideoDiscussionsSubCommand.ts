@@ -6,7 +6,7 @@ import { ChatInputCommandInteraction, MessageFlags, TextChannel } from 'discord.
 
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
-import { getLatestYoutubeVideo, getRandomYoutubeAPIKey } from '../../../youtube';
+import { getLatestYoutubeVideo } from '../../../youtube';
 
 const paths = {
     latestThread: path.join(process.cwd(), 'latestthread.json'),
@@ -17,8 +17,8 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         try {
             const latest = await getLatestYoutubeVideo(
+                ctx,
                 ctx.env.get('youtube_id'),
-                getRandomYoutubeAPIKey(ctx),
             );
 
             const channel = ctx.channels.resolve(
@@ -40,7 +40,7 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
                 await fs.writeFile(paths.latestVideo, JSON.stringify({ video: '' }));
             }
 
-            if (currentVideoId === latest.id) {
+            if (currentVideoId === latest.videoUrl) {
                 await interaction.reply({
                     content: 'It looks like the most recent video has already been posted.',
                     flags: MessageFlags.Ephemeral,
@@ -49,7 +49,7 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
             }
 
             const messages = await channel.messages.fetch({ limit: 100 });
-            if (messages.some((message) => message.content.includes(latest.id))) {
+            if (messages.some((message) => message.content.includes(latest.videoUrl))) {
                 await interaction.reply({
                     content: 'Latest video already posted.',
                     flags: MessageFlags.Ephemeral,
@@ -59,7 +59,7 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
 
             const message = await channel.send({
                 allowedMentions: { roles: [ctx.env.get('youtube_video_discussions_role')] },
-                content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${latest.description}\nhttps://www.youtube.com/watch?v=${latest.id}`,
+                content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${latest.description}\n${latest.videoUrl}`,
             });
 
             const thread = await message.startThread({
@@ -88,7 +88,7 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
 
             await Promise.all([
                 fs.writeFile(paths.latestThread, JSON.stringify({ thread: thread.id })),
-                fs.writeFile(paths.latestVideo, JSON.stringify({ video: latest.id })),
+                fs.writeFile(paths.latestVideo, JSON.stringify({ video: latest.videoUrl })),
             ]);
 
             await interaction.reply({
