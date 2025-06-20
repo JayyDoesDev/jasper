@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/jasper.png?raw=true" alt="jasper" width="500""></p>
 <h1 align="center">Jasper</h1>
-<h2 align="center">🔍 🔨 The muiltipurpose Discord bot for No Text To Speech!</h2>
+<h2 align="center">🔍 🔨 The multipurpose Discord bot for No Text To Speech!</h2>
 
 <div>
     <h2 align="center">
