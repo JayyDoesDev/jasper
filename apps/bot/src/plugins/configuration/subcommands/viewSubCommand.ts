@@ -14,7 +14,7 @@ const createTable = (table: string, fields: string[], locked: boolean) => {
 const createField = (
     field: string,
     data: Snowflake[],
-    options: { isChannel: boolean; isRole: boolean; isUser: boolean; },
+    options: { isChannel: boolean; isRole: boolean; isUser: boolean },
 ) => {
     if (!data || data.length === 0) {
         return `   * **${field}:** None\n`;

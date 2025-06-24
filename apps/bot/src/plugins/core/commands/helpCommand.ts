@@ -7,7 +7,16 @@ import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { defineCommand } from '../../../define';
 import { documentationAutocomplete } from '../controllers/documentationAutocomplete';
 
-const documentationPath = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'DOCUMENTATION.md');
+const documentationPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    'DOCUMENTATION.md',
+);
 const documentationContent = fs.readFileSync(documentationPath, 'utf-8');
 
 export = {

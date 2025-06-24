@@ -4,7 +4,7 @@ import { ICommand } from '@antibot/interactions';
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 import { sync } from 'glob';
 
-import { Context } from '../classes/context'
+import { Context } from '../classes/context';
 import { Command, Plugin } from '../define';
 import { Combine } from '../types';
 

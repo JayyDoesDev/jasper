@@ -35,7 +35,7 @@ data class YoutubeSearchSnippet(
 )
 
 data class YoutubeSearchThumbnails(
-        val `default`: YoutubeSearchDefault,
+        val default: YoutubeSearchDefault,
         val medium: YoutubeSearchMedium,
         val high: YoutubeSearchHigh
 )

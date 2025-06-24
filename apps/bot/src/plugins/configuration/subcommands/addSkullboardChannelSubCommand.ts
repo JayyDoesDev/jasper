@@ -3,10 +3,7 @@ import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
-import {
-    createConfigurationExistsEmbed,
-    createConfigurationUpdateEmbed,
-} from '../../../embeds';
+import { createConfigurationExistsEmbed, createConfigurationUpdateEmbed } from '../../../embeds';
 import { GuildSnowflake } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 

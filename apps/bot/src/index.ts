@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
-import { getChannelSubscribers, getLatestYoutubeVideo, updateSubCountChannel } from './youtube';
+import { getLatestYoutubeVideo, updateSubCountChannel } from './youtube';
 
 config();
 
@@ -52,10 +52,10 @@ async function main() {
             console.log('Database disconnected');
         });
 
-        setInterval(postNewVideo, ctx.env.get('youtube_post_timer'));
+        setInterval(postNewVideo, Number(ctx.env.get('youtube_post_timer')) * 1000);
 
         if (ctx.env.get('sub_update') === '1') {
-            setInterval(updateSubCountChannel, ctx.env.get('sub_timer'));
+            setInterval(updateSubCountChannel, Number(ctx.env.get('sub_timer')) * 1000);
         }
 
         await ctx.login(ctx.env.get('botToken'));

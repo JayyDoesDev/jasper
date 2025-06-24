@@ -66,7 +66,7 @@ class SettingsService extends Service {
                 SkullboardBoolean: false,
                 SkullboardChannel: null,
                 SkullboardEmoji: '💀',
-                SkullboardReactionThreshold: 4
+                SkullboardReactionThreshold: 4,
             },
             Text: { Topics: [] },
             Users: { IgnoreSnipedUsers: [] },
@@ -101,7 +101,7 @@ class SettingsService extends Service {
                 SkullboardBoolean: Skullboard.SkullboardBoolean,
                 SkullboardChannel: Skullboard.SkullboardChannel,
                 SkullboardEmoji: Skullboard.SkullboardEmoji ?? '💀',
-                SkullboardReactionThreshold: Skullboard.SkullboardReactionThreshold
+                SkullboardReactionThreshold: Skullboard.SkullboardReactionThreshold,
             },
             Text: { Topics: Text.Topics },
             Users: { IgnoreSnipedUsers: Users.IgnoreSnipedUsers },

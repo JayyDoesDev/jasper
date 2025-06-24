@@ -8,7 +8,16 @@ import { Context } from '../../../classes/context';
 import { defineCommand } from '../../../define';
 import { documentationAutocomplete } from '../controllers/documentationAutocomplete';
 
-const documentationPath = path.join(__dirname, '..', '..', '..', '..', '..', '..', 'CONTRIBUTING.md');
+const documentationPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    'CONTRIBUTING.md',
+);
 const documentationContent = fs.readFileSync(documentationPath, 'utf-8');
 
 export = {

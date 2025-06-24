@@ -70,7 +70,7 @@ export default class WebServer {
         if (raw) return response;
 
         const contentType = response.headers.get('Content-Type') || '';
-        console.log(response)
+
         if (response.status === 204 || !contentType.includes('application/json')) {
             return null;
         }

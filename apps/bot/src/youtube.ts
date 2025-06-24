@@ -3,12 +3,12 @@ import numeral from 'numeral';
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
 
-export interface YoutubeChannelResponseBase {
-    channelId: string;
-}
-
 export interface YoutubeChannelResponse extends YoutubeChannelResponseBase {
     videos: YoutubeResponse[];
+}
+
+export interface YoutubeChannelResponseBase {
+    channelId: string;
 }
 
 export interface YoutubeChannelSubscribersResponse extends YoutubeChannelResponseBase {
@@ -84,7 +84,7 @@ export async function updateSubCountChannel(context: Context, youtubeId: string)
         numeral(data.subscriberCount).format('0.00a'),
     ).toUpperCase();
     // @ts-ignore
-    const channel = ctx.channels.cache.get(ctx.env.get('sub_count_channel')) as TextChannel;
+    const channel = context.channels.cache.get(context.env.get('sub_count_channel')) as TextChannel;
     if (channel) {
         void channel.setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
     }

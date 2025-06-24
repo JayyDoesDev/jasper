@@ -4,10 +4,7 @@ import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { Context } from '../../../classes/context';
 import { getChannelConfigurationContainer } from '../../../container';
 import { defineSubCommand } from '../../../define';
-import {
-    createConfigurationExistsEmbed,
-    createConfigurationUpdateEmbed,
-} from '../../../embeds';
+import { createConfigurationExistsEmbed, createConfigurationUpdateEmbed } from '../../../embeds';
 import { Settings } from '../../../models/guildSchema';
 import { Options, SetChannelOptions } from '../../../services/settingsService';
 
