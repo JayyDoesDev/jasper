@@ -90,6 +90,10 @@ export const RemoveTopicSubCommand = defineSubCommand({
 
         const updatedTopics = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
 
+        const updatedPages = chunk(updatedTopics, 10);
+        state.addTopicPages.pages = updatedPages;
+        state.addTopicPages.page = Math.min(state.addTopicPages.page, updatedPages.length - 1);
+
         await interaction.reply({
             components,
             content: `I've removed **${topic}** from the topics list.`,
