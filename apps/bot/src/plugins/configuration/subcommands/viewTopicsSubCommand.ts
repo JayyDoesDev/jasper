@@ -26,37 +26,36 @@ export const ViewTopicsSubCommand = defineSubCommand({
             return;
         }
 
-        var components;
-        if (topicsExistInDB.length === 0) {
-            components = [];
-        } else {
+        let components = [];
+        
+        if (!topicsExistInDB.length === 0) {
             components = [
-                {
-                    components: [
-                        {
-                            customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                            disabled: state.addTopicPages.page === 0,
-                            label: 'Previous',
-                            style: ButtonStyle.Primary as const,
-                            type: ComponentType.Button as const,
-                        },
-                        {
-                            customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
-                            label: 'Home',
-                            style: ButtonStyle.Secondary as const,
-                            type: ComponentType.Button as const,
-                        },
-                        {
-                            customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
-                            disabled:
-                                state.addTopicPages.page === state.addTopicPages.pages.length - 1,
-                            label: 'Next',
-                            style: ButtonStyle.Primary as const,
-                            type: ComponentType.Button as const,
-                        },
-                    ],
-                    type: ComponentType.ActionRow as const,
-                },
+                    {
+                        components: [
+                            {
+                                customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
+                                disabled: state.addTopicPages.page === 0,
+                                label: 'Previous',
+                                style: ButtonStyle.Primary as const,
+                                type: ComponentType.Button as const,
+                            },
+                            {
+                                customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                                label: 'Home',
+                                style: ButtonStyle.Secondary as const,
+                                type: ComponentType.Button as const,
+                            },
+                            {
+                                customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                                disabled:
+                                    state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                                label: 'Next',
+                                style: ButtonStyle.Primary as const,
+                                type: ComponentType.Button as const,
+                            },
+                        ],
+                        type: ComponentType.ActionRow as const,
+                    },
             ];
         }
 
