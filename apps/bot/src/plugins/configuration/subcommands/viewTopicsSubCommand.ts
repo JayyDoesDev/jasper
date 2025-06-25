@@ -26,33 +26,39 @@ export const ViewTopicsSubCommand = defineSubCommand({
             return;
         }
 
-        const components = [
-            {
-                components: [
-                    {
-                        customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === 0,
-                        label: 'Previous',
-                        style: ButtonStyle.Primary as const,
-                        type: ComponentType.Button as const,
-                    },
-                    {
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
-                        label: 'Home',
-                        style: ButtonStyle.Secondary as const,
-                        type: ComponentType.Button as const,
-                    },
-                    {
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
-                        label: 'Next',
-                        style: ButtonStyle.Primary as const,
-                        type: ComponentType.Button as const,
-                    },
-                ],
-                type: ComponentType.ActionRow as const,
-            },
-        ];
+        var components;
+        if (topicsExistInDB.length === 0) {
+            components = [];
+        } else {
+            components = [
+                {
+                    components: [
+                        {
+                            customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
+                            disabled: state.addTopicPages.page === 0,
+                            label: 'Previous',
+                            style: ButtonStyle.Primary as const,
+                            type: ComponentType.Button as const,
+                        },
+                        {
+                            customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                            label: 'Home',
+                            style: ButtonStyle.Secondary as const,
+                            type: ComponentType.Button as const,
+                        },
+                        {
+                            customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                            disabled:
+                                state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                            label: 'Next',
+                            style: ButtonStyle.Primary as const,
+                            type: ComponentType.Button as const,
+                        },
+                    ],
+                    type: ComponentType.ActionRow as const,
+                },
+            ];
+        }
 
         await interaction.reply({
             components,
@@ -65,7 +71,7 @@ export const ViewTopicsSubCommand = defineSubCommand({
                                 (string, i) =>
                                     `**${state.addTopicPages.page * 10 + i + 1}.** *${string}*`,
                             )
-                            .join('\n') || 'No topics',
+                            .join('\n') || 'There are no topics configured.',
                     footer: {
                         text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${topicsExistInDB.length}`,
                     },
