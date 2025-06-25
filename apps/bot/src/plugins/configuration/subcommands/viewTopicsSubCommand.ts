@@ -60,7 +60,7 @@ export const ViewTopicsSubCommand = defineSubCommand({
                 {
                     color: global.embedColor,
                     description:
-                        state.addTopicPages.pages[state.addTopicPages.page]
+                        (state.addTopicPages.pages[state.addTopicPages.page] || [])
                             .map(
                                 (string, i) =>
                                     `**${state.addTopicPages.page * 10 + i + 1}.** *${string}*`,
