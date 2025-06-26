@@ -74,12 +74,8 @@ Required environment variables:
 
 YouTube integration:
 - `YOUTUBE_CHANNEL_ID`: YouTube channel ID to monitor
-- `YOUTUBE_KEY`: YouTube API key
-- `YOUTUBE_KEY_TWO`: Backup YouTube API key
-- `YOUTUBE_KEY_THREE`: Additional backup YouTube API key
 - `YOUTUBE_VIDEO_POST_CHANNEL_ID`: Channel ID for video notifications
 - `YOUTUBE_VIDEO_POST_TIMER`: Notification check interval
-- `YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID`: Role ID for video discussion notifications
 - `YOUTUBE_VIDEO_POST_UPDATE`: Enable video post updates
 - `SUB_COUNT_CHANNEL`: Channel ID for subscriber count updates
 - `SUB_COUNT_TIMER`: Subscriber count check interval

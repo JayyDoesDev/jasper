@@ -84,7 +84,7 @@ export async function updateSubCountChannel(context: Context, youtubeId: string)
         numeral(data.subscriberCount).format('0.00a'),
     ).toUpperCase();
     // @ts-ignore
-    const channel = context.channels.cache.get(context.env.get('sub_count_channel')) as TextChannel;
+    const channel = context.channels.cache.get(context.env.get('sub_count_channel')) as VoiceChannel;
     if (channel) {
         void channel.setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
     }

@@ -98,17 +98,6 @@ export class Context extends Client {
                 env: 'GUILD_ONLY_COMMANDS_GUILD_ID',
             },
             { aliases: ['youtube_id', 'youtube_channel_id', 'youtube'], env: 'YOUTUBE_CHANNEL_ID' },
-            { aliases: ['youtube_key_regular', 'youtube_key_one'], env: 'YOUTUBE_KEY' },
-            { aliases: ['youtube_key_two'], env: 'YOUTUBE_KEY_TWO' },
-            { aliases: ['youtube_key_three'], env: 'YOUTUBE_KEY_THREE' },
-            {
-                aliases: [
-                    'youtube_video_post_channel_id',
-                    'youtube_post_channel',
-                    'youtube_video_post_channel',
-                ],
-                env: 'YOUTUBE_VIDEO_POST_CHANNEL_ID',
-            },
             {
                 aliases: ['youtube_video_post_timer', 'youtube_post_timer'],
                 env: 'YOUTUBE_VIDEO_POST_TIMER',
@@ -116,14 +105,6 @@ export class Context extends Client {
             {
                 aliases: ['youtube_video_post_update', 'youtube_post_update'],
                 env: 'YOUTUBE_VIDEO_POST_UPDATE',
-            },
-            {
-                aliases: [
-                    'youtube_video_discussions_role_id',
-                    'youtube_video_discussions_role',
-                    'youtube_video_disscussions',
-                ],
-                env: 'YOUTUBE_VIDEO_DISCUSSIONS_ROLE_ID',
             },
             { aliases: ['sub_count_channel'], env: 'SUB_COUNT_CHANNEL' },
             { aliases: ['sub_count_time', 'sub_timer', 'sub_count_time'], env: 'SUB_COUNT_TIMER' },
