@@ -1,15 +1,12 @@
-FROM node:18-alpine
+FROM node:20
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json yarn.lock ./
+# Copy source code
+COPY ./ ./
 
 # Install dependencies
 RUN yarn install --frozen-lockfile
-
-# Copy source code
-COPY . .
 
 # Build TypeScript
 RUN yarn build

@@ -27,8 +27,8 @@ export const ViewTopicsSubCommand = defineSubCommand({
         }
 
         let components = [];
-        
-        if (!topicsExistInDB.length === 0) {
+
+        if (topicsExistInDB.length === 0) {
             components = [
                     {
                         components: [
