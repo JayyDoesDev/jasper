@@ -107,7 +107,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                         const attachmentUrls = Array.from(message.attachments.values())
                             .filter((attachment) => attachment.url)
                             .map(
-                                (attachment) => `<img src="${attachment.url}" alt="attachment" />`,
+                                (attachment) => attachment.url,
                             );
 
                         // Get mentioned users info
@@ -124,7 +124,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
 
                         const response = await this.ctx.webserver.request<PlaywrightRenderRequest>(
                             'POST',
-                            'playwright/render',
+                            '/fun/skullboard',
                             {
                                 attachments: attachmentUrls.length > 0 ? attachmentUrls : null,
                                 avatar: member.user.displayAvatarURL({
@@ -152,7 +152,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                     this.ctx.webserver.sanitize(
                                         message.author?.username || 'Unknown User',
                                     ) +
-                                    (message.member
+                                    (message.member && message.member.nickname
                                         ? ` (${this.ctx.webserver.sanitize(
                                               message.member.nickname ||
                                                   message.author?.globalName ||
@@ -182,6 +182,12 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             true,
                         );
 
+                        if (!response.ok) {
+                            throw new Error(
+                                `Failed to generate image: ${response.status} ${response.statusText}`,
+                            );
+                        }
+
                         const buffer = await response.arrayBuffer();
                         const imageBuffer = Buffer.from(buffer);
 
@@ -197,6 +203,16 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                             inline: true,
                                             name: 'Author',
                                             value: `<@${message.author?.id}>`,
+                                        },
+                                        {
+                                            inline: true,
+                                            name: 'Channel',
+                                            value: `<#${message.channel.id}>`,
+                                        },
+                                        {
+                                            inline: true,
+                                            name: 'Message Link',
+                                            value: `[Jump to message](https://discord.com/channels/${message.guildId}/${message.channel.id}/${message.id})`,
                                         },
                                     ],
                                     image: {

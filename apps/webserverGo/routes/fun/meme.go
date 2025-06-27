@@ -9,7 +9,6 @@ import (
 )
 
 func MemeHandler(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
     var requestBody struct {
         FontSize float64 `json:"fontsize"`
         Img      string  `json:"img"`

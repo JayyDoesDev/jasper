@@ -2,6 +2,7 @@ package meme
 
 import (
 	"image"
+	"log/slog"
 	"strings"
 
 	"github.com/fogleman/gg"
@@ -48,6 +49,7 @@ func wrapText(dc *gg.Context, text string, maxWidth float64) []string {
 func GenImage(URL string, fontSize float64, caption string) (image.Image, error) {
 	img, err := utils.LoadImageFromURL(URL)
 	if err != nil {
+        slog.Error("Failed to load image from URL", "url", URL, "error", err)
         return nil, err
 	}
 
@@ -56,6 +58,7 @@ func GenImage(URL string, fontSize float64, caption string) (image.Image, error)
 
 	dc := gg.NewContext(imgWidth, 1000)
 	if err := dc.LoadFontFace(fontPath, fontSize); err != nil {
+        slog.Error("Failed to load font face", "fontPath", fontPath, "error", err)
 		return nil, err
 	}
 
@@ -68,6 +71,7 @@ func GenImage(URL string, fontSize float64, caption string) (image.Image, error)
 
 	dc = gg.NewContext(imgWidth, totalHeight)
 	if err := dc.LoadFontFace(fontPath, fontSize); err != nil {
+        slog.Error("Failed to load font face", "fontPath", fontPath, "error", err)
 		return nil, err
 	}
 
