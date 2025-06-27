@@ -4,8 +4,7 @@ import {
 } from '@antibot/interactions';
 import {
     AttachmentBuilder,
-    ChatInputCommandInteraction,
-    MessageFlags,
+    ChatInputCommandInteraction
 } from 'discord.js';
 
 import { Context } from '../../../classes/context';
@@ -37,15 +36,13 @@ export = {
             const image = interaction.options.getAttachment('image', true);
 
             try {
+                await interaction.deferReply();
                 const response = await fetch('http://localhost:8080/fun/meme', {
                     body: JSON.stringify({
-                        bottomText: '',
-                        fontSize: 48,
-                        image: image.url,
-                        memeStyle: 'classic',
-                        strokeColor: '#000000',
-                        textColor: '#ffffff',
-                        topText: text,
+                        fontSize: 72,
+                        img: image.url,
+                        position: 'top',
+                        text: text,
                 }),
                     headers: {
                         'Content-Type': 'application/json',
@@ -55,7 +52,7 @@ export = {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Render server error: ${response.status}`);
+                    throw new Error(`Render server error: ${response.status} ${await response.text()}`);
                 }
 
                 const buffer = await response.arrayBuffer();
@@ -65,14 +62,13 @@ export = {
                     name: 'captioned.png',
                 });
 
-                return interaction.reply({
+                return interaction.editReply({
                     files: [attachment],
                 });
             } catch (error) {
                 console.error('Caption command error:', error);
-                return interaction.reply({
-                    content: 'There was an error generating the caption.',
-                    flags: MessageFlags.Ephemeral,
+                return interaction.editReply({
+                    content: 'There was an error generating the caption.'
                 });
             }
         },

@@ -1,19 +1,16 @@
-package image_gen
+package meme
 
 import (
-	"fmt"
 	"image"
-	"image/png"
-	"log"
-	"net/http"
-	"os"
 	"strings"
 
 	"github.com/fogleman/gg"
+
+	"jasper/utils"
 )
 
 const (
-	fontPath   = "./impact.ttf"
+	fontPath   = "./generators/meme/impact.ttf"
 	lineHeight = 1.5
 	textMargin = 50
 )
@@ -47,29 +44,11 @@ func wrapText(dc *gg.Context, text string, maxWidth float64) []string {
 	return lines
 }
 
-func loadImageFromURL(url string) (image.Image, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to fetch image: status code %d", resp.StatusCode)
-	}
-
-	img, err := png.Decode(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return img, nil
-}
-
 // pls make default font size 72 tyvm
-func GenImage(URL string, fontSize float64, caption string) {
-	img, err := loadImageFromURL(URL)
+func GenImage(URL string, fontSize float64, caption string) (image.Image, error) {
+	img, err := utils.LoadImageFromURL(URL)
 	if err != nil {
-		log.Fatal(err)
+        return nil, err
 	}
 
 	imgWidth := img.Bounds().Dx()
@@ -77,7 +56,7 @@ func GenImage(URL string, fontSize float64, caption string) {
 
 	dc := gg.NewContext(imgWidth, 1000)
 	if err := dc.LoadFontFace(fontPath, fontSize); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	maxTextWidth := float64(imgWidth - 40)
@@ -89,7 +68,7 @@ func GenImage(URL string, fontSize float64, caption string) {
 
 	dc = gg.NewContext(imgWidth, totalHeight)
 	if err := dc.LoadFontFace(fontPath, fontSize); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	dc.SetRGB(1, 1, 1)
@@ -107,13 +86,5 @@ func GenImage(URL string, fontSize float64, caption string) {
 
 	dc.DrawImageAnchored(img, imgWidth/2, boxHeight+imgHeight/2, 0.5, 0.5)
 
-	outFile, err := os.Create("output.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer outFile.Close()
-
-	if err := png.Encode(outFile, dc.Image()); err != nil {
-		log.Fatal(err)
-	}
+	return dc.Image(), nil
 }

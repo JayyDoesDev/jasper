@@ -9,10 +9,9 @@ import (
     "github.com/joho/godotenv"
 
     "jasper/middleware"
-    "jasper/routes/youtube"
+    routes_yt "jasper/routes/youtube"
+    routes_fun "jasper/routes/fun"
 )
-
-// Handler for /youtube/{id}
 
 func main() {
     err := godotenv.Load()
@@ -23,8 +22,10 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(middleware.AuthMiddleware)
 
-	r.HandleFunc("/youtube/{id}", youtube.ChannelInfoHandler).Methods("GET")
-	r.HandleFunc("/youtube/{id}/subscribers", youtube.SubscriberCountHandler).Methods("GET")
+	r.HandleFunc("/youtube/{id}", routes_yt.ChannelInfoHandler).Methods("GET")
+	r.HandleFunc("/youtube/{id}/subscribers", routes_yt.SubscriberCountHandler).Methods("GET")
+
+    r.HandleFunc("/fun/meme", routes_fun.MemeHandler).Methods("POST")
 
 	fmt.Println("Server is running on :8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
