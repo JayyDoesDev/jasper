@@ -54,7 +54,17 @@ func RenderTemplateToImage(data SkullboardPageData) (image.Image, error) {
     }
     tmpFile.Close()
 
-    ctx, cancel := chromedp.NewContext(context.Background())
+    opts := append(chromedp.DefaultExecAllocatorOptions[:],
+        chromedp.ExecPath("chromium"), // Set this to the right path for Chromium
+        chromedp.Headless,
+        chromedp.DisableGPU,
+        chromedp.NoSandbox, // optional, for Docker compatibility
+    )
+
+    ctx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+    defer cancel()
+
+    ctx, cancel = chromedp.NewContext(ctx)
     defer cancel()
 
     err = chromedp.Run(ctx,
