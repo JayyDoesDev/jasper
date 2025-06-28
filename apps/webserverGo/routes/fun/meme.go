@@ -37,7 +37,7 @@ func MemeHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // Generate the meme image
-    img, err := meme.GenImage(requestBody.Img, requestBody.FontSize, requestBody.Text)
+    img, err := meme.GenImage(requestBody.Img, requestBody.FontSize, requestBody.Text, requestBody.Position)
 
     if err != nil {
         http.Error(w, "Failed to generate meme image: "+err.Error(), http.StatusInternalServerError)

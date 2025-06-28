@@ -13,7 +13,7 @@ import (
 const (
 	fontPath   = "./generators/meme/impact.ttf"
 	lineHeight = 1.5
-	textMargin = 50
+	textMargin = 30
 )
 
 func wrapText(dc *gg.Context, text string, maxWidth float64) []string {
@@ -46,7 +46,7 @@ func wrapText(dc *gg.Context, text string, maxWidth float64) []string {
 }
 
 // pls make default font size 72 tyvm
-func GenImage(URL string, fontSize float64, caption string) (image.Image, error) {
+func GenImage(URL string, fontSize float64, caption string, position string) (image.Image, error) {
 	img, err := utils.LoadImageFromURL(URL)
 	if err != nil {
         slog.Error("Failed to load image from URL", "url", URL, "error", err)
@@ -76,11 +76,20 @@ func GenImage(URL string, fontSize float64, caption string) (image.Image, error)
 	}
 
 	dc.SetRGB(1, 1, 1)
-	dc.DrawRectangle(0, 0, float64(imgWidth), float64(boxHeight))
+    if position == "top" {
+		dc.DrawRectangle(0, 0, float64(imgWidth), float64(boxHeight))
+	} else {
+		dc.DrawRectangle(0, float64(imgHeight), float64(imgWidth), float64(boxHeight))
+	}
 	dc.Fill()
 
 	dc.SetRGB(0, 0, 0)
-	startY := float64(boxHeight)/2 - textHeight/2 + fontSize
+	var startY float64
+    if position == "top" {
+		startY = float64(boxHeight)/2 - textHeight/2 + fontSize
+	} else {
+		startY = float64(imgHeight) + float64(boxHeight)/2 - textHeight/2 + fontSize
+	}
 	for i, line := range lines {
 		w, _ := dc.MeasureString(line)
 		x := float64(imgWidth)/2 - w/2
@@ -88,7 +97,11 @@ func GenImage(URL string, fontSize float64, caption string) (image.Image, error)
 		dc.DrawString(line, x, y)
 	}
 
-	dc.DrawImageAnchored(img, imgWidth/2, boxHeight+imgHeight/2, 0.5, 0.5)
+    if position == "top" {
+		dc.DrawImageAnchored(img, imgWidth/2, boxHeight+imgHeight/2, 0.5, 0.5)
+	} else {
+		dc.DrawImageAnchored(img, imgWidth/2, imgHeight/2, 0.5, 0.5)
+	}
 
 	return dc.Image(), nil
 }

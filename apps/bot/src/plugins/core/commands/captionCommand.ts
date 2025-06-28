@@ -28,21 +28,45 @@ export = {
                     required: true,
                     type: ApplicationCommandOptionType.ATTACHMENT,
                 },
+                {
+                    description: 'Font size for the caption',
+                    name: 'font_size',
+                    required: false,
+                    type: ApplicationCommandOptionType.INTEGER,
+                },
+                {
+                    choices: [
+                        {
+                            name: 'Top',
+                            value: 'top',
+                        },
+                        {
+                            name: 'Bottom',
+                            value: 'bottom',
+                        },
+                    ],
+                    description: 'Position of the caption (top or bottom)',
+                    name: 'position',
+                    required: false,
+                    type: ApplicationCommandOptionType.STRING,
+                }
             ],
             type: ApplicationCommandType.CHAT_INPUT,
         },
         on: async (ctx: Context, interaction) => {
             const text = interaction.options.getString('text', true);
             const image = interaction.options.getAttachment('image', true);
+            const fontSize = interaction.options.getInteger('font_size') ?? 72;
+            const position = interaction.options.getString('position') ?? 'top';
 
             try {
                 await interaction.deferReply();
                 const response = await fetch('http://localhost:8080/fun/meme', {
                     body: JSON.stringify({
-                        fontSize: 72,
+                        fontSize,
                         img: image.url,
-                        position: 'top',
-                        text: text,
+                        position,
+                        text
                 }),
                     headers: {
                         'Content-Type': 'application/json',
