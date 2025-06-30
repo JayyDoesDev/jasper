@@ -1,5 +1,14 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    MessageFlags,
+    ContainerBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+    SeparatorBuilder,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
+} from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationRoles } from '../../../container';
@@ -33,15 +42,36 @@ export const ShowSubCommand = defineSubCommand({
             return;
         }
 
-        const embed = {
-            color: global.embedColor,
-            description: tag.TagEmbedDescription,
-            footer: { text: tag.TagEmbedFooter },
-            image: { url: tag.TagEmbedImageURL },
-            title: tag.TagEmbedTitle,
-        };
+        const container = new ContainerBuilder()
+            .setAccentColor(global.embedColor)
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`### ${tag.TagEmbedTitle}`),
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Large).setDivider(true),
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`${tag.TagEmbedDescription}`),
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+            );
 
-        await interaction.editReply({ embeds: [embed] });
+        if (tag.TagEmbedImageURL) {
+            container.addMediaGalleryComponents(
+                new MediaGalleryBuilder().addItems(
+                    new MediaGalleryItemBuilder().setURL(`${tag.TagEmbedImageURL}`),
+                ),
+            );
+        }
+        container.addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
+        );
+
+        await interaction.editReply({
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+        });
     },
     name: 'show',
     restrictToConfigRoles: [
