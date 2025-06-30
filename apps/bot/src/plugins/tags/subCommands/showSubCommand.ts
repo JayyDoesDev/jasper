@@ -33,15 +33,34 @@ export const ShowSubCommand = defineSubCommand({
             return;
         }
 
-        const embed = {
-            color: global.embedColor,
-            description: tag.TagEmbedDescription,
-            footer: { text: tag.TagEmbedFooter },
-            image: { url: tag.TagEmbedImageURL },
-            title: tag.TagEmbedTitle,
-        };
+        const container = new (require('discord.js').ContainerBuilder)().setAccentColor(global.embedColor)
+            .addTextDisplayComponents(
+                new (require('discord.js').TextDisplayBuilder)().setContent(`### ${tag.TagEmbedTitle}`),
+            )
+            .addSeparatorComponents(
+                new (require('discord.js').SeparatorBuilder)().setSpacing(require('discord.js').SeparatorSpacingSize.Large).setDivider(true),
+            )
+            .addTextDisplayComponents(
+                new (require('discord.js').TextDisplayBuilder)().setContent(`${tag.TagEmbedDescription}`),
+            )
+            .addSeparatorComponents(
+                new (require('discord.js').SeparatorBuilder)().setSpacing(require('discord.js').SeparatorSpacingSize.Small).setDivider(true),
+            );
 
-        await interaction.editReply({ embeds: [embed] });
+        if (tag.TagEmbedImageURL) {
+            container.addMediaGalleryComponents(
+                new (require('discord.js').MediaGalleryBuilder)()
+                    .addItems(
+                        new (require('discord.js').MediaGalleryItemBuilder)()
+                            .setURL(`${tag.TagEmbedImageURL}`),
+                    ),
+            );
+        }
+        container.addTextDisplayComponents(
+            new (require('discord.js').TextDisplayBuilder)().setContent(`-# ${tag.TagEmbedFooter}`)
+        );
+
+        await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
     },
     name: 'show',
     restrictToConfigRoles: [

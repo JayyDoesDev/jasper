@@ -4,7 +4,7 @@ import {
     ApplicationCommandType,
     PermissionsBitField,
 } from '@antibot/interactions';
-import { ChannelType, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, ContainerBuilder, MessageFlags, TextDisplayBuilder } from 'discord.js';
 
 import { ConfigurationRoles } from '../../../container';
 import { defineCommand } from '../../../define';
@@ -32,16 +32,26 @@ export = {
             type: ApplicationCommandType.CHAT_INPUT,
         },
         on: async (ctx, interaction) => {
-            const finalReply: Record<'content', string> = {
-                content: `Post marked as Resolved by <@${interaction.user.id}>`,
-            };
+            const container = new ContainerBuilder().setAccentColor(global.embedColor)
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(`-# Post marked as Resolved by <@${interaction.user.id}>`)
+                );
             const originalQuestion: string = interaction.options.getString('original_question');
             const summarizedAnswer: string = interaction.options.getString('summarized_answer');
-            const embeds: {
-                color: number;
-                fields: { name: string; value: string }[];
-                title: string;
-            }[] = [{ color: global.embedColor, fields: [], title: 'Overview' }];
+            if (originalQuestion) {
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(`**Original Question:**\n${originalQuestion}`)
+                );
+            }
+            if (summarizedAnswer) {
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(`**Summarized Answer:**\n${summarizedAnswer}`)
+                );
+            }
+            const finalReply: Record<string, any> = {
+                components: [container],
+                flags: MessageFlags.IsComponentsV2,
+            };
 
             const appliedTags = (interaction.channel as any).appliedTags;
             if (interaction.channel.type == ChannelType.PublicThread) {
@@ -74,21 +84,7 @@ export = {
                         ...appliedTags,
                     ]);
                 }
-                if (originalQuestion) {
-                    embeds[0].fields.push({
-                        name: 'Original Question',
-                        value: originalQuestion,
-                    });
-                }
-                if (summarizedAnswer) {
-                    embeds[0].fields.push({
-                        name: 'Summarized Answer',
-                        value: summarizedAnswer,
-                    });
-                }
-                if (embeds[0].fields.length > 0) {
-                    finalReply['embeds'] = embeds;
-                }
+
                 await interaction.reply(finalReply);
                 if (!interaction.channel.locked) {
                     await interaction.channel.setLocked(true);
