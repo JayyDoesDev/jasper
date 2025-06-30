@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction } from 'discord.js';
+import { ChatInputCommandInteraction, ContainerBuilder, MediaGalleryBuilder, MediaGalleryItemBuilder, MessageFlags, SeparatorBuilder, SeparatorSpacingSize, TextDisplayBuilder } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationRoles } from '../../../container';
@@ -24,26 +24,51 @@ export const UseSubCommand = defineSubCommand({
         const name = interaction.options.getString('tag-name', true);
         const mention = interaction.options.getUser('mention');
 
-        await interaction.deferReply();
-
         ctx.services.tags.configure<Options>({ guildId, name });
         const tag = await ctx.services.tags.getValues<Options, TagResponse>();
 
         if (!tag) {
-            await interaction.editReply('Tag not found.');
+            await interaction.reply({ content: 'Tag not found.', ephemeral: true });
             return;
         }
 
-        const embed = {
-            color: global.embedColor,
-            description: tag.TagEmbedDescription,
-            footer: { text: tag.TagEmbedFooter },
-            image: { url: tag.TagEmbedImageURL },
-            title: tag.TagEmbedTitle,
-        };
+        await interaction.deferReply(); 
+        const container = new ContainerBuilder().setAccentColor(global.embedColor);
 
-        const content = mention ? `${mention}` : undefined;
-        await interaction.editReply({ content, embeds: [embed] });
+        if (mention) {
+            container.addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`${mention}`)
+            );
+        }
+
+        container
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`### ${tag.TagEmbedTitle}`),
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Large).setDivider(true),
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`${tag.TagEmbedDescription}`),
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+            );
+
+        if (tag.TagEmbedImageURL) {
+            container.addMediaGalleryComponents(
+                new MediaGalleryBuilder()
+                    .addItems(
+                        new MediaGalleryItemBuilder()
+                            .setURL(`${tag.TagEmbedImageURL}`),
+                    ),
+            );
+        }
+        container.addTextDisplayComponents(
+            new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`)
+        );
+
+        await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
     },
     name: 'use',
     restrictToConfigRoles: [
