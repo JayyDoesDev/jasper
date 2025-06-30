@@ -1,5 +1,14 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, ContainerBuilder, MediaGalleryBuilder, MediaGalleryItemBuilder, MessageFlags, SeparatorBuilder, SeparatorSpacingSize, TextDisplayBuilder } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    ContainerBuilder,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
+    MessageFlags,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+} from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationRoles } from '../../../container';
@@ -32,13 +41,11 @@ export const UseSubCommand = defineSubCommand({
             return;
         }
 
-        await interaction.deferReply(); 
+        await interaction.deferReply();
         const container = new ContainerBuilder().setAccentColor(global.embedColor);
 
         if (mention) {
-            container.addTextDisplayComponents(
-                new TextDisplayBuilder().setContent(`${mention}`)
-            );
+            container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${mention}`));
         }
 
         container
@@ -57,18 +64,19 @@ export const UseSubCommand = defineSubCommand({
 
         if (tag.TagEmbedImageURL) {
             container.addMediaGalleryComponents(
-                new MediaGalleryBuilder()
-                    .addItems(
-                        new MediaGalleryItemBuilder()
-                            .setURL(`${tag.TagEmbedImageURL}`),
-                    ),
+                new MediaGalleryBuilder().addItems(
+                    new MediaGalleryItemBuilder().setURL(`${tag.TagEmbedImageURL}`),
+                ),
             );
         }
         container.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`)
+            new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
         );
 
-        await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
+        await interaction.editReply({
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+        });
     },
     name: 'use',
     restrictToConfigRoles: [

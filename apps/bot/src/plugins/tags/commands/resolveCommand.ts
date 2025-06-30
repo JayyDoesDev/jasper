@@ -4,7 +4,13 @@ import {
     ApplicationCommandType,
     PermissionsBitField,
 } from '@antibot/interactions';
-import { ChannelType, ChatInputCommandInteraction, ContainerBuilder, MessageFlags, TextDisplayBuilder } from 'discord.js';
+import {
+    ChannelType,
+    ChatInputCommandInteraction,
+    ContainerBuilder,
+    MessageFlags,
+    TextDisplayBuilder,
+} from 'discord.js';
 
 import { ConfigurationRoles } from '../../../container';
 import { defineCommand } from '../../../define';
@@ -32,20 +38,27 @@ export = {
             type: ApplicationCommandType.CHAT_INPUT,
         },
         on: async (ctx, interaction) => {
-            const container = new ContainerBuilder().setAccentColor(global.embedColor)
+            const container = new ContainerBuilder()
+                .setAccentColor(global.embedColor)
                 .addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(`-# Post marked as Resolved by <@${interaction.user.id}>`)
+                    new TextDisplayBuilder().setContent(
+                        `-# Post marked as Resolved by <@${interaction.user.id}>`,
+                    ),
                 );
             const originalQuestion: string = interaction.options.getString('original_question');
             const summarizedAnswer: string = interaction.options.getString('summarized_answer');
             if (originalQuestion) {
                 container.addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(`**Original Question:**\n${originalQuestion}`)
+                    new TextDisplayBuilder().setContent(
+                        `**Original Question:**\n${originalQuestion}`,
+                    ),
                 );
             }
             if (summarizedAnswer) {
                 container.addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(`**Summarized Answer:**\n${summarizedAnswer}`)
+                    new TextDisplayBuilder().setContent(
+                        `**Summarized Answer:**\n${summarizedAnswer}`,
+                    ),
                 );
             }
             const finalReply: Record<string, any> = {

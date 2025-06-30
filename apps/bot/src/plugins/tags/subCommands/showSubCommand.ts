@@ -1,5 +1,14 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    MessageFlags,
+    ContainerBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+    SeparatorBuilder,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
+} from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationRoles } from '../../../container';
@@ -33,34 +42,36 @@ export const ShowSubCommand = defineSubCommand({
             return;
         }
 
-        const container = new (require('discord.js').ContainerBuilder)().setAccentColor(global.embedColor)
+        const container = new ContainerBuilder()
+            .setAccentColor(global.embedColor)
             .addTextDisplayComponents(
-                new (require('discord.js').TextDisplayBuilder)().setContent(`### ${tag.TagEmbedTitle}`),
+                new TextDisplayBuilder().setContent(`### ${tag.TagEmbedTitle}`),
             )
             .addSeparatorComponents(
-                new (require('discord.js').SeparatorBuilder)().setSpacing(require('discord.js').SeparatorSpacingSize.Large).setDivider(true),
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Large).setDivider(true),
             )
             .addTextDisplayComponents(
-                new (require('discord.js').TextDisplayBuilder)().setContent(`${tag.TagEmbedDescription}`),
+                new TextDisplayBuilder().setContent(`${tag.TagEmbedDescription}`),
             )
             .addSeparatorComponents(
-                new (require('discord.js').SeparatorBuilder)().setSpacing(require('discord.js').SeparatorSpacingSize.Small).setDivider(true),
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
             );
 
         if (tag.TagEmbedImageURL) {
             container.addMediaGalleryComponents(
-                new (require('discord.js').MediaGalleryBuilder)()
-                    .addItems(
-                        new (require('discord.js').MediaGalleryItemBuilder)()
-                            .setURL(`${tag.TagEmbedImageURL}`),
-                    ),
+                new MediaGalleryBuilder().addItems(
+                    new MediaGalleryItemBuilder().setURL(`${tag.TagEmbedImageURL}`),
+                ),
             );
         }
         container.addTextDisplayComponents(
-            new (require('discord.js').TextDisplayBuilder)().setContent(`-# ${tag.TagEmbedFooter}`)
+            new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
         );
 
-        await interaction.editReply({ components: [container], flags: MessageFlags.IsComponentsV2 });
+        await interaction.editReply({
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+        });
     },
     name: 'show',
     restrictToConfigRoles: [
