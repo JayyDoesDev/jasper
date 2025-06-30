@@ -32,7 +32,6 @@ export = {
             type: ApplicationCommandType.CHAT_INPUT,
         },
         on: async (ctx, interaction) => {
-            // Build the ContainerBuilder with all text display components (no 'content' field)
             const container = new ContainerBuilder().setAccentColor(global.embedColor)
                 .addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(`-# Post marked as Resolved by <@${interaction.user.id}>`)
