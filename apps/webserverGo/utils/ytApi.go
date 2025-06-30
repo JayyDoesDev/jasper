@@ -1,12 +1,11 @@
 package utils
 
 import (
-    "time"
-    "encoding/json"
-    "fmt"
-    "net/http"
-    "os"
-
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
+	"time"
 )
 
 func FetchChannelData(channelID string) (map[string]interface{}, error) {

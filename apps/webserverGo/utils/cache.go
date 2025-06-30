@@ -1,8 +1,8 @@
 package utils
 
 import (
-    "time"
-    "sync"
+	"sync"
+	"time"
 )
 
 type cachedResponse struct {

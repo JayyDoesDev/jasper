@@ -1,12 +1,12 @@
 package youtube
 
 import (
-    "net/http"
-    "encoding/json"
+	"encoding/json"
+	"net/http"
 
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 
-    "jasper/utils"
+	"jasper/utils"
 )
 
 func SubscriberCountHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,5 +29,10 @@ func SubscriberCountHandler(w http.ResponseWriter, r *http.Request) {
 	response := map[string]string{
 		"subscriberCount": stats["subscriberCount"].(string),
 	}
-	json.NewEncoder(w).Encode(response)
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }

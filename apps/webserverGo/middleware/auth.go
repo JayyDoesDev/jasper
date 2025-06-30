@@ -1,8 +1,8 @@
 package middleware
 
 import (
-    "net/http"
-    "os"
+	"net/http"
+	"os"
 )
 
 func AuthMiddleware(next http.Handler) http.Handler {

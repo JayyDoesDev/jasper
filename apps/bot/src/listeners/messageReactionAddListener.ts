@@ -95,7 +95,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             size: 1024,
                         });
                         const roleIconUrl =
-                            member?.roles?.highest?.iconURL() || message.guild.iconURL();
+                            member?.roles?.highest?.iconURL() || "";
 
                         if (
                             !this.ctx.webserver.isValidUrl(avatarUrl) ||

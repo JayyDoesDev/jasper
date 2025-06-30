@@ -49,18 +49,20 @@ func wrapText(dc *gg.Context, text string, maxWidth float64) []string {
 func GenImage(URL string, fontSize float64, caption string, position string) (image.Image, error) {
 	img, err := utils.LoadImageFromURL(URL)
 	if err != nil {
-        slog.Error("Failed to load image from URL", "url", URL, "error", err)
-        return nil, err
+		slog.Error("Failed to load image from URL", "url", URL, "error", err)
+		return nil, err
 	}
 
 	imgWidth := img.Bounds().Dx()
 	imgHeight := img.Bounds().Dy()
 
 	dc := gg.NewContext(imgWidth, 1000)
-	if err := dc.LoadFontFace(fontPath, fontSize); err != nil {
-        slog.Error("Failed to load font face", "fontPath", fontPath, "error", err)
+	font, err := utils.LoadFont("./generators/meme/impact.ttf", fontSize)
+	if err != nil {
+		slog.Error("Failed to load font", "fontPath", fontPath, "error", err)
 		return nil, err
 	}
+	dc.SetFontFace(font)
 
 	maxTextWidth := float64(imgWidth - 40)
 	lines := wrapText(dc, caption, maxTextWidth)
@@ -71,12 +73,12 @@ func GenImage(URL string, fontSize float64, caption string, position string) (im
 
 	dc = gg.NewContext(imgWidth, totalHeight)
 	if err := dc.LoadFontFace(fontPath, fontSize); err != nil {
-        slog.Error("Failed to load font face", "fontPath", fontPath, "error", err)
+		slog.Error("Failed to load font face", "fontPath", fontPath, "error", err)
 		return nil, err
 	}
 
 	dc.SetRGB(1, 1, 1)
-    if position == "top" {
+	if position == "top" {
 		dc.DrawRectangle(0, 0, float64(imgWidth), float64(boxHeight))
 	} else {
 		dc.DrawRectangle(0, float64(imgHeight), float64(imgWidth), float64(boxHeight))
@@ -85,7 +87,7 @@ func GenImage(URL string, fontSize float64, caption string, position string) (im
 
 	dc.SetRGB(0, 0, 0)
 	var startY float64
-    if position == "top" {
+	if position == "top" {
 		startY = float64(boxHeight)/2 - textHeight/2 + fontSize
 	} else {
 		startY = float64(imgHeight) + float64(boxHeight)/2 - textHeight/2 + fontSize
@@ -97,7 +99,7 @@ func GenImage(URL string, fontSize float64, caption string, position string) (im
 		dc.DrawString(line, x, y)
 	}
 
-    if position == "top" {
+	if position == "top" {
 		dc.DrawImageAnchored(img, imgWidth/2, boxHeight+imgHeight/2, 0.5, 0.5)
 	} else {
 		dc.DrawImageAnchored(img, imgWidth/2, imgHeight/2, 0.5, 0.5)

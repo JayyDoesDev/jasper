@@ -1,12 +1,12 @@
 package youtube
 
 import (
-    "encoding/json"
-    "net/http"
+	"encoding/json"
+	"net/http"
 
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 
-    "jasper/utils"
+	"jasper/utils"
 )
 
 func ChannelInfoHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,5 +19,9 @@ func ChannelInfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(data)
+	err = json.NewEncoder(w).Encode(data)
+	if err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
