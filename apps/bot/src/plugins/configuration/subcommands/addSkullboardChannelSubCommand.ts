@@ -17,15 +17,13 @@ export const AddSkullboardChannelSubCommand = defineSubCommand({
 
         if (skullboardSettings?.SkullboardChannel === channel.id) {
             await interaction.reply({
-                content: `For the record, **${channel}** is already set as the skullboard channel.`,
-                embeds: [
+                components: [
                     createConfigurationExistsEmbed({
                         configName: 'Skullboard',
                         description: `<#${skullboardSettings.SkullboardChannel}>`,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -36,15 +34,13 @@ export const AddSkullboardChannelSubCommand = defineSubCommand({
         });
 
         await interaction.reply({
-            content: `**${channel}** has been set as the skullboard channel.`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Skullboard',
                     description: `<#${channel.id}>`,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.IsComponentsV2,
         });
     },
     name: 'add_skullboard_channel',

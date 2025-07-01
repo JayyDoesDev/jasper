@@ -44,15 +44,13 @@ export const RemoveUserSubCommand = defineSubCommand({
             );
             const description = updatedUserNames.join(', ') || 'No users';
             await interaction.reply({
-                content: `I've removed **${user.username}** from **${config}**`,
-                embeds: [
+                components: [
                     createConfigurationUpdateEmbed({
                         configName: 'Users',
                         description,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -63,15 +61,13 @@ export const RemoveUserSubCommand = defineSubCommand({
         const description = userNames.join(', ') || 'No users';
 
         await interaction.reply({
-            content: `I couldn't find **${user.username}** inside of **${config}**`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Users',
                     description,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'remove_user',

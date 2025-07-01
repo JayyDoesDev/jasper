@@ -39,16 +39,15 @@ export const AddChannelSubCommand = defineSubCommand({
         if (channelExistsInDB.includes(channel.id)) {
             const description = channelExistsInDB.map((k) => `<#${k}>`).join(', ') || 'No channels';
             await interaction.reply({
-                content: `For the record, **${channel}** is already in **${config}**`,
-                embeds: [
+                components: [
                     createConfigurationExistsEmbed({
                         configName: 'Channels',
                         description,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
+
             return;
         }
 
@@ -61,15 +60,13 @@ export const AddChannelSubCommand = defineSubCommand({
         const description = updatedChannels.map((k) => `<#${k}>`).join(', ') || 'No channels';
 
         await interaction.reply({
-            content: `I've added **${channel}** to **${config}**`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Channels',
                     description,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'add_channel',

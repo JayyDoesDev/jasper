@@ -40,15 +40,13 @@ export const AddUserSubCommand = defineSubCommand({
             );
             const description = userNames.join(', ') || 'No users';
             await interaction.reply({
-                content: `For the record, **${user.username}** is already in **${config}**`,
-                embeds: [
+                components: [
                     createConfigurationExistsEmbed({
                         configName: 'Users',
                         description,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -65,15 +63,13 @@ export const AddUserSubCommand = defineSubCommand({
         const description = updatedUserNames.join(', ') || 'No users';
 
         await interaction.reply({
-            content: `I've added **${user.username}** to **${config}**`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Users',
                     description,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'add_user',

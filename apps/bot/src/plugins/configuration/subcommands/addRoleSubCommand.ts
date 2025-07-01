@@ -39,15 +39,13 @@ export const AddRoleSubCommand = defineSubCommand({
             );
             const description = roleNames.join(', ') || 'No roles';
             await interaction.reply({
-                content: `For the record, **${role.name}** is already in **${config}**`,
-                embeds: [
+                components: [
                     createConfigurationExistsEmbed({
                         configName: 'Roles',
                         description,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -64,15 +62,13 @@ export const AddRoleSubCommand = defineSubCommand({
         const description = updatedRoleNames.join(', ') || 'No roles';
 
         await interaction.reply({
-            content: `I've added **${role.name}** to **${config}**`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Roles',
                     description,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'add_role',
