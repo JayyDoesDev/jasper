@@ -10,8 +10,9 @@ export default function (ctx: Context): void {
     try {
         let events: string[] = [];
         process.platform == 'linux'
-            ? (events = sync('./plugins/**/*.js'))
-            : (events = sync('./dist/plugins/**/*.js'));
+            ? (events = sync(path.join(__dirname, '../../plugins/**/*.js')))
+            : (events = sync(path.join(__dirname, '../../dist/plugins/**/*.js')));
+
         for (let i = 0; i < events.length; i++) {
             try {
                 const filePath = path.resolve(events[i]);

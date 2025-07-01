@@ -10,8 +10,8 @@ export default function (ctx: Context): void {
     try {
         let listeners: string[] = [];
         process.platform == 'linux'
-            ? (listeners = sync('./listeners/*.js'))
-            : (listeners = sync('./dist/listeners/*.js'));
+            ? (listeners = sync(path.join(__dirname, '../listeners/*.js')))
+            : (listeners = sync(path.join(__dirname, '../dist/listeners/*.js')));
 
         for (const listenerPath of listeners) {
             try {
