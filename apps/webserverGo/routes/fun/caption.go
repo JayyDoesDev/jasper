@@ -5,10 +5,10 @@ import (
 	"image/png"
 	"net/http"
 
-	"jasper/generators/meme"
+	"jasper/generators/fun"
 )
 
-func MemeHandler(w http.ResponseWriter, r *http.Request) {
+func CaptionHandler(w http.ResponseWriter, r *http.Request) {
 	var requestBody struct {
 		FontSize float64 `json:"fontsize"`
 		Img      string  `json:"img"`
@@ -34,7 +34,7 @@ func MemeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img, err := meme.GenImage(requestBody.Img, requestBody.FontSize, requestBody.Text, requestBody.Position)
+	img, err := fun.MakeCaptionImage(requestBody.Img, requestBody.FontSize, requestBody.Text, requestBody.Position)
 
 	if err != nil {
 		http.Error(w, "Failed to generate meme image: "+err.Error(), http.StatusInternalServerError)
