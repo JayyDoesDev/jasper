@@ -1,13 +1,13 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
 import {
     ChatInputCommandInteraction,
-    MessageFlags,
     ContainerBuilder,
-    SeparatorSpacingSize,
-    TextDisplayBuilder,
-    SeparatorBuilder,
     MediaGalleryBuilder,
     MediaGalleryItemBuilder,
+    MessageFlags,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 import { Context } from '../../../classes/context';

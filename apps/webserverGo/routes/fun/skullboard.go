@@ -13,14 +13,9 @@ func SkullboardHandler(w http.ResponseWriter, r *http.Request) {
 	var requestBody struct {
 		Attachments        []string `json:"attachments"`
 		Avatar             string   `json:"avatar"`
-		ChannelId          string   `json:"channelId"`
-		ChannelName        string   `json:"channelName"`
 		Content            string   `json:"content"`
-		CustomData         any      `json:"customData"`
 		RoleIcon           string   `json:"roleIcon"`
-		RoleName           string   `json:"roleName"`
 		Timestamp          string   `json:"timestamp"`
-		UserId             string   `json:"userId"`
 		Username           string   `json:"username"`
 		UsernameColor      string   `json:"usernameColor"`
 		ReplyAvatar        string   `json:"replyAvatar"`
