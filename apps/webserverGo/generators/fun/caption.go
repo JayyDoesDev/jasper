@@ -1,4 +1,4 @@
-package meme
+package fun
 
 import (
 	"image"
@@ -45,7 +45,7 @@ func wrapText(dc *gg.Context, text string, maxWidth float64) []string {
 	return lines
 }
 
-func GenImage(URL string, fontSize float64, caption string, position string) (image.Image, error) {
+func MakeCaptionImage(URL string, fontSize float64, caption string, position string) (image.Image, error) {
 	img, err := utils.LoadImageFromURL(URL)
 	if err != nil {
 		slog.Error("Failed to load image from URL", "url", URL, "error", err)

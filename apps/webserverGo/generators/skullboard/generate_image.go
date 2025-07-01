@@ -61,20 +61,28 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	usernameLength, _ := tempDC.MeasureString(data.Username)
 	timestampLength, _ := tempDC.MeasureString(data.Timestamp)
 	if data.RoleIconURL != "" {
-		roleIconWidth, _ := tempDC.MeasureString("RoleIcon")
-		usernameLength += roleIconWidth + 10
+		usernameLength += 25 + 10
 	}
-	if padding*2+pfpSize+textMargin+usernameLength+timestampLength > float64(width) {
-		width = int(padding*2 + pfpSize + textMargin + usernameLength + timestampLength)
+	if messageBoxX + usernameLength + timestampLength > float64(width) {
+		width = int(messageBoxX + usernameLength + timestampLength)
 	}
 	contentHeight := usernameHeight + messageHeight
 
-	if data.ReplyContent != "" {
-		contentHeight += 30
-		if width < 300 {
-			width = 300
-		}
-	}
+    if data.ReplyContent != "" {
+        contentHeight += 50.0
+        replyIconWidth := float64(104 * 40 / 54)
+        replyAvatarWidth := 35.0
+        replyUsernameWidth, _ := tempDC.MeasureString(data.ReplyUsername)
+        replyContentWidth, _ := tempDC.MeasureString(data.ReplyContent)
+        replyTotalWidth := replyIconWidth + replyAvatarWidth + replyUsernameWidth + replyContentWidth + messageBoxX
+        if replyTotalWidth > float64(width) {
+            width = int(replyTotalWidth)
+        }
+    }
+
+    if width > 800 {
+        width = 800
+    }
 
 	if len(data.Attachments) > 0 {
 		for _, attachmentURL := range data.Attachments {
@@ -176,7 +184,7 @@ func GenerateDiscordMessage(data MessageData) (image.Image, error) {
 			slog.Error("Failed to load role icon image", "url", data.RoleIconURL, "error", err)
 			return nil, err
 		}
-		roleIcon = utils.ResizeImage(roleIcon, 22, 22) // Resize to 16x16
+		roleIcon = utils.ResizeImage(roleIcon, 22, 22)
 		dc.DrawImageAnchored(roleIcon, int(messageBoxX+usernameWidth+20), int(currentY+fontSize), 0.5, 0.75)
 	}
 
