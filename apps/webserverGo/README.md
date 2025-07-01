@@ -58,7 +58,7 @@ Configure these variables in your `.env` file:
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `JASPER_API_KEY` | API key for authenticating requests to the server | ✅ Yes |
-| `YOUTUBE_API_KEY_1` | Primary YouTube Data API key | ✅ Yes (for Subscriber Count Functionality) |
+| `YOUTUBE_API_KEY_1` | Primary YouTube Data API key | ✅ Yes (for subcriber count funcionality) |
 | `YOUTUBE_API_KEY_2` | Secondary YouTube Data API key (optional backup) | ❌ No |
 | `YOUTUBE_API_KEY_3` | Tertiary YouTube Data API key (optional backup) | ❌ No |
 
