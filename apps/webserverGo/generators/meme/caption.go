@@ -45,7 +45,6 @@ func wrapText(dc *gg.Context, text string, maxWidth float64) []string {
 	return lines
 }
 
-// pls make default font size 72 tyvm
 func GenImage(URL string, fontSize float64, caption string, position string) (image.Image, error) {
 	img, err := utils.LoadImageFromURL(URL)
 	if err != nil {

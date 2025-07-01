@@ -14,7 +14,6 @@ func getApiKey() string {
     apiKey2 := os.Getenv("YOUTUBE_API_KEY_2")
     apiKey3 := os.Getenv("YOUTUBE_API_KEY_3")
 
-    // return one of the three at random
     apiKeys := []string{apiKey1, apiKey2, apiKey3}
     var filtered []string
 	for _, str := range apiKeys {
@@ -50,7 +49,7 @@ func FetchChannelData(channelID string) (map[string]interface{}, error) {
 	}
 	defer resp.Body.Close()
 
-	var result map[string]interface{}
+	var result map[string]any
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		return nil, err

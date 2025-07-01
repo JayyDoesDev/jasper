@@ -31,12 +31,12 @@ func SkullboardHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	img, err := skullboard.GenerateDiscordMessage(skullboard.MessageData{
-		ReplyAvatarURL:     requestBody.ReplyAvatar,
+		ReplyAvatar:        requestBody.ReplyAvatar,
 		ReplyUsernameColor: requestBody.ReplyUsernameColor,
 		ReplyUsername:      requestBody.ReplyUsername,
 		ReplyContent:       requestBody.ReplyContent,
 
-		AvatarURL:     requestBody.Avatar,
+		Avatar:        requestBody.Avatar,
 		UsernameColor: requestBody.UsernameColor,
 		Username:      requestBody.Username,
 		RoleIconURL:   requestBody.RoleIcon,

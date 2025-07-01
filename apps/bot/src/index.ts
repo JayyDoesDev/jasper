@@ -36,7 +36,7 @@ global.embedColor = CONFIG.embedColor;
 async function main() {
     try {
         await Promise.all(
-            ['command', 'event', 'listener'].map(async (x) => {
+            ['Command', 'Event', 'Listener'].map(async (x) => {
                 const handlerModule = await import(`./handlers/${x}`);
                 return handlerModule.default(ctx);
             }),

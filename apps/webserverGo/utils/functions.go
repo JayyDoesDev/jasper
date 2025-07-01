@@ -42,12 +42,12 @@ func ResizeImage(img image.Image, width, height int) image.Image {
 
 func ConvertHexColor(hex string) (float64, float64, float64) {
 	if len(hex) != 7 || hex[0] != '#' {
-		return 1, 1, 1 // Default to white if invalid
+		return 1, 1, 1
 	}
 	var r, g, b uint8
 	_, err := fmt.Sscanf(hex[1:], "%02x%02x%02x", &r, &g, &b)
 	if err != nil {
-		return 1, 1, 1 // Default to white if parsing fails
+		return 1, 1, 1
 	}
 	return float64(r) / 255.0, float64(g) / 255.0, float64(b) / 255.0
 }

@@ -15,22 +15,13 @@ interface PlaywrightRenderRequest {
     [key: string]: unknown;
     attachments?: null | string[];
     avatar: string;
-    // channelId: string;
-    // channelName: string;
     content: string;
-    // customData?: {
-    //     mentionedRoles: Record<string, string>;
-    //     mentionedUsers: Record<string, string>;
-    // };
     replyAvatar?: string;
     replyContent?: string;
     replyUsername?: string;
     replyUsernameColor?: string;
     roleIcon: string;
-    // roleId: null | string;
-    // roleName: string;
     timestamp: string;
-    // userId: string;
     username: string;
     usernameColor: string;
 }
@@ -110,18 +101,6 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                 (attachment) => attachment.url,
                             );
 
-                        // // Get mentioned users info
-                        // const mentionedUsers = new Map<string, string>();
-                        // message.mentions.users.forEach((user) => {
-                        //     mentionedUsers.set(user.id, user.username);
-                        // });
-
-                        // // Prepare mentioned roles info
-                        // const mentionedRoles = new Map<string, string>();
-                        // message.mentions.roles.forEach((role) => {
-                        //     mentionedRoles.set(role.id, role.name);
-                        // });
-
                         const response = await this.ctx.webserver.request<PlaywrightRenderRequest>(
                             'POST',
                             '/fun/skullboard',
@@ -131,23 +110,10 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                     forceStatic: true,
                                     size: 1024,
                                 }),
-                                // channelId: message.channel.id,
-                                // channelName:
-                                //     message.channel.isTextBased() && 'name' in message.channel
-                                //         ? message.channel.name
-                                //         : 'channel',
                                 content: message.content || '',
-                                // customData: {
-                                //     mentionedRoles: Object.fromEntries(mentionedRoles),
-                                //     mentionedUsers: Object.fromEntries(mentionedUsers),
-                                // },
                                 roleIcon:
                                     roleIconUrl,
-                                // roleId: typeof coloredRole === 'string' ? null : coloredRole.id,
-                                // roleName:
-                                //     typeof coloredRole === 'string' ? 'Role' : coloredRole.name,
                                 timestamp: this.ctx.webserver.sanitize(timestamp),
-                                // userId: message.author?.id,
                                 username:
                                     this.ctx.webserver.sanitize(
                                         message.author?.username || 'Unknown User',
