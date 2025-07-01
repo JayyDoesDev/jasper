@@ -13,8 +13,7 @@
 </div>
 
 - 🤖 **Bot** - The main Discord bot (Node.js)
-- 🌐 **Webserver** - Spring Boot server providing web functionality 
-- ☁️ **Worker** - Cloudflare Workers instance
+- 🌐 **Webserver** - Spring Boot server providing web functionality
 
 ## Project Structure
 
@@ -24,7 +23,6 @@
 │   ├── bot/         # Discord bot application
 |   ├── databases/   # MongoDB and Redis Docker Containers
 │   ├── webserver/   # Spring Boot server
-│   └── worker/      # Cloudflare Workers
 ├── compose.yml      # Docker Compose configuration
 └── .env             # Environment variables
 ```
@@ -47,19 +45,12 @@ yarn dev
 ```
 
 #### Databases
-Follow the setup instructions in [apps/databases/README.md](apps/databases/README.md) to configure and start MongoDB and Redis services. 
+Follow the setup instructions in [apps/databases/README.md](apps/databases/README.md) to configure and start MongoDB and Redis services.
 
 #### Webserver
 ```bash
 cd apps/webserver
 ./gradlew bootRun
-```
-
-#### Worker
-```bash
-cd apps/worker
-yarn install
-yarn dev
 ```
 
 ### Using Docker

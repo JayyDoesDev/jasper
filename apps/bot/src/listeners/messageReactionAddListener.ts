@@ -15,22 +15,13 @@ interface PlaywrightRenderRequest {
     [key: string]: unknown;
     attachments?: null | string[];
     avatar: string;
-    channelId: string;
-    channelName: string;
     content: string;
-    customData?: {
-        mentionedRoles: Record<string, string>;
-        mentionedUsers: Record<string, string>;
-    };
     replyAvatar?: string;
     replyContent?: string;
     replyUsername?: string;
     replyUsernameColor?: string;
     roleIcon: string;
-    roleId: null | string;
-    roleName: string;
     timestamp: string;
-    userId: string;
     username: string;
     usernameColor: string;
 }
@@ -95,7 +86,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             size: 1024,
                         });
                         const roleIconUrl =
-                            member?.roles?.highest?.iconURL() || message.guild.iconURL();
+                            member?.roles?.highest?.iconURL() || "";
 
                         if (
                             !this.ctx.webserver.isValidUrl(avatarUrl) ||
@@ -107,52 +98,27 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                         const attachmentUrls = Array.from(message.attachments.values())
                             .filter((attachment) => attachment.url)
                             .map(
-                                (attachment) => `<img src="${attachment.url}" alt="attachment" />`,
+                                (attachment) => attachment.url,
                             );
-
-                        // Get mentioned users info
-                        const mentionedUsers = new Map<string, string>();
-                        message.mentions.users.forEach((user) => {
-                            mentionedUsers.set(user.id, user.username);
-                        });
-
-                        // Prepare mentioned roles info
-                        const mentionedRoles = new Map<string, string>();
-                        message.mentions.roles.forEach((role) => {
-                            mentionedRoles.set(role.id, role.name);
-                        });
 
                         const response = await this.ctx.webserver.request<PlaywrightRenderRequest>(
                             'POST',
-                            'playwright/render',
+                            '/fun/skullboard',
                             {
                                 attachments: attachmentUrls.length > 0 ? attachmentUrls : null,
                                 avatar: member.user.displayAvatarURL({
                                     forceStatic: true,
                                     size: 1024,
                                 }),
-                                channelId: message.channel.id,
-                                channelName:
-                                    message.channel.isTextBased() && 'name' in message.channel
-                                        ? message.channel.name
-                                        : 'channel',
                                 content: message.content || '',
-                                customData: {
-                                    mentionedRoles: Object.fromEntries(mentionedRoles),
-                                    mentionedUsers: Object.fromEntries(mentionedUsers),
-                                },
                                 roleIcon:
-                                    roleIconUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
-                                roleId: typeof coloredRole === 'string' ? null : coloredRole.id,
-                                roleName:
-                                    typeof coloredRole === 'string' ? 'Role' : coloredRole.name,
+                                    roleIconUrl,
                                 timestamp: this.ctx.webserver.sanitize(timestamp),
-                                userId: message.author?.id,
                                 username:
                                     this.ctx.webserver.sanitize(
                                         message.author?.username || 'Unknown User',
                                     ) +
-                                    (message.member
+                                    (message.member && message.member.nickname
                                         ? ` (${this.ctx.webserver.sanitize(
                                               message.member.nickname ||
                                                   message.author?.globalName ||
@@ -182,6 +148,12 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             true,
                         );
 
+                        if (!response.ok) {
+                            throw new Error(
+                                `Failed to generate image: ${response.status} ${response.statusText}`,
+                            );
+                        }
+
                         const buffer = await response.arrayBuffer();
                         const imageBuffer = Buffer.from(buffer);
 
@@ -197,6 +169,16 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                             inline: true,
                                             name: 'Author',
                                             value: `<@${message.author?.id}>`,
+                                        },
+                                        {
+                                            inline: true,
+                                            name: 'Channel',
+                                            value: `<#${message.channel.id}>`,
+                                        },
+                                        {
+                                            inline: true,
+                                            name: 'Message Link',
+                                            value: `[Jump to message](https://discord.com/channels/${message.guildId}/${message.channel.id}/${message.id})`,
                                         },
                                     ],
                                     image: {

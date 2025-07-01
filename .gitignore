@@ -407,3 +407,8 @@ FodyWeavers.xsd
 # MacOS DS_Store file
 .DS_Store
 /nbproject/private/
+
+# Jasper specific files
+mongo.env
+redis.env
+apps/databases/volumes
