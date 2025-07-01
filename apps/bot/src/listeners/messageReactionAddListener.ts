@@ -85,8 +85,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                             forceStatic: true,
                             size: 1024,
                         });
-                        const roleIconUrl =
-                            member?.roles?.highest?.iconURL() || "";
+                        const roleIconUrl = member?.roles?.highest?.iconURL() || '';
 
                         if (
                             !this.ctx.webserver.isValidUrl(avatarUrl) ||
@@ -97,9 +96,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
 
                         const attachmentUrls = Array.from(message.attachments.values())
                             .filter((attachment) => attachment.url)
-                            .map(
-                                (attachment) => attachment.url,
-                            );
+                            .map((attachment) => attachment.url);
 
                         const response = await this.ctx.webserver.request<PlaywrightRenderRequest>(
                             'POST',
@@ -111,8 +108,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                     size: 1024,
                                 }),
                                 content: message.content || '',
-                                roleIcon:
-                                    roleIconUrl,
+                                roleIcon: roleIconUrl,
                                 timestamp: this.ctx.webserver.sanitize(timestamp),
                                 username:
                                     this.ctx.webserver.sanitize(

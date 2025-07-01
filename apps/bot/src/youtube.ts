@@ -2,6 +2,7 @@ import numeral from 'numeral';
 
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
+import { VoiceChannel } from 'discord.js';
 
 export interface YoutubeChannelResponse extends YoutubeChannelResponseBase {
     videos: YoutubeResponse[];
@@ -84,7 +85,9 @@ export async function updateSubCountChannel(context: Context, youtubeId: string)
         numeral(data.subscriberCount).format('0.00a'),
     ).toUpperCase();
     // @ts-ignore
-    const channel = context.channels.cache.get(context.env.get('sub_count_channel')) as VoiceChannel;
+    const channel = context.channels.cache.get(
+        context.env.get('sub_count_channel'),
+    ) as VoiceChannel;
     if (channel) {
         void channel.setName(`\u{1F4FA} \u{FF5C} Sub Count: ${subscriberCount}`);
     }
