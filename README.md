@@ -12,8 +12,10 @@
     </h2>
 </div>
 
+- 💾 **Database** - Dockerized Databases Enviroment for the Jasper Bot
 - 🤖 **Bot** - The main Discord bot (Node.js)
 - 🌐 **Webserver** - Spring Boot server providing web functionality
+- 🚀 **WebserverGo** - Go-based webserver (remake of the Java SpringBoot webserver)
 
 ## Project Structure
 
@@ -23,6 +25,7 @@
 │   ├── bot/         # Discord bot application
 |   ├── databases/   # MongoDB and Redis Docker Containers
 │   ├── webserver/   # Spring Boot server
+│   ├── webserverGo/ # Go-based webserver (remake of the Java SpringBoot webserver)
 ├── compose.yml      # Docker Compose configuration
 └── .env             # Environment variables
 ```
@@ -53,6 +56,16 @@ cd apps/webserver
 ./gradlew bootRun
 ```
 
+#### WebserverGo
+```bash
+cd apps/webserverGo
+make build
+make run
+```
+
+For more details, see the [WebserverGo Documentation](apps/webserverGo/README.md).
+
+
 ### Using Docker
 
 The entire ecosystem can be run using Docker Compose:
@@ -75,8 +88,8 @@ Individual services can be managed with:
 
 ```bash
 # Start/stop specific service
-docker-compose up -d [bot|webserver|worker]
-docker-compose stop [bot|webserver|worker]
+docker-compose up -d [bot|webserver]
+docker-compose stop [bot|webserver]
 ```
 
 ## Environment Variables
@@ -86,7 +99,7 @@ See the individual README files in each application directory for details on req
 - [Bot Environment Variables](apps/bot/README.md#environment-variables)
 - [Databases Instances Variables](apps/bot/README.md#environment-variables)
 - [Webserver Environment Variables](apps/webserver/README.md#environment-variables)
-- [Worker Environment Variables](apps/worker/README.md#environment-variables)
+- [WebserverGo Environment Variables](apps/webserverGo/README.md#environment-variables)
 
 ## Documentation
 
@@ -95,7 +108,7 @@ Each application has its own README with detailed documentation:
 - [Bot Documentation](apps/bot/README.md)
 - [Databases Instances Documentation](apps/databases/README.md)
 - [Webserver Documentation](apps/webserver/README.md)
-- [Worker Documentation](apps/worker/README.md)
+- [WebserverGo Documentation](apps/webserverGo/README.md)
 
 ## Contributing
 
