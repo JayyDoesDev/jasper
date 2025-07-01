@@ -1,8 +1,8 @@
+import { VoiceChannel } from 'discord.js';
 import numeral from 'numeral';
 
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
-import { VoiceChannel } from 'discord.js';
 
 export interface YoutubeChannelResponse extends YoutubeChannelResponseBase {
     videos: YoutubeResponse[];
