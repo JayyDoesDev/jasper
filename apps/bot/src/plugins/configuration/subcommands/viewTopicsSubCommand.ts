@@ -29,7 +29,6 @@ export const ViewTopicsSubCommand = defineSubCommand({
         let components = [];
 
         if (topicsExistInDB.length !== 0) {
-            console.log('No topics found in the database');
             components = [
                 {
                     components: [
