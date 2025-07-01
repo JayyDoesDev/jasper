@@ -4,15 +4,15 @@ import { ICommand } from '@antibot/interactions';
 import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from 'discord.js';
 import { sync } from 'glob';
 
-import { Context } from '../classes/context';
+import { Context } from '../classes/context'
 import { Command, Plugin } from '../define';
 import { Combine } from '../types';
 
 export default function (ctx: Context): void {
     let commands: string[] = [];
     process.platform == 'linux'
-        ? (commands = sync('./plugins/**/*.js'))
-        : (commands = sync('./dist/plugins/**/*.js'));
+        ? (commands = sync(path.join(__dirname, '../plugins/**/*.js')))
+        : (commands = sync(path.join(__dirname, '../dist/plugins/**/*.js')));
 
     for (let i = 0; i < commands.length; i++) {
         const filePath = path.resolve(commands[i]);
