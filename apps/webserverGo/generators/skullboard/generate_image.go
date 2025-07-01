@@ -69,12 +69,20 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	}
 	contentHeight := usernameHeight + messageHeight
 
-	if data.ReplyContent != "" {
-		contentHeight += 30
-		if width < 300 {
-			width = 300
-		}
-	}
+    if data.ReplyContent != "" {
+        contentHeight += 30.0
+        replyIconWidth := float64(104 * 40 / 54)
+        replyAvatarWidth := 35.0
+        replyUsernameWidth, _ := tempDC.MeasureString(data.ReplyUsername)
+        replyContentWidth, _ := tempDC.MeasureString(data.ReplyContent)
+        replyTotalWidth := replyIconWidth + replyAvatarWidth + replyUsernameWidth + replyContentWidth + 25 + padding*2
+        if replyTotalWidth > float64(width) {
+            width = int(replyTotalWidth)
+        }
+        if width > 800 {
+            width = 800
+        }
+    }
 
 	if len(data.Attachments) > 0 {
 		for _, attachmentURL := range data.Attachments {
