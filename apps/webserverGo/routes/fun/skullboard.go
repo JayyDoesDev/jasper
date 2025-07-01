@@ -16,6 +16,7 @@ func SkullboardHandler(w http.ResponseWriter, r *http.Request) {
 		Content            string   `json:"content"`
 		RoleIcon           string   `json:"roleIcon"`
 		Timestamp          string   `json:"timestamp"`
+        Mentions           []string `json:"mentions"`
 		Username           string   `json:"username"`
 		UsernameColor      string   `json:"usernameColor"`
 		ReplyAvatar        string   `json:"replyAvatar"`
@@ -42,6 +43,7 @@ func SkullboardHandler(w http.ResponseWriter, r *http.Request) {
 		RoleIconURL:   requestBody.RoleIcon,
 		Timestamp:     requestBody.Timestamp,
 		Content:       requestBody.Content,
+        Mentions:      requestBody.Mentions,
 
 		Attachments: requestBody.Attachments,
 	})

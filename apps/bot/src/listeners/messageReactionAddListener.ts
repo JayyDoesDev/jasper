@@ -101,6 +101,17 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                 (attachment) => attachment.url,
                             );
 
+                        const userMentions = message.mentions.users.map(
+                            (user) => [user.id, user.username].join(":"),
+                        );
+                        const channelMentions = message.mentions.channels.map(
+                            (channel) => {
+                                if (channel.isDMBased()) return 'no-name';
+                                if (channel.isVoiceBased()) return 'voice-channel';
+                                return [channel.id, channel.name].join(":");
+                            }
+                        );
+
                         const response = await this.ctx.webserver.request<PlaywrightRenderRequest>(
                             'POST',
                             '/fun/skullboard',
@@ -111,6 +122,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                     size: 1024,
                                 }),
                                 content: message.content || '',
+                                mentions: [...userMentions, ...channelMentions],
                                 roleIcon:
                                     roleIconUrl,
                                 timestamp: this.ctx.webserver.sanitize(timestamp),
