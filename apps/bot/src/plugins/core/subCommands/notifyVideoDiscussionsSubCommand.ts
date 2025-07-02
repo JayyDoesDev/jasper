@@ -16,7 +16,8 @@ const paths = {
 export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         try {
-            const latest = (await getLatestYoutubeVideo(ctx, ctx.env.get('youtube_id'))).latest_video;
+            const latest = (await getLatestYoutubeVideo(ctx, ctx.env.get('youtube_id')))
+                .latest_video;
 
             const channel = ctx.channels.resolve(
                 ctx.env.get('youtube_post_channel'),

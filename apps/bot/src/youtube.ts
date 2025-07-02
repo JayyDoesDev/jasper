@@ -15,13 +15,13 @@ export interface YoutubeChannelSubscribersResponse extends YoutubeChannelRespons
 
 export interface YoutubeResponse extends YoutubeChannelResponseBase {
     channel: {
-        id: string
+        id: string;
         statistics: {
             subscriberCount: string;
             videoCount: string;
             viewCount: string;
-        }
-    }
+        };
+    };
     latest_video: {
         channelId: string;
         channelTitle: string;
@@ -33,7 +33,7 @@ export interface YoutubeResponse extends YoutubeChannelResponseBase {
         title: string;
         videoId: string;
         videoUrl: string;
-    },
+    };
 }
 
 export async function getChannel<T = YoutubeResponse>(
@@ -49,21 +49,12 @@ export async function getChannelSubscribers<T extends YoutubeChannelSubscribersR
     context: Context,
     youtubeId: string,
 ): Promise<null | T> {
-    let data = await context.webserver.request(
-        'GET',
-        `/youtube/${youtubeId}/subscribers`,
-    );
+    let data = await context.webserver.request('GET', `/youtube/${youtubeId}/subscribers`);
 
     if (!data || typeof data !== 'object' || !('status' in data)) {
-        await context.webserver.request(
-            'GET',
-            `/youtube/${youtubeId}`,
-        );
+        await context.webserver.request('GET', `/youtube/${youtubeId}`);
 
-        data = await context.webserver.request(
-            'GET',
-            `/youtube/${youtubeId}/subscribers`,
-        );
+        data = await context.webserver.request('GET', `/youtube/${youtubeId}/subscribers`);
     }
 
     return data ? ({ ...data } as T) : null;

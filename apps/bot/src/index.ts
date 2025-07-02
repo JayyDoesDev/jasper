@@ -55,7 +55,12 @@ async function main() {
         setInterval(postNewVideo, Number(ctx.env.get('youtube_post_timer')) * 1000);
 
         if (ctx.env.get('sub_update') === '1') {
-            setInterval(updateSubCountChannel, Number(ctx.env.get('sub_timer')) * 1000, ctx, ctx.env.get('youtube_channel_id'));
+            setInterval(
+                updateSubCountChannel,
+                Number(ctx.env.get('sub_timer')) * 1000,
+                ctx,
+                ctx.env.get('youtube_channel_id'),
+            );
         }
 
         await ctx.login(ctx.env.get('botToken'));
@@ -99,7 +104,7 @@ async function postNewVideo(): Promise<void> {
             allowedMentions: { roles: [ctx.env.get('youtube_video_discussions_role')] },
             content: `<@&${ctx.env.get('youtube_video_discussions_role')}>\n# ${latest.title}\n${
                 latest.description
-                }\n${latest.videoUrl}`,
+            }\n${latest.videoUrl}`,
         });
 
         const thread = await message.startThread({
