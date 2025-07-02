@@ -1,10 +1,9 @@
 import { ApplicationCommandType } from '@antibot/interactions';
 import {
-    APIEmbed,
+    AttachmentBuilder,
     ChatInputCommandInteraction,
     Message,
     MessageFlags,
-    TextChannel,
 } from 'discord.js';
 
 import { Context } from '../../../classes/context';
@@ -19,7 +18,7 @@ export = {
             options: [],
             type: ApplicationCommandType.CHAT_INPUT,
         },
-        on: (ctx: Context, interaction: ChatInputCommandInteraction) => {
+        on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const snipe = ctx.snipe.get(interaction.channelId) as Message<true> | undefined;
 
             if (!snipe) {
@@ -35,73 +34,59 @@ export = {
                     : snipe.content
                 : '';
 
-            const attachment = snipe.attachments.first();
-
-            if (snipe.embeds.length > 0) {
-                const originalEmbeds = snipe.embeds.map((embed) => {
-                    const embedData: APIEmbed = {
-                        color: embed.color || global.embedColor,
-                        description: embed.description,
-                        fields: embed.fields || [],
-                        timestamp: embed.timestamp,
-                        title: embed.title || '',
-                        url: embed.url || '',
-                    };
-
-                    if (embed.thumbnail) embedData.thumbnail = embed.thumbnail;
-                    if (embed.image) embedData.image = embed.image;
-                    if (embed.author) embedData.author = embed.author;
-                    if (embed.footer) embedData.footer = embed.footer;
-
-                    return embedData;
+            const member = snipe.guild.members.resolve(snipe.author.id);
+            if (!member) {
+                return interaction.reply({
+                    content: 'Could not resolve message author.',
+                    flags: MessageFlags.Ephemeral,
                 });
-
-                const metadataEmbed: APIEmbed = {
-                    author: {
-                        icon_url: snipe.author.displayAvatarURL(),
-                        name: snipe.author.tag,
-                    },
-                    color: global.embedColor,
-                    description: messageContent,
-                    fields: [],
-                    footer: {
-                        text: `#${(snipe.channel as TextChannel).name}`,
-                    },
-                    timestamp: snipe.createdAt.toISOString(),
-                    title: '',
-                    url: '',
-                };
-
-                if (attachment) {
-                    metadataEmbed.image = { url: attachment.url };
-                }
-
-                originalEmbeds.unshift(metadataEmbed);
-                return interaction.reply({ embeds: originalEmbeds });
             }
 
-            const baseEmbed: APIEmbed = {
-                author: {
-                    icon_url: snipe.author.displayAvatarURL(),
-                    name: snipe.author.tag,
-                },
-                color: global.embedColor,
-                description: messageContent,
-                fields: [],
-                footer: {
-                    text: `#${(snipe.channel as TextChannel).name}`,
-                },
-                timestamp: snipe.createdAt.toISOString(),
-                title: '',
-                url: '',
+            const timestamp = new Date(snipe.createdTimestamp).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                hour12: true,
+                minute: '2-digit',
+            });
+
+            const avatarUrl = member.user.displayAvatarURL({ forceStatic: true, size: 1024 });
+            const roleIconUrl = member.roles.highest?.iconURL() || '';
+
+            const coloredRole =
+                member.roles.cache
+                    .filter((role) => role.color !== 0)
+                    .sort((a, b) => b.position - a.position)
+                    .first();
+
+            const renderRequestBody = {
+                attachments: snipe.attachments.map(a => a.url),
+                avatar: avatarUrl,
+                content: messageContent,
+                roleIcon: roleIconUrl,
+                timestamp,
+                username: member.user.username,
+                usernameColor: typeof coloredRole === 'string' ? coloredRole : coloredRole.hexColor,
             };
 
-            if (attachment) {
-                baseEmbed.image = { url: attachment.url };
+            const response = await ctx.webserver.request(
+                'POST',
+                '/fun/skullboard',
+                renderRequestBody,
+                true
+            );
+
+            if (!response.ok) {
+                return interaction.reply({
+                    content: 'Failed to generate image.',
+                    flags: MessageFlags.Ephemeral,
+                });
             }
 
+            const buffer = Buffer.from(await response.arrayBuffer());
+            const snipeAttachment = new AttachmentBuilder(buffer, { name: 'snipe.png' });
+
+
             return interaction.reply({
-                embeds: [baseEmbed],
+                files: [snipeAttachment],
             });
         },
         restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
