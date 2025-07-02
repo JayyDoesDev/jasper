@@ -1,5 +1,11 @@
-import { ApplicationCommandOptionType, ApplicationCommandType } from '@antibot/interactions';
-import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
+import {
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+} from '@antibot/interactions';
+import {
+    AttachmentBuilder,
+    ChatInputCommandInteraction
+} from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineCommand } from '../../../define';
@@ -7,12 +13,17 @@ import { defineCommand } from '../../../define';
 export = {
     Command: defineCommand<ChatInputCommandInteraction>({
         command: {
-            description: 'Add a caption to an image.',
-            name: 'caption',
+            description: 'Add text (top or bottom) to an image.',
+            name: 'meme',
             options: [
                 {
-                    description: 'Caption text',
-                    name: 'text',
+                    description: 'Top text',
+                    name: 'toptext',
+                    required: true,
+                    type: ApplicationCommandOptionType.STRING,
+                },{
+                    description: 'Bottom text',
+                    name: 'bottomtext',
                     required: true,
                     type: ApplicationCommandOptionType.STRING,
                 },
@@ -27,41 +38,25 @@ export = {
                     name: 'font_size',
                     required: false,
                     type: ApplicationCommandOptionType.INTEGER,
-                },
-                {
-                    choices: [
-                        {
-                            name: 'Top',
-                            value: 'top',
-                        },
-                        {
-                            name: 'Bottom',
-                            value: 'bottom',
-                        },
-                    ],
-                    description: 'Position of the caption (top or bottom)',
-                    name: 'position',
-                    required: false,
-                    type: ApplicationCommandOptionType.STRING,
-                },
+                }
             ],
             type: ApplicationCommandType.CHAT_INPUT,
         },
         on: async (ctx: Context, interaction) => {
-            const text = interaction.options.getString('text', true);
+            const toptext = interaction.options.getString('toptext', true) ?? "";
+            const bottomtext = interaction.options.getString('bottomtext', true) ?? "";
             const image = interaction.options.getAttachment('image', true);
             const fontSize = interaction.options.getInteger('font_size') ?? 72;
-            const position = interaction.options.getString('position') ?? 'top';
 
             try {
                 await interaction.deferReply();
                 const response = await fetch('http://localhost:8080/fun/meme', {
                     body: JSON.stringify({
+                        bottomtext,
                         fontSize,
                         img: image.url,
-                        position,
-                        text,
-                    }),
+                        toptext,
+                }),
                     headers: {
                         'Content-Type': 'application/json',
                         'JASPER-API-KEY': ctx.env.get('jasper_api_key'),
@@ -70,9 +65,7 @@ export = {
                 });
 
                 if (!response.ok) {
-                    throw new Error(
-                        `Render server error: ${response.status} ${await response.text()}`,
-                    );
+                    throw new Error(`Render server error: ${response.status} ${await response.text()}`);
                 }
 
                 const buffer = await response.arrayBuffer();
@@ -88,7 +81,7 @@ export = {
             } catch (error) {
                 console.error('Caption command error:', error);
                 return interaction.editReply({
-                    content: 'There was an error generating the caption.',
+                    content: 'There was an error generating the caption.'
                 });
             }
         },
