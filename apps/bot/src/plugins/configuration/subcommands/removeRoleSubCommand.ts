@@ -45,15 +45,13 @@ export const RemoveRoleSubCommand = defineSubCommand({
             );
             const description = updatedRoleNames.join(', ') || 'No roles';
             await interaction.reply({
-                content: `I've removed **${role.name}** from **${config}**`,
-                embeds: [
+                components: [
                     createConfigurationUpdateEmbed({
                         configName: 'Roles',
                         description,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -64,15 +62,13 @@ export const RemoveRoleSubCommand = defineSubCommand({
         const description = roleNames.join(', ') || 'No roles';
 
         await interaction.reply({
-            content: `I couldn't find **${role.name}** inside of **${config}**`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Roles',
                     description,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'remove_role',

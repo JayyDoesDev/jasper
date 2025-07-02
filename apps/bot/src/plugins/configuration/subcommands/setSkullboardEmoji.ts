@@ -26,15 +26,13 @@ export const SetSkullboardEmojiSubCommand = defineSubCommand({
 
         if (skullboardSettings?.SkullboardEmoji === emoji) {
             await interaction.reply({
-                content: `For the record, **${emoji}** is already set as the skullboard emoji.`,
-                embeds: [
+                components: [
                     createConfigurationExistsEmbed({
                         configName: 'Skullboard',
                         description: `${skullboardSettings.SkullboardEmoji}`,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -45,15 +43,13 @@ export const SetSkullboardEmojiSubCommand = defineSubCommand({
         });
 
         await interaction.reply({
-            content: `**${emoji}** has been set as the skullboard emoji.`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Skullboard',
                     description: `${emoji}`,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'set_skullboard_emoji',

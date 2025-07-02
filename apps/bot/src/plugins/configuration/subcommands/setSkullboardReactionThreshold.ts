@@ -17,15 +17,13 @@ export const SetSkullboardReactionThresholdSubCommand = defineSubCommand({
 
         if (skullboardSettings?.SkullboardReactionThreshold === threshold) {
             await interaction.reply({
-                content: `For the record, **${threshold}** is already set as the skullboard reaction threshold.`,
-                embeds: [
+                components: [
                     createConfigurationExistsEmbed({
                         configName: 'Skullboard',
                         description: `${skullboardSettings.SkullboardReactionThreshold}`,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -36,15 +34,13 @@ export const SetSkullboardReactionThresholdSubCommand = defineSubCommand({
         });
 
         await interaction.reply({
-            content: `**${threshold}** has been set as the skullboard reaction threshold.`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Skullboard',
                     description: `${threshold}`,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'set_skullboard_reaction_threshold',

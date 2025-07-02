@@ -118,6 +118,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute to this 
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
-<a href="https://github.com/JayyDoesDev/Jasper/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=JayyDoesDev/Jasper" />
+<a href="https://github.com/jayydoesdev/jasper/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jayydoesdev/jasper" />
 </a>

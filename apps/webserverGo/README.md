@@ -1,4 +1,6 @@
-# WebserverGo
+<p align="center"><img src="https://github.com/JayyDoesDev/jasper/blob/main/.github/assets/jasper.png?raw=true" alt="jasper" width="500"></p>
+<h1 align="center">Jasper WebserverGo</h1>
+<h2 align="center">🌐 🔵 Go based mux webserver Jasper's web functionality</h2>
 
 A high-performance Go-based webserver that serves as a remake of the original Java SpringBoot webserver. This server provides various APIs for YouTube channel information and fun image generation features.
 

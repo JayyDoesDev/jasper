@@ -49,15 +49,13 @@ export const RemoveChannelSubCommand = defineSubCommand({
             const description = updatedChannels.map((k) => `<#${k}>`).join(', ') || 'No channels';
 
             await interaction.reply({
-                content: `I've removed **${channel}** from **${config}**`,
-                embeds: [
+                components: [
                     createConfigurationUpdateEmbed({
                         configName: 'Channels',
                         description,
-                        guild: interaction.guild!,
                     }),
                 ],
-                flags: MessageFlags.Ephemeral,
+                flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
             });
             return;
         }
@@ -65,15 +63,13 @@ export const RemoveChannelSubCommand = defineSubCommand({
         const description = channelExistsInDB.map((k) => `<#${k}>`).join(', ') || 'No channels';
 
         await interaction.reply({
-            content: `I couldn't find **${channel}** inside of **${config}**`,
-            embeds: [
+            components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Channels',
                     description,
-                    guild: interaction.guild!,
                 }),
             ],
-            flags: MessageFlags.Ephemeral,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
     name: 'remove_channel',

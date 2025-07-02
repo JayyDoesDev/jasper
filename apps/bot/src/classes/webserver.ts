@@ -28,30 +28,6 @@ export default class WebServer {
         return VALID_URL_PATTERN.test(url);
     }
 
-    public async parseMentions(
-        ctx: Context,
-        guildId: Snowflake,
-        text: string[],
-    ): Promise<string[]> {
-        for (let i = 0; i < text.length; i++) {
-            if (text[i].startsWith('<@')) {
-                const userId = text[i].slice(2, -1);
-                try {
-                    const guild = await ctx.guilds.fetch(guildId);
-                    const member = (await guild.members.fetch(userId)) as GuildMember;
-                    if (member) {
-                        const name = member.displayName || member.user.username;
-                        text[i] = `<span class="mention" data-user-id="${name}">@${name}</span>`;
-                    }
-                } catch (error) {
-                    console.error('Error fetching member:', error);
-                    continue;
-                }
-            }
-        }
-        return text;
-    }
-
     public async request<Body extends Record<string, unknown>>(
         method: string,
         route: string,
