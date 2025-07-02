@@ -21,6 +21,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.Use(middleware.AuthMiddleware)
+    r.Use(middleware.LoggingMiddleware)
 
 	r.HandleFunc("/youtube/{id}", routes_yt.ChannelInfoHandler).Methods("GET")
 	r.HandleFunc("/youtube/{id}/subscribers", routes_yt.SubscriberCountHandler).Methods("GET")

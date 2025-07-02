@@ -97,6 +97,7 @@ Slowmode settings:
 ## Development
 
 1. Copy `.env.example` to `.env` and fill in the values
+2. Copy `latestvideo.copy.json` and `latestthread.copy.json` to `latestvideo.json` and `latestthread.json` respectively. Leave them as is.
 2. Install dependencies:
    ```bash
    yarn install

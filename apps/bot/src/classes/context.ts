@@ -98,6 +98,7 @@ export class Context extends Client {
                 env: 'GUILD_ONLY_COMMANDS_GUILD_ID',
             },
             { aliases: ['youtube_id', 'youtube_channel_id', 'youtube'], env: 'YOUTUBE_CHANNEL_ID' },
+            { aliases: ['youtube_post_channel', 'youtube_post'], env: 'YOUTUBE_POST_CHANNEL' },
             {
                 aliases: ['youtube_video_post_timer', 'youtube_post_timer'],
                 env: 'YOUTUBE_VIDEO_POST_TIMER',

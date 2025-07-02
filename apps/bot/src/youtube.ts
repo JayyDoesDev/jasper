@@ -3,10 +3,6 @@ import numeral from 'numeral';
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
 
-export interface YoutubeChannelResponse extends YoutubeChannelResponseBase {
-    videos: YoutubeResponse[];
-}
-
 export interface YoutubeChannelResponseBase {
     channelId: string;
 }
@@ -17,28 +13,33 @@ export interface YoutubeChannelSubscribersResponse extends YoutubeChannelRespons
 }
 
 export interface YoutubeResponse extends YoutubeChannelResponseBase {
-    commentCount: number;
-    description: string;
-    dislikeCount: number;
-    duration: number;
-    likeCount: number;
-    publishedAt: string;
-    thumbnailUrl: string;
-    title: string;
-    videoUrl: string;
-    viewCount: number;
+    channel: {
+        id: string
+        statistics: {
+            subscriberCount: string;
+            videoCount: string;
+            viewCount: string;
+        }
+    }
+    latest_video: {
+        channelId: string;
+        channelTitle: string;
+        description: string;
+        liveBroadcastContent: string;
+        publishedAt: string;
+        publishTime: string;
+        thumbnails: any;
+        title: string;
+        videoId: string;
+        videoUrl: string;
+    },
 }
 
-export async function getChannel<T = YoutubeChannelResponse>(
+export async function getChannel<T = YoutubeResponse>(
     context: Context,
     youtubeId: string,
 ): Promise<null | T> {
-    let data = await context.webserver.request('GET', `/web/youtube/channel/${youtubeId}`);
-
-    if (!data || typeof data !== 'object' || !('status' in data)) {
-        await context.webserver.request('POST', `/web/youtube/channel`, { channelId: youtubeId });
-        data = await context.webserver.request('GET', `/web/youtube/channel/${youtubeId}`);
-    }
+    const data = await context.webserver.request('GET', `/youtube/${youtubeId}`);
 
     return data ? ({ ...data } as T) : null;
 }
@@ -49,15 +50,18 @@ export async function getChannelSubscribers<T extends YoutubeChannelSubscribersR
 ): Promise<null | T> {
     let data = await context.webserver.request(
         'GET',
-        `/web/youtube/channel/${youtubeId}/subscribers`,
+        `/youtube/${youtubeId}/subscribers`,
     );
 
     if (!data || typeof data !== 'object' || !('status' in data)) {
-        await context.webserver.request('POST', `/web/youtube/channel`, { channelId: youtubeId });
+        await context.webserver.request(
+            'GET',
+            `/youtube/${youtubeId}`,
+        );
 
         data = await context.webserver.request(
             'GET',
-            `/web/youtube/channel/${youtubeId}/subscribers`,
+            `/youtube/${youtubeId}/subscribers`,
         );
     }
 
@@ -70,11 +74,11 @@ export async function getLatestYoutubeVideo<T = YoutubeResponse>(
 ): Promise<null | T> {
     const data = await getChannel(context, youtubeId);
 
-    if (!data || typeof data !== 'object' || !('status' in data) || data.videos.length === 0) {
+    if (!data || typeof data !== 'object') {
         return null;
     }
 
-    return { ...data.videos[0] } as T;
+    return { ...data } as T;
 }
 
 export async function updateSubCountChannel(context: Context, youtubeId: string): Promise<void> {
