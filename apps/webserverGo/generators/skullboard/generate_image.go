@@ -34,7 +34,7 @@ const (
 	padding     = 20
 	pfpSize     = 48
 	textMargin  = 10
-	fontSize    = 16.0
+	fontSize    = 16
 	lineHeight  = fontSize * 1.5
 	messageBoxX = float64(padding + pfpSize + textMargin)
 )
@@ -54,6 +54,7 @@ func replaceMentionsFromMessageContent(content string, mentions []string) string
 
 func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	width := 800
+    height := 0
 
 	tempDC := gg.NewContext(10000, 10000)
 	tempDC.SetFontFace(font)
@@ -73,6 +74,7 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	messageMaxWidth := float64(width - padding*2 - pfpSize - textMargin)
 	lines = tempDC.WordWrap(data.Content, messageMaxWidth)
 	messageHeight := float64(len(lines)) * lineHeight
+    height = int(messageHeight + padding*2)
 
 	usernameHeight := fontSize + 2
 	usernameLength, _ := tempDC.MeasureString(data.Username)
@@ -83,10 +85,10 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	if messageBoxX + usernameLength + timestampLength + pfpSize > float64(width) {
 		width = int(messageBoxX + usernameLength + timestampLength + pfpSize)
 	}
-	contentHeight := usernameHeight + messageHeight + padding
+	height += usernameHeight
 
     if data.ReplyContent != "" {
-        contentHeight += 50.0
+        height += 50.0
         replyIconWidth := float64(104 * 40 / 54)
         replyAvatarWidth := 35.0
         replyUsernameWidth, _ := tempDC.MeasureString(data.ReplyUsername)
@@ -108,11 +110,11 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 				slog.Error("Failed to load attachment image", "url", attachmentURL, "error", err)
 				return 0, 0, err
 			}
-			attachmentWidth := float64(attachmentImage.Bounds().Dx())
-			attachmentHeight := float64(attachmentImage.Bounds().Dy())
-			contentHeight += attachmentHeight + 20
+			attachmentWidth := attachmentImage.Bounds().Dx()
+			attachmentHeight := attachmentImage.Bounds().Dy()
+			height += attachmentHeight + 20
 
-			attachmentTotalWidth := int(attachmentWidth + messageBoxX)
+			attachmentTotalWidth := attachmentWidth + int(messageBoxX)
 			if attachmentTotalWidth > width {
 				width = attachmentTotalWidth
 			}
@@ -120,7 +122,7 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	}
 
 	totalWidth := int(width)
-	totalHeight := int(contentHeight)
+	totalHeight := int(height)
 
 	return totalWidth, totalHeight, nil
 }
