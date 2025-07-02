@@ -5,10 +5,16 @@ import {
     ButtonStyle,
     ChatInputCommandInteraction,
     ComponentType,
+    ContainerBuilder,
     ContextMenuCommandInteraction,
     Interaction as InteractionEvent,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
     MessageFlags,
     ModalSubmitInteraction,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
 } from 'discord.js';
 
 import { Context } from '../classes/context';
@@ -165,18 +171,42 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             } else {
                 await this.ctx.services.tags.create<Options & { tag: Tag }, void>();
 
+                const confirmContent = new TextDisplayBuilder().setContent(
+                    `${Emojis.CHECK_MARK} Successfully created \`${name}\`!`,
+                );
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(global.embedColor)
+                    .addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${title}`))
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Large)
+                            .setDivider(true),
+                    )
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(`${description}`),
+                    );
+
+                if (image_url) {
+                    container.addMediaGalleryComponents(
+                        new MediaGalleryBuilder().addItems(
+                            new MediaGalleryItemBuilder().setURL(`${image_url}`),
+                        ),
+                    );
+                }
+                if (footer) {
+                    container.addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Small)
+                            .setDivider(true),
+                    ),
+                        container.addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(`-# ${footer}`),
+                        );
+                }
                 await interaction.reply({
-                    content: `${Emojis.CHECK_MARK} Successfully created \`${name}\`!`,
-                    embeds: [
-                        {
-                            color: 0x323338,
-                            description: description,
-                            footer: { text: footer },
-                            image: image_url ? { url: image_url } : undefined,
-                            title: title,
-                        },
-                    ],
-                    flags: MessageFlags.Ephemeral,
+                    components: [confirmContent, container],
+                    flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
                 });
             }
         }
@@ -230,18 +260,45 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                         name,
                     });
 
+                const confirmContent = new TextDisplayBuilder().setContent(
+                    `${Emojis.CHECK_MARK} Successfully edited \`${name}\`!`,
+                );
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(global.embedColor)
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(`### ${TagEmbedTitle}`),
+                    )
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Large)
+                            .setDivider(true),
+                    )
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(`${TagEmbedDescription}`),
+                    );
+
+                if (image_url) {
+                    container.addMediaGalleryComponents(
+                        new MediaGalleryBuilder().addItems(
+                            new MediaGalleryItemBuilder().setURL(`${TagEmbedImageURL}`),
+                        ),
+                    );
+                }
+                if (footer) {
+                    container.addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Small)
+                            .setDivider(true),
+                    ),
+                        container.addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(`-# ${TagEmbedFooter}`),
+                        );
+                }
+
                 await interaction.reply({
-                    content: `${Emojis.CHECK_MARK} Successfully edited \`${name}\`!`,
-                    embeds: [
-                        {
-                            color: 0x323338,
-                            description: TagEmbedDescription,
-                            footer: { text: TagEmbedFooter },
-                            image: { url: TagEmbedImageURL ?? undefined },
-                            title: TagEmbedTitle,
-                        },
-                    ],
-                    flags: MessageFlags.Ephemeral,
+                    components: [confirmContent, container],
+                    flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
                 });
             } catch (error) {
                 throw 'Error on TagEditModal ' + error.stack || error;
