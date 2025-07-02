@@ -1,11 +1,5 @@
-import {
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-} from '@antibot/interactions';
-import {
-    AttachmentBuilder,
-    ChatInputCommandInteraction
-} from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationCommandType } from '@antibot/interactions';
+import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineCommand } from '../../../define';
@@ -37,7 +31,7 @@ export = {
                     name: 'position',
                     required: false,
                     type: ApplicationCommandOptionType.STRING,
-                }
+                },
             ],
             type: ApplicationCommandType.CHAT_INPUT,
         },
@@ -47,21 +41,15 @@ export = {
 
             try {
                 await interaction.deferReply();
-                const response = await fetch('http://localhost:8080/fun/speechbubble', {
-                    body: JSON.stringify({
+                const response = await ctx.webserver.request(
+                    'POST',
+                    '/fun/speechbubble',
+                    {
                         img: image.url,
                         position,
-                }),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'JASPER-API-KEY': ctx.env.get('jasper_api_key'),
                     },
-                    method: 'POST',
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Render server error: ${response.status} ${await response.text()}`);
-                }
+                    true,
+                );
 
                 const buffer = await response.arrayBuffer();
                 const imageBuffer = Buffer.from(buffer);
@@ -76,7 +64,7 @@ export = {
             } catch (error) {
                 console.error('Caption command error:', error);
                 return interaction.editReply({
-                    content: 'There was an error generating the caption.'
+                    content: 'There was an error generating the caption.',
                 });
             }
         },
