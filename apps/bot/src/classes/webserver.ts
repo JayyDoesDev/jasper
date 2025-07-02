@@ -1,5 +1,4 @@
 /* eslint @typescript-eslint/no-explicit-any: "off" */
-// import { GuildMember, Snowflake } from 'discord.js';
 import DOMPurify, { Config } from 'isomorphic-dompurify';
 
 import { Context } from './context';
