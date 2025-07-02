@@ -38,15 +38,15 @@ export = {
             type: ApplicationCommandType.CHAT_INPUT,
         },
         on: async (ctx, interaction) => {
-            const container = new ContainerBuilder()
-                .setAccentColor(global.embedColor)
-                .addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(
-                        `-# Post marked as Resolved by <@${interaction.user.id}>`,
-                    ),
-                );
             const originalQuestion: string = interaction.options.getString('original_question');
             const summarizedAnswer: string = interaction.options.getString('summarized_answer');
+
+            const mentionText = new TextDisplayBuilder().setContent(
+                `Post marked as resolved by <@${interaction.user.id}>`,
+            );
+
+            const container = new ContainerBuilder().setAccentColor(global.embedColor);
+
             if (originalQuestion) {
                 container.addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(
@@ -62,7 +62,7 @@ export = {
                 );
             }
             const finalReply: Record<string, any> = {
-                components: [container],
+                components: [mentionText, container],
                 flags: MessageFlags.IsComponentsV2,
             };
 

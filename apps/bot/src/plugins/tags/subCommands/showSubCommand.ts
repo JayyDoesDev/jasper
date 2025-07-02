@@ -52,9 +52,6 @@ export const ShowSubCommand = defineSubCommand({
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(`${tag.TagEmbedDescription}`),
-            )
-            .addSeparatorComponents(
-                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
             );
 
         if (tag.TagEmbedImageURL) {
@@ -64,9 +61,14 @@ export const ShowSubCommand = defineSubCommand({
                 ),
             );
         }
-        container.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
-        );
+        if (tag.TagEmbedFooter) {
+            container.addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+            ),
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
+                );
+        }
 
         await interaction.editReply({
             components: [container],
@@ -84,7 +86,7 @@ export const ShowSubCommand = defineSubCommand({
 });
 
 export const commandOptions = {
-    description: "Show a tag's content",
+    description: "Show a tag's content to yourself",
     name: ShowSubCommand.name,
     options: [
         {

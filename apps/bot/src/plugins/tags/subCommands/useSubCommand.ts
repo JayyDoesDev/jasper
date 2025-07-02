@@ -44,8 +44,9 @@ export const UseSubCommand = defineSubCommand({
         await interaction.deferReply();
         const container = new ContainerBuilder().setAccentColor(global.embedColor);
 
+        let mentionText = null;
         if (mention) {
-            container.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${mention}`));
+            mentionText = new TextDisplayBuilder().setContent(`${mention}`);
         }
 
         container
@@ -57,9 +58,6 @@ export const UseSubCommand = defineSubCommand({
             )
             .addTextDisplayComponents(
                 new TextDisplayBuilder().setContent(`${tag.TagEmbedDescription}`),
-            )
-            .addSeparatorComponents(
-                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
             );
 
         if (tag.TagEmbedImageURL) {
@@ -69,12 +67,18 @@ export const UseSubCommand = defineSubCommand({
                 ),
             );
         }
-        container.addTextDisplayComponents(
-            new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
-        );
+
+        if (tag.TagEmbedFooter) {
+            container.addSeparatorComponents(
+                new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+            ),
+                container.addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
+                );
+        }
 
         await interaction.editReply({
-            components: [container],
+            components: mentionText ? [mentionText, container] : [container],
             flags: MessageFlags.IsComponentsV2,
         });
     },
