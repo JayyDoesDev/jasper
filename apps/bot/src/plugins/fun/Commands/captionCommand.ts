@@ -55,25 +55,17 @@ export = {
 
             try {
                 await interaction.deferReply();
-                const response = await fetch('http://localhost:8080/fun/meme', {
-                    body: JSON.stringify({
+                const response = await ctx.webserver.request(
+                    'POST',
+                    '/fun/caption',
+                    {
                         fontSize,
                         img: image.url,
                         position,
                         text,
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'JASPER-API-KEY': ctx.env.get('jasper_api_key'),
                     },
-                    method: 'POST',
-                });
-
-                if (!response.ok) {
-                    throw new Error(
-                        `Render server error: ${response.status} ${await response.text()}`,
-                    );
-                }
+                    true,
+                );
 
                 const buffer = await response.arrayBuffer();
                 const imageBuffer = Buffer.from(buffer);

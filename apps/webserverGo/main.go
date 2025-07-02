@@ -26,6 +26,8 @@ func main() {
 	r.HandleFunc("/youtube/{id}/subscribers", routes_yt.SubscriberCountHandler).Methods("GET")
 
 	r.HandleFunc("/fun/caption", routes_fun.CaptionHandler).Methods("POST")
+	r.HandleFunc("/fun/meme", routes_fun.MemeHandler).Methods("POST")
+	r.HandleFunc("/fun/speechbubble", routes_fun.BubbleHandler).Methods("POST")
 	r.HandleFunc("/fun/skullboard", routes_fun.SkullboardHandler).Methods("POST")
 
 	fmt.Println("Server is running on :8080")
