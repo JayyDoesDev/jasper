@@ -6,7 +6,7 @@ import (
 )
 
 type cachedResponse struct {
-	data      map[string]interface{}
+	data      map[string]any
 	timestamp time.Time
 }
 

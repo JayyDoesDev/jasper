@@ -16,7 +16,8 @@ const paths = {
 export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         try {
-            const latest = await getLatestYoutubeVideo(ctx, ctx.env.get('youtube_id'));
+            const latest = (await getLatestYoutubeVideo(ctx, ctx.env.get('youtube_id')))
+                .latest_video;
 
             const channel = ctx.channels.resolve(
                 ctx.env.get('youtube_post_channel'),
@@ -37,7 +38,7 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
                 await fs.writeFile(paths.latestVideo, JSON.stringify({ video: '' }));
             }
 
-            if (currentVideoId === latest.videoUrl) {
+            if (currentVideoId === latest.videoId) {
                 await interaction.reply({
                     content: 'It looks like the most recent video has already been posted.',
                     flags: MessageFlags.Ephemeral,
@@ -85,7 +86,7 @@ export const NotifyVideoDiscussionsSubCommand = defineSubCommand({
 
             await Promise.all([
                 fs.writeFile(paths.latestThread, JSON.stringify({ thread: thread.id })),
-                fs.writeFile(paths.latestVideo, JSON.stringify({ video: latest.videoUrl })),
+                fs.writeFile(paths.latestVideo, JSON.stringify({ video: latest.videoId })),
             ]);
 
             await interaction.reply({

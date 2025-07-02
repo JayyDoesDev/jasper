@@ -41,30 +41,34 @@
 ## Key Components
 
 1. **Plugins**: Modular functionality organized by feature
-   - Configuration: Server-specific settings and setup
-   - Core: Essential bot commands and features
-   - Moderator: Moderation and administration tools
-   - Tags: Custom command and response system
+
+    - Configuration: Server-specific settings and setup
+    - Core: Essential bot commands and features
+    - Moderator: Moderation and administration tools
+    - Tags: Custom command and response system
 
 2. **Event System**: Robust event handling infrastructure
-   - Command processing
-   - Message management
-   - Interaction responses
-   - Error handling
+
+    - Command processing
+    - Message management
+    - Interaction responses
+    - Error handling
 
 3. **Database Models**: MongoDB schemas for data storage
-   - Guild configurations
-   - User data
-   - Tag storage
+
+    - Guild configurations
+    - User data
+    - Tag storage
 
 4. **Services**: Business logic abstraction
-   - Settings management
-   - Tag operations
-   - Core functionality
+    - Settings management
+    - Tag operations
+    - Core functionality
 
 ## Environment Variables
 
 Required environment variables:
+
 - `BOTID`: Discord application ID
 - `PUBLICKEY`: Discord public key
 - `TOKEN`: Discord bot token
@@ -73,8 +77,9 @@ Required environment variables:
 - `GUILD_ONLY_COMMANDS_GUILD_ID`: Guild ID for guild-only commands
 
 YouTube integration:
+
 - `YOUTUBE_CHANNEL_ID`: YouTube channel ID to monitor
-- `YOUTUBE_VIDEO_POST_CHANNEL_ID`: Channel ID for video notifications
+- `YOUTUBE_VIDEO_POST_CHANNEL`: Channel ID for video notifications
 - `YOUTUBE_VIDEO_POST_TIMER`: Notification check interval
 - `YOUTUBE_VIDEO_POST_UPDATE`: Enable video post updates
 - `SUB_COUNT_CHANNEL`: Channel ID for subscriber count updates
@@ -82,10 +87,12 @@ YouTube integration:
 - `SUB_COUNT_UPDATE`: Enable subscriber count updates (1 = true, 0 = false)
 
 Redis configuration:
+
 - `REDISHOST`: Redis server host
 - `REDISPORT`: Redis server port
 
 Slowmode settings:
+
 - `SLOWMODE`: Enable slowmode (1 = true, 0 = false)
 - `SLOWMODE_CHANNEL_ID`: Channel ID for slowmode
 - `SLOWMODE_COOLDOWN`: Slowmode cooldown duration
@@ -97,22 +104,24 @@ Slowmode settings:
 ## Development
 
 1. Copy `.env.example` to `.env` and fill in the values
-2. Install dependencies:
-   ```bash
-   yarn install
-   ```
-3. Build the project:
-   ```bash
-   yarn build
-   ```
-4. Start development server:
-   ```bash
-   yarn dev
-   ```
+2. Copy `latestvideo.copy.json` and `latestthread.copy.json` to `latestvideo.json` and `latestthread.json` respectively. Leave them as is.
+3. Install dependencies:
+    ```bash
+    yarn install
+    ```
+4. Build the project:
+    ```bash
+    yarn build
+    ```
+5. Start development server:
+    ```bash
+    yarn dev
+    ```
 
 ## Scripts
 
 ### Development
+
 - `yarn build` - Compiles JavaScript and TypeScript files
 - `yarn dev` - Builds project, runs ESLint, and starts the bot
 - `yarn start` - Runs the production build
@@ -120,6 +129,7 @@ Slowmode settings:
 - `yarn pretty` - Formats code using Prettier
 
 ### Docker
+
 - `yarn builddocker` - Builds Docker image
 - `yarn docker` - Runs Docker container
 - `yarn dockerstop` - Stops Docker container
@@ -127,6 +137,7 @@ Slowmode settings:
 - `yarn docker-compose-stop` - Stops Docker Compose services
 
 ### Database Migrations
+
 - `yarn migration` - Runs base migration setup
 - `yarn migration:topics` - Migrates topics data
 - `yarn migration:skull_default` - Migrates skull default settings
@@ -135,6 +146,7 @@ Slowmode settings:
 ## Type Safety
 
 The project is written in TypeScript and includes comprehensive type definitions for:
+
 - Anti-Bot interactions w/ Discord.js
 - Command structures
 - Event handlers

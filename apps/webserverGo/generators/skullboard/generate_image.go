@@ -2,7 +2,10 @@ package skullboard
 
 import (
 	"image"
+	"image/color"
 	"log/slog"
+	"regexp"
+	"strings"
 
 	"github.com/fogleman/gg"
 	"golang.org/x/image/font"
@@ -16,12 +19,13 @@ type MessageData struct {
 	ReplyUsername      string
 	ReplyContent       string
 
-	Avatar        string
-	UsernameColor string
-	Username      string
-	RoleIconURL   string
-	Timestamp     string
-	Content       string
+	Avatar          string
+	UsernameColor   string
+	Username        string
+	RoleIconURL     string
+	Timestamp       string
+	Content         string
+    Mentions    []string
 
 	Attachments []string
 }
@@ -35,13 +39,26 @@ const (
 	messageBoxX = float64(padding + pfpSize + textMargin)
 )
 
+func replaceMentionsFromMessageContent(content string, mentions []string) string {
+    for _, mention := range mentions {
+        splittedMention := strings.Split(mention, ":")
+        if len(splittedMention) != 2 {
+            continue
+        }
+        content = strings.ReplaceAll(content, "<@"+splittedMention[0]+">", "\u200b@"+splittedMention[1]+"\u200b")
+        content = strings.ReplaceAll(content, "<@!"+splittedMention[0]+">", "\u200b@"+splittedMention[1]+"\u200b")
+        content = strings.ReplaceAll(content, "<#"+splittedMention[0]+">", "\u200b#"+splittedMention[1]+"\u200b")
+    }
+    return content
+}
+
 func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	width := 800
 
 	tempDC := gg.NewContext(10000, 10000)
 	tempDC.SetFontFace(font)
 
-	lines := tempDC.WordWrap(data.Content, float64(width))
+	lines := tempDC.WordWrap(replaceMentionsFromMessageContent(data.Content, data.Mentions), float64(width))
 
 	longestLineWidth := 0.0
 	for _, line := range lines {
@@ -63,10 +80,10 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	if data.RoleIconURL != "" {
 		usernameLength += 25 + 10
 	}
-	if messageBoxX + usernameLength + timestampLength > float64(width) {
-		width = int(messageBoxX + usernameLength + timestampLength)
+	if messageBoxX + usernameLength + timestampLength + pfpSize > float64(width) {
+		width = int(messageBoxX + usernameLength + timestampLength + pfpSize)
 	}
-	contentHeight := usernameHeight + messageHeight
+	contentHeight := usernameHeight + messageHeight + padding
 
     if data.ReplyContent != "" {
         contentHeight += 50.0
@@ -103,10 +120,11 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 	}
 
 	totalWidth := int(width)
-	totalHeight := int(contentHeight + padding*2)
+	totalHeight := int(contentHeight)
 
 	return totalWidth, totalHeight, nil
 }
+
 
 func GenerateDiscordMessage(data MessageData) (image.Image, error) {
 	font, err := utils.LoadFont("./generators/skullboard/Roboto-Regular.ttf", fontSize)
@@ -197,11 +215,39 @@ func GenerateDiscordMessage(data MessageData) (image.Image, error) {
 	dc.DrawStringAnchored(data.Timestamp, timestampX, float64(currentY+fontSize), 0, 0)
 	currentY += fontSize * 2.5
 
-	dc.SetRGB(0.9, 0.9, 0.9)
-	lines := dc.WordWrap(data.Content, float64(totalWidth-padding*2-pfpSize-textMargin))
+    mentionColor := color.RGBA{R: 66, G: 135, B: 245, A: 255}
+    normalColor := color.RGBA{R: 230, G: 230, B: 230, A: 255}
+
+	lines := dc.WordWrap(replaceMentionsFromMessageContent(data.Content, data.Mentions), float64(totalWidth-padding*2-pfpSize-textMargin))
+    regex := regexp.MustCompile(`\x{200b}(@|#)[^ ]+\x{200b}`)
+
 	for _, line := range lines {
-		dc.DrawStringAnchored(line, messageBoxX, currentY, 0, 0)
-		currentY += lineHeight
+        x := messageBoxX
+        lastIndex := 0
+        matches := regex.FindAllStringIndex(line, -1)
+
+        for _, match := range matches {
+            start, end := match[0], match[1]
+            if start > lastIndex {
+                dc.SetColor(normalColor)
+                text := line[lastIndex:start]
+                dc.DrawStringAnchored(text, x, currentY, 0, 0)
+                w, _ := dc.MeasureString(text)
+                x += w
+            }
+            dc.SetColor(mentionColor)
+            text := line[start:end]
+            dc.DrawStringAnchored(text, x, currentY, 0, 0)
+            w, _ := dc.MeasureString(text)
+            x += w
+            lastIndex = end
+        }
+        if lastIndex < len(line) {
+            dc.SetColor(normalColor)
+            text := line[lastIndex:]
+            dc.DrawStringAnchored(text, x, currentY, 0, 0)
+        }
+        currentY += lineHeight
 	}
 
 	if len(data.Attachments) > 0 {

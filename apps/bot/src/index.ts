@@ -55,7 +55,12 @@ async function main() {
         setInterval(postNewVideo, Number(ctx.env.get('youtube_post_timer')) * 1000);
 
         if (ctx.env.get('sub_update') === '1') {
-            setInterval(updateSubCountChannel, Number(ctx.env.get('sub_timer')) * 1000);
+            setInterval(
+                updateSubCountChannel,
+                Number(ctx.env.get('sub_timer')) * 1000,
+                ctx,
+                ctx.env.get('youtube_channel_id'),
+            );
         }
 
         await ctx.login(ctx.env.get('botToken'));
@@ -69,7 +74,7 @@ async function postNewVideo(): Promise<void> {
     if (ctx.env.get('youtube_post_update') === '0') return;
 
     try {
-        const latest = await getLatestYoutubeVideo(ctx, ctx.env.get('youtube_id'));
+        const latest = (await getLatestYoutubeVideo(ctx, ctx.env.get('youtube_id'))).latest_video;
 
         const channel = ctx.channels.resolve(ctx.env.get('youtube_post_channel')) as TextChannel;
         if (!channel) {
@@ -85,7 +90,7 @@ async function postNewVideo(): Promise<void> {
             console.log(err);
         }
 
-        if (currentVideoId === latest.videoUrl) {
+        if (currentVideoId === latest.videoId) {
             return;
         }
 
@@ -128,7 +133,7 @@ async function postNewVideo(): Promise<void> {
 
         await Promise.all([
             fs.writeFile(CONFIG.paths.latestThread, JSON.stringify({ thread: thread.id })),
-            fs.writeFile(CONFIG.paths.latestVideo, JSON.stringify({ video: latest.channelId })),
+            fs.writeFile(CONFIG.paths.latestVideo, JSON.stringify({ video: latest.videoId })),
         ]);
     } catch (error) {
         console.error('Error in postNewVideo:', error);
