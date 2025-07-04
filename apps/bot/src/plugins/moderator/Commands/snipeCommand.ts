@@ -34,8 +34,6 @@ export = {
                 });
             }
 
-
-
             const attachmentUrls = Array.from(snipe.attachments.values())
                 .filter((attachment) => attachment.url)
                 .map((attachment) => attachment.url);
@@ -86,8 +84,7 @@ export = {
                     (member && member.nickname
                         ? ` (${ctx.webserver.sanitize(member.nickname || snipe.author?.globalName || '')})`
                         : ''),
-                usernameColor:
-                    typeof coloredRole === 'string' ? coloredRole : coloredRole.hexColor,
+                usernameColor: typeof coloredRole === 'string' ? coloredRole : coloredRole.hexColor,
                 // You can add reply fields if you want, as in the original
             };
 
@@ -107,14 +104,13 @@ export = {
                 screenshotUrl = 'attachment://screenshot.png';
             }
 
-            let containerBuilder = new ContainerBuilder()
-                .setAccentColor(8224125)
-           
+            let containerBuilder = new ContainerBuilder().setAccentColor(8224125);
+
             if (screenshotUrl) {
                 containerBuilder = containerBuilder.addMediaGalleryComponents(
                     new MediaGalleryBuilder().addItems(
-                        new MediaGalleryItemBuilder().setURL(screenshotUrl)
-                    )
+                        new MediaGalleryItemBuilder().setURL(screenshotUrl),
+                    ),
                 );
             }
 
@@ -123,14 +119,18 @@ export = {
                     new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
                 )
                 .addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(`-# Sniped! Sent <t:${Math.floor(snipe.createdTimestamp / 1000)}:R> in ${(snipe.channel as TextChannel)}`),
+                    new TextDisplayBuilder().setContent(
+                        `-# Sniped! Sent <t:${Math.floor(snipe.createdTimestamp / 1000)}:R> in ${snipe.channel as TextChannel}`,
+                    ),
                 );
 
             const components = [containerBuilder];
 
             return interaction.reply({
                 components,
-                files: screenshotBuffer ? [{ attachment: screenshotBuffer, name: 'screenshot.png' }] : [],
+                files: screenshotBuffer
+                    ? [{ attachment: screenshotBuffer, name: 'screenshot.png' }]
+                    : [],
                 flags: MessageFlags.IsComponentsV2,
             });
         },

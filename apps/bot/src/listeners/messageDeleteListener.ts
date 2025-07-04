@@ -13,7 +13,7 @@ export default class MessageDeleteListener extends Listener<'messageDelete'> {
     }
 
     public async execute(message: Message<true>): Promise<void> {
-        if (!message.guild) return; 
+        if (!message.guild) return;
         /* ^
          * | Patches an interesting bug, temporary fix.
          * Error: TypeError: Cannot read properties of null (reading 'id')
