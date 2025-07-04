@@ -13,6 +13,12 @@ export default class MessageDeleteListener extends Listener<'messageDelete'> {
     }
 
     public async execute(message: Message<true>): Promise<void> {
+        if (!message.guild) return; 
+        /* ^
+         * | Patches an interesting bug, temporary fix.
+         * Error: TypeError: Cannot read properties of null (reading 'id')
+         */
+
         await this.ctx.services.settings.configure<Options>({ guildId: message.guild.id });
         const { Channels, Roles, Users } = this.ctx.services.settings.getSettings();
 
