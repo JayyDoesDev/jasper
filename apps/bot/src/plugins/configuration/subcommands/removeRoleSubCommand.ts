@@ -40,10 +40,8 @@ export const RemoveRoleSubCommand = defineSubCommand({
             });
 
             const updatedRoles = await ctx.services.settings.getRoles<Snowflake>(guildId, config);
-            const updatedRoleNames = await Promise.all(
-                updatedRoles.map(async (k) => `${(await interaction.guild.roles.fetch(k)).name}`),
-            );
-            const description = updatedRoleNames.join(', ') || 'No roles';
+            const updatedRoleMentions = updatedRoles.map((roleId) => `<@&${roleId}>`);
+            const description = updatedRoleMentions.join(', ') || 'No roles';
             await interaction.reply({
                 components: [
                     createConfigurationUpdateEmbed({
@@ -56,10 +54,8 @@ export const RemoveRoleSubCommand = defineSubCommand({
             return;
         }
 
-        const roleNames = await Promise.all(
-            roleExistsInDB.map(async (k) => `${(await interaction.guild.roles.fetch(k)).name}`),
-        );
-        const description = roleNames.join(', ') || 'No roles';
+        const roleMentions = roleExistsInDB.map((roleId) => `<@&${roleId}>`);
+        const description = roleMentions.join(', ') || 'No roles';
 
         await interaction.reply({
             components: [
