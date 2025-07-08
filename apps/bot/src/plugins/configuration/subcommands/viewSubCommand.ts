@@ -17,7 +17,7 @@ const createField = (
     options: { isChannel: boolean; isRole: boolean; isUser: boolean },
 ) => {
     if (!data || data.length === 0) {
-        return `   * **${field}:** None\n`;
+        return `- **${field}:** None\n`;
     }
 
     const formattedData = data
@@ -32,7 +32,7 @@ const createField = (
                     : id,
         );
     const suffix = data.length > 8 ? ` *(+${data.length - 8} more)*` : '';
-    return `   * **${field}:** ${formattedData.join(', ')}${suffix}\n`;
+    return `- **${field}:** ${formattedData.join(', ')}${suffix}\n`;
 };
 
 export const ViewChannelSubCommand = defineSubCommand({
@@ -115,9 +115,9 @@ export const ViewChannelSubCommand = defineSubCommand({
                         createTable(
                             'Skullboard',
                             [
-                                `   * **Skullboard Channel:** ${Skullboard.SkullboardChannel ? `<#${Skullboard.SkullboardChannel}>` : 'None'}\n`,
-                                `   * **Emoji:** ${Skullboard.SkullboardEmoji ?? '💀'}\n`,
-                                `   * **Reaction Threshold:** ${Skullboard.SkullboardReactionThreshold}\n`,
+                                `- **Skullboard Channel:** ${Skullboard.SkullboardChannel ? `<#${Skullboard.SkullboardChannel}>` : 'None'}\n`,
+                                `- **Emoji:** ${Skullboard.SkullboardEmoji ?? '💀'}\n`,
+                                `- **Reaction Threshold:** ${Skullboard.SkullboardReactionThreshold}\n`,
                             ],
                             false,
                         ) +
@@ -133,9 +133,9 @@ export const ViewChannelSubCommand = defineSubCommand({
                                         isUser: false,
                                     },
                                 ),
-                                `   * **Cooldown:** ${global.slowmodeCooldown}s\n`,
-                                `   * **Message Time Window:** ${global.messageTimeWindow}s\n`,
-                                `   * **Message Threshold:** ${global.messageThreshold}\n`,
+                                `- **Cooldown:** ${global.slowmodeCooldown}s\n`,
+                                `- **Message Time Window:** ${global.messageTimeWindow}s\n`,
+                                `- **Message Threshold:** ${global.messageThreshold}\n`,
                             ],
                             true,
                         ),
