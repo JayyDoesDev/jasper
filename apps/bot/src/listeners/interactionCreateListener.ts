@@ -1,6 +1,7 @@
 import { PermissionsToHuman, PlantPermission } from '@antibot/interactions';
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import {
+    ActionRowBuilder,
     ButtonInteraction,
     ButtonStyle,
     ChatInputCommandInteraction,
@@ -11,16 +12,20 @@ import {
     MediaGalleryBuilder,
     MediaGalleryItemBuilder,
     MessageFlags,
+    ModalBuilder,
     ModalSubmitInteraction,
     SeparatorBuilder,
     SeparatorSpacingSize,
     TextDisplayBuilder,
+    TextInputBuilder,
+    TextInputStyle,
 } from 'discord.js';
 
 import { Context } from '../classes/context';
 import { withConfigurationRoles } from '../db';
 import { Command, defineEvent, message } from '../define';
 import { Emojis } from '../enums';
+import { InactiveThread, Options as InactiveThreadOptions } from '../services/inactiveThreadsService';
 import { Options, Tag, TagResponse } from '../services/tagService';
 
 import { Listener } from './listener';
@@ -32,11 +37,11 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
     public async execute<
         Interaction extends
-            | ButtonInteraction
-            | ChatInputCommandInteraction
-            | ContextMenuCommandInteraction
-            | InteractionEvent
-            | ModalSubmitInteraction,
+        | ButtonInteraction
+        | ChatInputCommandInteraction
+        | ContextMenuCommandInteraction
+        | InteractionEvent
+        | ModalSubmitInteraction,
     >(interaction: Interaction): Promise<void> {
         await this.handleCommands(interaction);
         if (interaction.isButton()) {
@@ -44,6 +49,10 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 await this.onListSubCommandButtons(interaction);
             } else if (interaction.customId.startsWith('add_topic_subcommand_button_')) {
                 await this.onAddTopicSubCommandButtons(interaction);
+            } else if (interaction.customId.startsWith('keep_thread_')) {
+                await this.onKeepThreadButton(interaction);
+            } else if (interaction.customId.startsWith('close_thread_')) {
+                await this.onCloseThreadButton(interaction);
             }
         }
         if (interaction.isModalSubmit()) {
@@ -103,9 +112,8 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                                 );
                             }
                             await interaction.reply({
-                                content: `I'm missing permissions! (${
-                                    perms.length <= 2 ? perms.join(' & ') : perms.join(', ')
-                                })`,
+                                content: `I'm missing permissions! (${perms.length <= 2 ? perms.join(' & ') : perms.join(', ')
+                                    })`,
                                 flags: MessageFlags.Ephemeral,
                             });
                             return;
@@ -136,7 +144,109 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
     private async handleModalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
         if (!interaction.isModalSubmit()) return;
 
-        // Handle Tag Create Modal
+        if (interaction.customId.startsWith('close_thread_modal_')) {
+            const threadId = interaction.customId.replace('close_thread_modal_', '');
+            const reason = interaction.fields.getTextInputValue('close_reason')?.trim() || 'No reason provided';
+
+            try {
+                if (!interaction.guild) {
+                    await interaction.reply({
+                        content: 'This action can only be performed in a server.',
+                        flags: [MessageFlags.Ephemeral]
+                    });
+                    return;
+                }
+
+                if (!interaction.channel || !interaction.channel.isThread()) {
+                    await interaction.reply({
+                        content: 'This action can only be performed in a thread.',
+                        flags: [MessageFlags.Ephemeral]
+                    });
+                    return;
+                }
+
+                await this.ctx.services.settings.configure<InactiveThreadOptions>({
+                    guildId: interaction.guild.id,
+                });
+                const { Channels } = this.ctx.services.settings.getSettings()
+                const allowedTagChannels = Channels.AllowedTagChannels;
+
+                if (!allowedTagChannels.includes(interaction.channel.parentId)) {
+                    await interaction.reply({
+                        content: 'This action can only be performed in allowed tag channels.',
+                        flags: [MessageFlags.Ephemeral]
+                    });
+                    return;
+                }
+
+                if (interaction.channel.ownerId !== interaction.user.id) {
+                    await interaction.reply({
+                        content: 'You can only close threads that you own.',
+                        flags: [MessageFlags.Ephemeral]
+                    });
+                    return;
+                }
+                
+                // delete the last warning message if it exists
+                const threadInfo = await this.ctx.services.inactiveThreads.getValues<InactiveThreadOptions, InactiveThread>({
+                    guildId: interaction.guild.id,
+                    threadId: threadId,
+                });
+                await this.ctx.services.inactiveThreads.deleteValue<InactiveThreadOptions, boolean>({
+                    guildId: interaction.guild.id,
+                    threadId: threadId,
+                });
+
+                if (threadInfo && threadInfo.warnMessageId) {
+                    try {
+                        const warningMessage = await interaction.channel.messages.fetch(threadInfo.warnMessageId);
+                        if (warningMessage) {
+                            await warningMessage.delete();
+                        }
+                    } catch (error) {
+                        console.error(`[Error deleting warning message ${threadInfo.warnMessageId}]:`, error);
+                    }
+                }
+
+                const cv2ClosingMessage =
+                    new ContainerBuilder()
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder()
+                                .setContent(`## The OP <@${interaction.user.id}> decided to closed this thread.`)
+                        )
+                        .addSeparatorComponents(
+                            new SeparatorBuilder()
+                                .setSpacing(SeparatorSpacingSize.Small)
+                                .setDivider(true),
+                        )
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder()
+                                .setContent(`### **Reason:** ${reason || 'No reason provided'}`)
+                        );
+
+                await interaction.channel.send({
+                    components: [cv2ClosingMessage],
+                    flags: MessageFlags.IsComponentsV2,
+                });
+
+                await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+                await interaction.deleteReply();
+
+                await interaction.channel.setLocked(true);
+                await interaction.channel.setArchived(true);
+
+                console.log(`[INFO] Thread ${threadId} closed by user interaction. Reason: ${reason}`);
+
+            } catch (error) {
+                console.error(`[Error closing thread ${threadId}]:`, error);
+                await interaction.reply({
+                    content: 'An error occurred while processing your request.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+            }
+            return;
+        }
+
         if (interaction.customId === `tag_create_${interaction.user.id}`) {
             const name = interaction.fields.getTextInputValue('tag_create_embed_name');
             const title = interaction.fields.getTextInputValue('tag_create_embed_title');
@@ -211,7 +321,6 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             }
         }
 
-        // Handle Tag Edit Modal
         if (interaction.customId === `tag_edit_${interaction.user.id}`) {
             try {
                 const name = interaction.fields.getTextInputValue('tag_edit_embed_name');
@@ -337,16 +446,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 )
                 .join('\n');
 
-            embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${
-                currentUserState.addTopicPages.pages.length
-            } • Total Topics: ${
-                (
+            embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${currentUserState.addTopicPages.pages.length
+                } • Total Topics: ${(
                     await this.ctx.services.settings.getTopics<string>(
                         interaction.guild!.id,
                         'Topics',
                     )
                 ).length
-            }`;
+                }`;
 
             const row = {
                 components: [
@@ -409,6 +516,146 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         await updateEmbed();
     }
 
+    private async onCloseThreadButton(interaction: ButtonInteraction): Promise<void> {
+        const threadId = interaction.customId.replace('close_thread_', '');
+
+        try {
+            if (!interaction.guild) {
+                await interaction.reply({
+                    content: 'This action can only be performed in a server.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+            if (!interaction.channel || !interaction.channel.isThread()) {
+                await interaction.reply({
+                    content: 'This action can only be performed in a thread.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+            await this.ctx.services.settings.configure<InactiveThreadOptions>({
+                guildId: interaction.guild.id,
+            });
+            const { Channels } = this.ctx.services.settings.getSettings()
+            const allowedTagChannels = Channels.AllowedTagChannels;
+
+            if (!allowedTagChannels.includes(interaction.channel.parentId)) {
+                await interaction.reply({
+                    content: 'This action can only be performed in allowed tag channels.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+            if (interaction.channel.ownerId !== interaction.user.id) {
+                await interaction.reply({
+                    content: 'You can only close threads that you own.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+            const modal = new ModalBuilder()
+                .setCustomId(`close_thread_modal_${threadId}`)
+                .setTitle('Close Thread - Reason');
+
+            const reasonInput = new TextInputBuilder()
+                .setCustomId('close_reason')
+                .setLabel('Why are you closing this thread?')
+                .setStyle(TextInputStyle.Paragraph)
+                .setPlaceholder('Please provide a reason for closing this thread...')
+                .setRequired(true)
+                .setMaxLength(1000);
+
+            const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonInput);
+            modal.addComponents(firstActionRow);
+
+            await interaction.showModal(modal);
+
+        } catch (error) {
+            console.error(`[Error showing close modal for thread ${threadId}]:`, error);
+            await interaction.reply({
+                content: 'An error occurred while processing your request.',
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+    }
+
+    private async onKeepThreadButton(interaction: ButtonInteraction): Promise<void> {
+        const threadId = interaction.customId.replace('keep_thread_', '');
+
+        try {
+            if (!interaction.guild) {
+                await interaction.reply({
+                    content: 'This action can only be performed in a server.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+            if (!interaction.channel || !interaction.channel.isThread()) {
+                await interaction.reply({
+                    content: 'This action can only be performed in a thread.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+
+            await this.ctx.services.settings.configure<InactiveThreadOptions>({
+                guildId: interaction.guild.id,
+            });
+            const { Channels } = this.ctx.services.settings.getSettings()
+            const allowedTagChannels = Channels.AllowedTagChannels;
+
+            if (!allowedTagChannels.includes(interaction.channel.parentId)) {
+                await interaction.reply({
+                    content: 'This action can only be performed in allowed tag channels.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+            if (interaction.channel.ownerId !== interaction.user.id) {
+                await interaction.reply({
+                    content: 'You can only keep threads that you own.',
+                    flags: [MessageFlags.Ephemeral]
+                });
+                return;
+            }
+
+            await this.ctx.services.inactiveThreads.removeWarning<InactiveThreadOptions>({
+                guildId: interaction.guild.id,
+                threadId: threadId,
+            });
+
+            const cv2NotInactive =
+                new ContainerBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder()
+                            .setContent(`## The OP <@${interaction.user.id}> is active and chose to keep the thread open.`)
+                    )
+                ;
+
+            await interaction.update({
+                components: [cv2NotInactive],
+                flags: MessageFlags.IsComponentsV2
+            });
+
+            console.log(`[INFO] Thread ${threadId} kept open by user interaction.`);
+
+        } catch (error) {
+            console.error(`[Error keeping thread ${threadId} open]:`, error);
+            await interaction.reply({
+                content: 'An error occurred while processing your request.',
+                flags: [MessageFlags.Ephemeral]
+            });
+        }
+    }
+
     private async onListSubCommandButtons(interaction: ButtonInteraction): Promise<void> {
         if (!interaction.isButton()) return;
 
@@ -435,15 +682,13 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             embedBase.description = currentUserState.tagPages[currentUserState.page]
                 .map(
                     (e, i) =>
-                        `> **${currentUserState.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${
-                            e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
+                        `> **${currentUserState.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
                         }`,
                 )
                 .join('\n');
 
-            embedBase.footer.text = `Page: ${currentUserState.page + 1}/${
-                currentUserState.tagPages.length
-            } • emojis by AnThOnY & deussa`;
+            embedBase.footer.text = `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length
+                } • emojis by AnThOnY & deussa`;
 
             const row = {
                 components: [

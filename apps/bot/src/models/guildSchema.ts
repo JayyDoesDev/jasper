@@ -6,7 +6,17 @@ import { Nullable } from '../types';
 export interface GuildDocument extends Document {
     _id: Snowflake;
     GuildSettings: Settings;
+    InactiveThreads?: InactiveThread[];
     Tags: Tag[];
+}
+
+export interface InactiveThread {
+    authorId: Snowflake;
+    lastMessageId: Snowflake;
+    lastMessageTimestamp: Snowflake;
+    threadId: Snowflake;
+    warnMessageId?: Snowflake;
+    warnTimestamp?: Snowflake;
 }
 
 export type Settings = {
@@ -135,6 +145,19 @@ export default model<GuildDocument>(
                 Users: {
                     IgnoreSnipedUsers: { default: [], type: [] },
                 },
+            },
+            InactiveThreads: {
+                default: [],
+                type: [
+                    {
+                        authorId: { required: true, type: String },
+                        lastMessageId: { required: true, type: String },
+                        lastMessageTimestamp: { required: true, type: String },
+                        threadId: { required: true, type: String },
+                        warnMessageId: { default: undefined, type: String },
+                        warnTimestamp: { default: undefined, type: String },
+                    },
+                ],
             },
             Tags: {
                 default: [],

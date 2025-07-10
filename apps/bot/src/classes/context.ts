@@ -12,6 +12,7 @@ import {
 
 import { Command, Plugin } from '../define';
 import { State } from '../plugins/types';
+import InactiveThreadsService from '../services/inactiveThreadsService';
 import SettingsService from '../services/settingsService';
 import TagService from '../services/tagService';
 
@@ -20,11 +21,13 @@ import { Store } from './store';
 import WebServer from './webserver';
 
 class Services {
+    public readonly inactiveThreads: InactiveThreadsService;
     public readonly settings: SettingsService;
     public readonly tags: TagService;
     constructor(public ctx: Context) {
         this.tags = new TagService(ctx);
         this.settings = new SettingsService(ctx);
+        this.inactiveThreads = new InactiveThreadsService(ctx);
     }
 }
 
