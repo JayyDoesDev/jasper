@@ -187,7 +187,6 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     return;
                 }
                 
-                // delete the last warning message if it exists
                 const threadInfo = await this.ctx.services.inactiveThreads.getValues<InactiveThreadOptions, InactiveThread>({
                     guildId: interaction.guild.id,
                     threadId: threadId,

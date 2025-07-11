@@ -1,6 +1,6 @@
 import { Context } from '../classes/context';
 import { defineEvent } from '../define';
-import { cleanUpExpiredThreads, cleanUpInactiveThreads } from '../plugins/tags/functions/threadInactiveCheck';
+import { cleanUpExpiredThreads, cleanUpInactiveThreads } from '../threadInactiveCheck';
 import { updateSubCountChannel } from '../youtube';
 
 import { Listener } from './listener';

@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ContainerBuilder, MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, SeparatorBuilder, SeparatorSpacingSize, TextDisplayBuilder, ThreadChannel } from "discord.js";
 
-import { Context } from "../../../classes/context";
-import { InactiveThread, Options } from "../../../services/inactiveThreadsService";
+import { Context } from "./classes/context";
+import { InactiveThread, Options } from "./services/inactiveThreadsService";
 
 
 export async function cleanUpExpiredThreads(ctx: Context) {
@@ -71,7 +71,6 @@ export async function cleanUpInactiveThreads(ctx: Context) {
     const inactiveThreadService = ctx.services.inactiveThreads;
 
     try {
-        // Get all guilds that have inactive threads
         const allGuilds = ctx.guilds.cache;
 
         for (const [guildId] of allGuilds) {
