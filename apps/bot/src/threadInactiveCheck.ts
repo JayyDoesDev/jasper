@@ -5,10 +5,7 @@ import { InactiveThread, Options } from "./services/inactiveThreadsService";
 
 
 export async function cleanUpExpiredThreads(ctx: Context) {
-    if (!ctx || !ctx.guilds) {
-        console.error("[Error] Discord client is not properly initialized in the context.");
-        return;
-    }
+    if (!ctx || !ctx.guilds) return;
 
     const inactiveThreadService = ctx.services.inactiveThreads;
 
@@ -19,19 +16,12 @@ export async function cleanUpExpiredThreads(ctx: Context) {
             try {
                 const inactiveThreads = await inactiveThreadService.getMultiValues<string, InactiveThread[]>(guildId);
 
-                if (!inactiveThreads || !Array.isArray(inactiveThreads) || inactiveThreads.length === 0) {
-                    console.log(`[DEBUG] No inactive threads found for guild ${guildId}`);
-                    continue;
-                }
-
-                console.log(`[DEBUG] Cleaning up ${inactiveThreads.length} tracked threads for guild ${guildId}`);
+                if (!inactiveThreads || !Array.isArray(inactiveThreads) || inactiveThreads.length === 0) continue;
 
                 for (const threadData of inactiveThreads) {
                     try {
                         const thread = await ctx.channels.fetch(threadData.threadId) as ThreadChannel;
-
                         if (thread.archived) {
-                            console.log(`[INFO] Thread ${threadData.threadId} is archived. Removing from tracking.`);
                             await inactiveThreadService.deleteValue<Options, boolean>({ guildId, threadId: threadData.threadId });
                         }
 
@@ -40,7 +30,6 @@ export async function cleanUpExpiredThreads(ctx: Context) {
                         if (discordError.code === RESTJSONErrorCodes.UnknownChannel ||
                             discordError.code === RESTJSONErrorCodes.UnknownMessage ||
                             discordError.code === RESTJSONErrorCodes.MissingAccess) {
-                            console.log(`[INFO] Thread ${threadData.threadId} no longer exists or is inaccessible. Removing from tracking.`);
                             await inactiveThreadService.deleteValue<Options, boolean>({ guildId, threadId: threadData.threadId });
                         } else {
                             console.error(`[Error checking thread ${threadData.threadId} during cleanup]:`, error);
@@ -52,8 +41,6 @@ export async function cleanUpExpiredThreads(ctx: Context) {
                 console.error(`[Error cleaning up guild ${guildId}]:`, error);
             }
         }
-        console.log("[INFO] No Guilds found with inactive threads. Cleanup complete.");
-
     } catch (error) {
         console.error("[Error in cleanUpExpiredThreads]:", error);
     }
@@ -65,8 +52,10 @@ export async function cleanUpInactiveThreads(ctx: Context) {
         return;
     }
 
-    const INACTIVITY_WARNING_TIME = 1 * 10 * 1000;
-    const GRACE_TIME_AFTER_WARNING = 1 * 20 * 1000;
+    // 1 minute
+    const INACTIVITY_WARNING_TIME = 1 * 60 * 1000;
+    // 2 minutes
+    const GRACE_TIME_AFTER_WARNING = 2 * 60 * 1000;
 
     const inactiveThreadService = ctx.services.inactiveThreads;
 
@@ -77,19 +66,13 @@ export async function cleanUpInactiveThreads(ctx: Context) {
             try {
                 const inactiveThreads = await inactiveThreadService.getMultiValues<string, InactiveThread[]>(guildId);
 
-                if (!inactiveThreads || !Array.isArray(inactiveThreads) || inactiveThreads.length === 0) {
-                    console.log(`[DEBUG] No inactive threads found for guild ${guildId}`);
-                    continue;
-                }
-
-                console.log(`[DEBUG] Processing ${inactiveThreads.length} inactive threads for guild ${guildId}`);
+                if (!inactiveThreads || !Array.isArray(inactiveThreads) || inactiveThreads.length === 0) continue;
 
                 for (const threadData of inactiveThreads) {
                     try {
                         const thread = await ctx.channels.fetch(threadData.threadId) as ThreadChannel;
 
                         if (thread.archived) {
-                            console.log(`[INFO] Thread ${threadData.threadId} is archived. Removing from tracking.`);
                             await inactiveThreadService.deleteValue<Options, boolean>({ guildId, threadId: threadData.threadId });
                             continue;
                         }
@@ -101,8 +84,6 @@ export async function cleanUpInactiveThreads(ctx: Context) {
                             const warnTime = parseInt(threadData.warnTimestamp);
 
                             if (now - warnTime > GRACE_TIME_AFTER_WARNING) {
-                                console.log(`[INFO] Closing thread ${threadData.threadId} due to inactivity after warning.`);
-
                                 const threadInfo = await ctx.services.inactiveThreads.getValues<Options, InactiveThread>({
                                     guildId: guildId,
                                     threadId: threadData.threadId,
@@ -144,8 +125,6 @@ export async function cleanUpInactiveThreads(ctx: Context) {
                             }
                         }
                         else if (now - lastMessageTime > INACTIVITY_WARNING_TIME) {
-                            console.log(`[INFO] Sending inactivity warning for thread ${threadData.threadId}.`);
-
                             const user = await ctx.users.fetch(threadData.authorId);
 
                             const keepOpenButton = new ButtonBuilder()
@@ -185,8 +164,6 @@ export async function cleanUpInactiveThreads(ctx: Context) {
                                 warnMessageId: embedMessage.id,
                                 warnTimestamp: embedMessage.createdTimestamp.toString(),
                             });
-
-                            console.log(`[INFO] Inactivity warning sent for thread ${threadData.threadId}.`);
                         }
 
                     } catch (error: unknown) {
