@@ -101,9 +101,7 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
 
     private async handleThreadTracking(message: Message): Promise<void> {
         try {
-            if (!message.guild) return console.warn("[WARN] Message is not in a guild, skipping thread tracking.");
-
-            if (!message.channel || !message.channel.isThread()) return console.warn("[WARN] Message is not in a thread, skipping thread tracking.");
+            if (!message.channel || !message.channel.isThread()) return;
 
 
             await this.ctx.services.settings.configure<InactiveThreadOptions>({
@@ -112,7 +110,7 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
             const { Channels } = this.ctx.services.settings.getSettings();
             const allowedTagChannels = Channels?.AllowedTagChannels;
 
-            if (!allowedTagChannels.includes(message.channel.parentId)) return console.warn(`[WARN] Thread parent channel ${message.channel.parentId} is not in allowed tag channels, skipping thread tracking.`);
+            if (!allowedTagChannels.includes(message.channel.parentId)) return;
             const guildId = message.guild.id;
             const threadId = message.channel.id;
             const authorId = message.author.id;

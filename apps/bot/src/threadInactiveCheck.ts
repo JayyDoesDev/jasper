@@ -75,6 +75,37 @@ export async function cleanUpInactiveThreads(ctx: Context, warningTimeMinutes: n
                             continue;
                         }
 
+                        // Check if the thread author is still in the server
+                        const guild = ctx.guilds.cache.get(guildId);
+                        if (guild) {
+                            try {
+                                await guild.members.fetch(threadData.authorId);
+                            } catch (error: unknown) {
+                                const discordError = error as { code?: number };
+                                if (discordError.code === RESTJSONErrorCodes.UnknownMember) {
+                                    // Author left the server, close the thread
+                                    const cv2ClosingMessage = new ContainerBuilder()
+                                        .addTextDisplayComponents(
+                                            new TextDisplayBuilder()
+                                                .setContent(`## This thread has been closed because the original poster left the server.`)
+                                        )
+                                        .addSeparatorComponents(
+                                            new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                                        );
+
+                                    await thread.send({
+                                        components: [cv2ClosingMessage],
+                                        flags: MessageFlags.IsComponentsV2,
+                                    });
+
+                                    await thread.setLocked(true);
+                                    await thread.setArchived(true);
+                                    await inactiveThreadService.deleteValue<Options, boolean>({ guildId, threadId: threadData.threadId });
+                                    continue;
+                                }
+                            }
+                        }
+
                         const now = Date.now();
                         const lastMessageTime = parseInt(threadData.lastMessageTimestamp);
 
