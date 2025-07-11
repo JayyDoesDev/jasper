@@ -141,13 +141,6 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
                     inactiveThread: updateData,
                     threadId,
                 });
-
-                console.log(`[INFO] Updated thread tracking:
-                    - Thread Name: ${message.channel.name}
-                    - Thread ID: ${threadId}
-                    - Parent Channel ID: ${message.channel.parentId}
-                    - User: ${message.author.tag} (ID: ${authorId})
-                    - Timestamp: ${new Date().toISOString()}`);
             } else {
                 const newThread: InactiveThread = {
                     authorId,
@@ -161,13 +154,6 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
                     inactiveThread: newThread,
                     threadId,
                 });
-
-                console.log(`[INFO] Started tracking new thread:
-                    - Thread Name: ${message.channel.name}
-                    - Thread ID: ${threadId}
-                    - Parent Channel ID: ${message.channel.parentId}
-                    - User: ${message.author.tag} (ID: ${authorId})
-                    - Timestamp: ${new Date().toISOString()}`);
             }
 
         } catch (error) {

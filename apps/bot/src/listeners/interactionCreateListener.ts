@@ -233,9 +233,6 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
                 await interaction.channel.setLocked(true);
                 await interaction.channel.setArchived(true);
-
-                console.log(`[INFO] Thread ${threadId} closed by user interaction. Reason: ${reason}`);
-
             } catch (error) {
                 console.error(`[Error closing thread ${threadId}]:`, error);
                 await interaction.reply({
@@ -643,9 +640,6 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 components: [cv2NotInactive],
                 flags: MessageFlags.IsComponentsV2
             });
-
-            console.log(`[INFO] Thread ${threadId} kept open by user interaction.`);
-
         } catch (error) {
             console.error(`[Error keeping thread ${threadId} open]:`, error);
             await interaction.reply({

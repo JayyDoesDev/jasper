@@ -129,6 +129,9 @@ export class Context extends Client {
             { aliases: ['slowmode_reset_time'], env: 'SLOWMODE_RESET_TIME' },
             { aliases: ['jasper_api_url'], env: 'JASPER_API_URL' },
             { aliases: ['jasper_api_key'], env: 'JASPER_API_KEY' },
+            { aliases: ['support_inactive_check'], env: 'SUPPORT_INACTIVE_CHECK' },
+            { aliases: ['support_inactive_warning_time'], env: 'SUPPORT_INACTIVE_WARNING_TIME' },
+            { aliases: ['support_inactive_grace_time'], env: 'SUPPORT_INACTIVE_GRACE_TIME' },
         );
         this.webserver = new WebServer(this);
         this.store = new Store(this);

@@ -46,16 +46,14 @@ export async function cleanUpExpiredThreads(ctx: Context) {
     }
 }
 
-export async function cleanUpInactiveThreads(ctx: Context) {
+export async function cleanUpInactiveThreads(ctx: Context, warningTimeMinutes: number, graceTimeMinutes: number) {
     if (!ctx || !ctx.guilds) {
         console.error("[Error] Discord client is not properly initialized in the context.");
         return;
     }
 
-    // 1 minute
-    const INACTIVITY_WARNING_TIME = 1 * 60 * 1000;
-    // 2 minutes
-    const GRACE_TIME_AFTER_WARNING = 2 * 60 * 1000;
+    const INACTIVITY_WARNING_TIME = warningTimeMinutes * 60 * 1000;
+    const GRACE_TIME_AFTER_WARNING = graceTimeMinutes * 60 * 1000;
 
     const inactiveThreadService = ctx.services.inactiveThreads;
 
@@ -169,10 +167,8 @@ export async function cleanUpInactiveThreads(ctx: Context) {
                     } catch (error: unknown) {
                         const discordError = error as { code?: number };
                         if (discordError.code === RESTJSONErrorCodes.UnknownChannel || discordError.code === RESTJSONErrorCodes.UnknownMessage) {
-                            console.log(`[INFO] Thread ${threadData.threadId} no longer exists. Removing from tracking.`);
                             await inactiveThreadService.deleteValue<Options, boolean>({ guildId, threadId: threadData.threadId });
                         } else if (discordError.code === RESTJSONErrorCodes.MissingAccess) {
-                            console.log(`[INFO] No access to thread ${threadData.threadId}. Removing from tracking.`);
                             await inactiveThreadService.deleteValue<Options, boolean>({ guildId, threadId: threadData.threadId });
                         } else {
                             console.error(`[Error processing thread ${threadData.threadId}]:`, error);

@@ -16,15 +16,42 @@ export default class ReadyListener extends Listener<'ready'> {
         }
         console.log(`${this.ctx.user.username} has logged in!`);
 
-        setInterval(async () => {
-            try {
-                await cleanUpExpiredThreads(this.ctx);
-                await cleanUpInactiveThreads(this.ctx);
-            }
-            catch (error) {
-                console.error('Error during inactive thread check:', error);
-            }
-        }, 10 * 1000);
+        const supportInactiveCheck = this.ctx.env.get('support_inactive_check');
+        const supportInactiveWarningTime = this.ctx.env.get('support_inactive_warning_time');
+        const supportInactiveGraceTime = this.ctx.env.get('support_inactive_grace_time');
+
+        if (supportInactiveCheck !== '1' && supportInactiveCheck?.toLowerCase() !== 'true') {
+            console.log('Support inactive check is disabled. Skipping inactive thread monitoring.');
+        } else if (!supportInactiveWarningTime || isNaN(Number(supportInactiveWarningTime)) || Number(supportInactiveWarningTime) <= 0) {
+            console.warn('Invalid or missing support_inactive_warning_time configuration. Skipping inactive thread monitoring.');
+        } else if (!supportInactiveGraceTime || isNaN(Number(supportInactiveGraceTime)) || Number(supportInactiveGraceTime) <= 0) {
+            console.warn('Invalid or missing support_inactive_grace_time configuration. Skipping inactive thread monitoring.');
+        } else {
+            console.log('Inactive thread monitoring enabled. Running initial check and then every minute.');
+
+            const warningTime = Number(supportInactiveWarningTime);
+            const graceTime = Number(supportInactiveGraceTime);
+
+            (async () => {
+                try {
+                    await cleanUpExpiredThreads(this.ctx);
+                    await cleanUpInactiveThreads(this.ctx, warningTime, graceTime);
+                }
+                catch (error) {
+                    console.error('Error during initial inactive thread check:', error);
+                }
+            })();
+
+            setInterval(async () => {
+                try {
+                    await cleanUpExpiredThreads(this.ctx);
+                    await cleanUpInactiveThreads(this.ctx, warningTime, graceTime);
+                }
+                catch (error) {
+                    console.error('Error during inactive thread check:', error);
+                }
+            }, 60 * 1000);
+        }
     }
 
     public toEvent() {
