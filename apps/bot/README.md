@@ -101,6 +101,17 @@ Slowmode settings:
 - `SLOWMODE_RESET_SLOWMODE`: Reset slowmode interval
 - `SLOWMODE_RESET_TIME`: Time to reset slowmode
 
+API configuration:
+
+- `JASPER_API_URL`: URL for the Jasper API
+- `JASPER_API_KEY`: API key for Jasper API authentication
+
+Support thread management:
+
+- `SUPPORT_INACTIVE_CHECK`: Enable support thread inactivity checking (1 = true, 0 = false)
+- `SUPPORT_INACTIVE_WARNING_TIME`: Time in minutes before warning about inactive thread (default: 2880 = 48 hours)
+- `SUPPORT_INACTIVE_GRACE_TIME`: Grace time in minutes after warning before action (default: 1440 = 24 hours)
+
 ## Development
 
 1. Copy `.env.example` to `.env` and fill in the values
