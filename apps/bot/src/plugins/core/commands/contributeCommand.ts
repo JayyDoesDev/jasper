@@ -65,7 +65,6 @@ export = {
             const choices = documentationAutocomplete(documentationContent);
 
             const choice = choices.find((c) => c.name === section);
-
             const contributeComponents = [
                 new ContainerBuilder()
                     .addTextDisplayComponents(
