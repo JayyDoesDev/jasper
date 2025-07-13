@@ -1,10 +1,10 @@
-import { Snowflake } from "discord.js";
+import { Snowflake } from 'discord.js';
 
-import { Context } from "../classes/context";
-import { getGuild } from "../db";
-import TagSchema, { GuildDocument } from "../models/guildSchema";
+import { Context } from '../classes/context';
+import { getGuild } from '../db';
+import TagSchema, { GuildDocument } from '../models/guildSchema';
 
-import { CommonCondition, Service } from "./service";
+import { CommonCondition, Service } from './service';
 
 export type InactiveThread = {
     authorId: Snowflake;
@@ -13,14 +13,14 @@ export type InactiveThread = {
     threadId: Snowflake;
     warnMessageId?: Snowflake;
     warnTimestamp?: Snowflake;
-}
+};
 
 export type Options = {
     guildId: Snowflake;
     threadId: Snowflake;
 };
 
-class InactiveThreadService extends Service{
+class InactiveThreadService extends Service {
     private guildId: Snowflake;
     private inactiveThread: InactiveThread;
 
@@ -36,7 +36,9 @@ class InactiveThreadService extends Service{
     }
 
     public async addWarning<T>(
-        options?: T extends Options ? Options & { warnMessageId: Snowflake; warnTimestamp: Snowflake } : null,
+        options?: T extends Options
+            ? Options & { warnMessageId: Snowflake; warnTimestamp: Snowflake }
+            : null,
     ): Promise<CommonCondition<InactiveThread | null>> {
         let guildId = this.guildId;
         let threadId = this.inactiveThread.threadId;
@@ -47,10 +49,15 @@ class InactiveThreadService extends Service{
         }
 
         if (!guildId || !threadId || !options?.warnMessageId || !options?.warnTimestamp) {
-            throw new Error('GuildId, threadId, warnMessageId, and warnTimestamp are required to add warning');
+            throw new Error(
+                'GuildId, threadId, warnMessageId, and warnTimestamp are required to add warning',
+            );
         }
 
-        return this.modify<Options & { inactiveThread?: Partial<InactiveThread> }, InactiveThread | null>({
+        return this.modify<
+            Options & { inactiveThread?: Partial<InactiveThread> },
+            InactiveThread | null
+        >({
             guildId,
             inactiveThread: {
                 warnMessageId: options.warnMessageId,
@@ -60,7 +67,9 @@ class InactiveThreadService extends Service{
         });
     }
 
-    public configure<T>(config: T extends Options ? Options & { inactiveThread?: InactiveThread } : null): this {
+    public configure<T>(
+        config: T extends Options ? Options & { inactiveThread?: InactiveThread } : null,
+    ): this {
         this.guildId = config?.guildId ?? '';
         this.inactiveThread = config?.inactiveThread ?? {
             authorId: '',
@@ -89,11 +98,15 @@ class InactiveThreadService extends Service{
         }
 
         if (!guildId || !inactiveThread.threadId) {
-            throw new Error('GuildId and threadId are required to create an inactive thread record');
+            throw new Error(
+                'GuildId and threadId are required to create an inactive thread record',
+            );
         }
 
         if (await this.itemExists<Options>({ guildId, threadId: inactiveThread.threadId })) {
-            throw new Error(`Inactive thread "${inactiveThread.threadId}" already exists in guild ${guildId}`);
+            throw new Error(
+                `Inactive thread "${inactiveThread.threadId}" already exists in guild ${guildId}`,
+            );
         }
 
         const guild = await getGuild<GuildDocument>(this.ctx, guildId);
@@ -151,10 +164,7 @@ class InactiveThreadService extends Service{
         guild.InactiveThreads.splice(index, 1);
         await this.ctx.store.setForeignKey({ guild: guildId }, guild);
 
-        await TagSchema.updateOne(
-            { _id: guildId },
-            { $pull: { InactiveThreads: { threadId } } }
-        );
+        await TagSchema.updateOne({ _id: guildId }, { $pull: { InactiveThreads: { threadId } } });
 
         return <CommonCondition<R>>true;
     }
@@ -179,7 +189,9 @@ class InactiveThreadService extends Service{
             return <CommonCondition<R extends InactiveThread[] ? InactiveThread[] : null>>[];
         }
 
-        return <CommonCondition<R extends InactiveThread[] ? InactiveThread[] : null>>inactiveThreads;
+        return <CommonCondition<R extends InactiveThread[] ? InactiveThread[] : null>>(
+            inactiveThreads
+        );
     }
 
     public async getValues<T, R>(
@@ -202,7 +214,9 @@ class InactiveThreadService extends Service{
         }
 
         const guild = await getGuild<GuildDocument>(this.ctx, guildId);
-        const inactiveThread = guild.InactiveThreads?.find((thread) => thread.threadId === threadId);
+        const inactiveThread = guild.InactiveThreads?.find(
+            (thread) => thread.threadId === threadId,
+        );
 
         if (!inactiveThread) {
             return null;
@@ -298,7 +312,10 @@ class InactiveThreadService extends Service{
             throw new Error('GuildId and threadId are required to remove warning');
         }
 
-        return this.modify<Options & { inactiveThread?: Partial<InactiveThread> }, InactiveThread | null>({
+        return this.modify<
+            Options & { inactiveThread?: Partial<InactiveThread> },
+            InactiveThread | null
+        >({
             guildId,
             inactiveThread: {
                 lastMessageTimestamp: new Date().getTime().toString(),

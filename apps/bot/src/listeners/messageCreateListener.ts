@@ -2,7 +2,10 @@ import { Message, TextChannel } from 'discord.js';
 
 import { Context } from '../classes/context';
 import { defineEvent } from '../define';
-import { InactiveThread, Options as InactiveThreadOptions } from '../services/inactiveThreadsService';
+import {
+    InactiveThread,
+    Options as InactiveThreadOptions,
+} from '../services/inactiveThreadsService';
 import { Options as SettingsOptions } from '../services/settingsService';
 
 import { Listener } from './listener';
@@ -39,7 +42,9 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
         await this.handleThreadTracking(message);
 
         if (message.guild) {
-            await this.ctx.services.settings.configure<SettingsOptions>({ guildId: message.guild.id });
+            await this.ctx.services.settings.configure<SettingsOptions>({
+                guildId: message.guild.id,
+            });
             const { Channels } = this.ctx.services.settings.getSettings();
 
             if (Channels.AutomaticSlowmodeChannels?.includes(message.channel.id)) {
@@ -103,7 +108,6 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
         try {
             if (!message.channel || !message.channel.isThread()) return;
 
-
             await this.ctx.services.settings.configure<InactiveThreadOptions>({
                 guildId: message.guild.id,
             });
@@ -117,7 +121,10 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
             const messageId = message.id;
             const timestamp = Date.now().toString();
 
-            const existingThread = await this.ctx.services.inactiveThreads.getValues<InactiveThreadOptions, InactiveThread | null>({
+            const existingThread = await this.ctx.services.inactiveThreads.getValues<
+                InactiveThreadOptions,
+                InactiveThread | null
+            >({
                 guildId,
                 threadId,
             });
@@ -134,7 +141,10 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
                     updateData.warnTimestamp = undefined;
                 }
 
-                await this.ctx.services.inactiveThreads.modify<InactiveThreadOptions & { inactiveThread?: Partial<InactiveThread> }, InactiveThread | null>({
+                await this.ctx.services.inactiveThreads.modify<
+                    InactiveThreadOptions & { inactiveThread?: Partial<InactiveThread> },
+                    InactiveThread | null
+                >({
                     guildId,
                     inactiveThread: updateData,
                     threadId,
@@ -147,15 +157,20 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
                     threadId,
                 };
 
-                await this.ctx.services.inactiveThreads.create<InactiveThreadOptions & { inactiveThread?: InactiveThread }, InactiveThread>({
+                await this.ctx.services.inactiveThreads.create<
+                    InactiveThreadOptions & { inactiveThread?: InactiveThread },
+                    InactiveThread
+                >({
                     guildId,
                     inactiveThread: newThread,
                     threadId,
                 });
             }
-
         } catch (error) {
-            console.error(`[Error] Failed to handle thread tracking for thread ${message.channel.id}:`, error);
+            console.error(
+                `[Error] Failed to handle thread tracking for thread ${message.channel.id}:`,
+                error,
+            );
         }
     }
 }

@@ -25,7 +25,10 @@ import { Context } from '../classes/context';
 import { withConfigurationRoles } from '../db';
 import { Command, defineEvent, message } from '../define';
 import { Emojis } from '../enums';
-import { InactiveThread, Options as InactiveThreadOptions } from '../services/inactiveThreadsService';
+import {
+    InactiveThread,
+    Options as InactiveThreadOptions,
+} from '../services/inactiveThreadsService';
 import { Options, Tag, TagResponse } from '../services/tagService';
 
 import { Listener } from './listener';
@@ -37,11 +40,11 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
     public async execute<
         Interaction extends
-        | ButtonInteraction
-        | ChatInputCommandInteraction
-        | ContextMenuCommandInteraction
-        | InteractionEvent
-        | ModalSubmitInteraction,
+            | ButtonInteraction
+            | ChatInputCommandInteraction
+            | ContextMenuCommandInteraction
+            | InteractionEvent
+            | ModalSubmitInteraction,
     >(interaction: Interaction): Promise<void> {
         await this.handleCommands(interaction);
         if (interaction.isButton()) {
@@ -112,8 +115,9 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                                 );
                             }
                             await interaction.reply({
-                                content: `I'm missing permissions! (${perms.length <= 2 ? perms.join(' & ') : perms.join(', ')
-                                    })`,
+                                content: `I'm missing permissions! (${
+                                    perms.length <= 2 ? perms.join(' & ') : perms.join(', ')
+                                })`,
                                 flags: MessageFlags.Ephemeral,
                             });
                             return;
@@ -146,13 +150,15 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
         if (interaction.customId.startsWith('close_thread_modal_')) {
             const threadId = interaction.customId.replace('close_thread_modal_', '');
-            const reason = interaction.fields.getTextInputValue('close_reason')?.trim() || 'No reason provided';
+            const reason =
+                interaction.fields.getTextInputValue('close_reason')?.trim() ||
+                'No reason provided';
 
             try {
                 if (!interaction.guild) {
                     await interaction.reply({
                         content: 'This action can only be performed in a server.',
-                        flags: [MessageFlags.Ephemeral]
+                        flags: [MessageFlags.Ephemeral],
                     });
                     return;
                 }
@@ -160,7 +166,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 if (!interaction.channel || !interaction.channel.isThread()) {
                     await interaction.reply({
                         content: 'This action can only be performed in a thread.',
-                        flags: [MessageFlags.Ephemeral]
+                        flags: [MessageFlags.Ephemeral],
                     });
                     return;
                 }
@@ -168,13 +174,13 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 await this.ctx.services.settings.configure<InactiveThreadOptions>({
                     guildId: interaction.guild.id,
                 });
-                const { Channels } = this.ctx.services.settings.getSettings()
+                const { Channels } = this.ctx.services.settings.getSettings();
                 const allowedTagChannels = Channels.AllowedTagChannels;
 
                 if (!allowedTagChannels.includes(interaction.channel.parentId)) {
                     await interaction.reply({
                         content: 'This action can only be performed in allowed tag channels.',
-                        flags: [MessageFlags.Ephemeral]
+                        flags: [MessageFlags.Ephemeral],
                     });
                     return;
                 }
@@ -182,46 +188,57 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 if (interaction.channel.ownerId !== interaction.user.id) {
                     await interaction.reply({
                         content: 'You can only close threads that you own.',
-                        flags: [MessageFlags.Ephemeral]
+                        flags: [MessageFlags.Ephemeral],
                     });
                     return;
                 }
-                
-                const threadInfo = await this.ctx.services.inactiveThreads.getValues<InactiveThreadOptions, InactiveThread>({
+
+                const threadInfo = await this.ctx.services.inactiveThreads.getValues<
+                    InactiveThreadOptions,
+                    InactiveThread
+                >({
                     guildId: interaction.guild.id,
                     threadId: threadId,
                 });
-                await this.ctx.services.inactiveThreads.deleteValue<InactiveThreadOptions, boolean>({
-                    guildId: interaction.guild.id,
-                    threadId: threadId,
-                });
+                await this.ctx.services.inactiveThreads.deleteValue<InactiveThreadOptions, boolean>(
+                    {
+                        guildId: interaction.guild.id,
+                        threadId: threadId,
+                    },
+                );
 
                 if (threadInfo && threadInfo.warnMessageId) {
                     try {
-                        const warningMessage = await interaction.channel.messages.fetch(threadInfo.warnMessageId);
+                        const warningMessage = await interaction.channel.messages.fetch(
+                            threadInfo.warnMessageId,
+                        );
                         if (warningMessage) {
                             await warningMessage.delete();
                         }
                     } catch (error) {
-                        console.error(`[Error deleting warning message ${threadInfo.warnMessageId}]:`, error);
+                        console.error(
+                            `[Error deleting warning message ${threadInfo.warnMessageId}]:`,
+                            error,
+                        );
                     }
                 }
 
-                const cv2ClosingMessage =
-                    new ContainerBuilder()
-                        .addTextDisplayComponents(
-                            new TextDisplayBuilder()
-                                .setContent(`## The OP <@${interaction.user.id}> decided to closed this thread.`)
-                        )
-                        .addSeparatorComponents(
-                            new SeparatorBuilder()
-                                .setSpacing(SeparatorSpacingSize.Small)
-                                .setDivider(true),
-                        )
-                        .addTextDisplayComponents(
-                            new TextDisplayBuilder()
-                                .setContent(`### **Reason:** ${reason || 'No reason provided'}`)
-                        );
+                const cv2ClosingMessage = new ContainerBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `## The OP <@${interaction.user.id}> decided to closed this thread.`,
+                        ),
+                    )
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Small)
+                            .setDivider(true),
+                    )
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `### **Reason:** ${reason || 'No reason provided'}`,
+                        ),
+                    );
 
                 await interaction.channel.send({
                     components: [cv2ClosingMessage],
@@ -237,7 +254,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 console.error(`[Error closing thread ${threadId}]:`, error);
                 await interaction.reply({
                     content: 'An error occurred while processing your request.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
             }
             return;
@@ -442,14 +459,16 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 )
                 .join('\n');
 
-            embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${currentUserState.addTopicPages.pages.length
-                } • Total Topics: ${(
+            embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${
+                currentUserState.addTopicPages.pages.length
+            } • Total Topics: ${
+                (
                     await this.ctx.services.settings.getTopics<string>(
                         interaction.guild!.id,
                         'Topics',
                     )
                 ).length
-                }`;
+            }`;
 
             const row = {
                 components: [
@@ -519,7 +538,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             if (!interaction.guild) {
                 await interaction.reply({
                     content: 'This action can only be performed in a server.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -527,7 +546,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             if (!interaction.channel || !interaction.channel.isThread()) {
                 await interaction.reply({
                     content: 'This action can only be performed in a thread.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -535,13 +554,13 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             await this.ctx.services.settings.configure<InactiveThreadOptions>({
                 guildId: interaction.guild.id,
             });
-            const { Channels } = this.ctx.services.settings.getSettings()
+            const { Channels } = this.ctx.services.settings.getSettings();
             const allowedTagChannels = Channels.AllowedTagChannels;
 
             if (!allowedTagChannels.includes(interaction.channel.parentId)) {
                 await interaction.reply({
                     content: 'This action can only be performed in allowed tag channels.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -549,7 +568,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             if (interaction.channel.ownerId !== interaction.user.id) {
                 await interaction.reply({
                     content: 'You can only close threads that you own.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -566,16 +585,17 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 .setRequired(true)
                 .setMaxLength(1000);
 
-            const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reasonInput);
+            const firstActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(
+                reasonInput,
+            );
             modal.addComponents(firstActionRow);
 
             await interaction.showModal(modal);
-
         } catch (error) {
             console.error(`[Error showing close modal for thread ${threadId}]:`, error);
             await interaction.reply({
                 content: 'An error occurred while processing your request.',
-                flags: [MessageFlags.Ephemeral]
+                flags: [MessageFlags.Ephemeral],
             });
         }
     }
@@ -587,7 +607,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             if (!interaction.guild) {
                 await interaction.reply({
                     content: 'This action can only be performed in a server.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -595,22 +615,21 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             if (!interaction.channel || !interaction.channel.isThread()) {
                 await interaction.reply({
                     content: 'This action can only be performed in a thread.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
 
-
             await this.ctx.services.settings.configure<InactiveThreadOptions>({
                 guildId: interaction.guild.id,
             });
-            const { Channels } = this.ctx.services.settings.getSettings()
+            const { Channels } = this.ctx.services.settings.getSettings();
             const allowedTagChannels = Channels.AllowedTagChannels;
 
             if (!allowedTagChannels.includes(interaction.channel.parentId)) {
                 await interaction.reply({
                     content: 'This action can only be performed in allowed tag channels.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -618,7 +637,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             if (interaction.channel.ownerId !== interaction.user.id) {
                 await interaction.reply({
                     content: 'You can only keep threads that you own.',
-                    flags: [MessageFlags.Ephemeral]
+                    flags: [MessageFlags.Ephemeral],
                 });
                 return;
             }
@@ -628,23 +647,20 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 threadId: threadId,
             });
 
-            const cv2NotInactive =
-                new ContainerBuilder()
-                    .addTextDisplayComponents(
-                        new TextDisplayBuilder()
-                            .setContent(`## The OP <@${interaction.user.id}> is active and chose to keep the thread open.`)
-                    )
-                ;
-
+            const cv2NotInactive = new ContainerBuilder().addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `## The OP <@${interaction.user.id}> is active and chose to keep the thread open.`,
+                ),
+            );
             await interaction.update({
                 components: [cv2NotInactive],
-                flags: MessageFlags.IsComponentsV2
+                flags: MessageFlags.IsComponentsV2,
             });
         } catch (error) {
             console.error(`[Error keeping thread ${threadId} open]:`, error);
             await interaction.reply({
                 content: 'An error occurred while processing your request.',
-                flags: [MessageFlags.Ephemeral]
+                flags: [MessageFlags.Ephemeral],
             });
         }
     }
@@ -675,13 +691,15 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             embedBase.description = currentUserState.tagPages[currentUserState.page]
                 .map(
                     (e, i) =>
-                        `> **${currentUserState.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
+                        `> **${currentUserState.page * 10 + i + 1}.** \`${e.TagName}\` **•** ${
+                            e.TagAuthor ? `<@${e.TagAuthor}>` : 'None'
                         }`,
                 )
                 .join('\n');
 
-            embedBase.footer.text = `Page: ${currentUserState.page + 1}/${currentUserState.tagPages.length
-                } • emojis by AnThOnY & deussa`;
+            embedBase.footer.text = `Page: ${currentUserState.page + 1}/${
+                currentUserState.tagPages.length
+            } • emojis by AnThOnY & deussa`;
 
             const row = {
                 components: [

@@ -22,12 +22,26 @@ export default class ReadyListener extends Listener<'ready'> {
 
         if (supportInactiveCheck !== '1' && supportInactiveCheck?.toLowerCase() !== 'true') {
             console.log('Support inactive check is disabled. Skipping inactive thread monitoring.');
-        } else if (!supportInactiveWarningTime || isNaN(Number(supportInactiveWarningTime)) || Number(supportInactiveWarningTime) <= 0) {
-            console.warn('Invalid or missing support_inactive_warning_time configuration. Skipping inactive thread monitoring.');
-        } else if (!supportInactiveGraceTime || isNaN(Number(supportInactiveGraceTime)) || Number(supportInactiveGraceTime) <= 0) {
-            console.warn('Invalid or missing support_inactive_grace_time configuration. Skipping inactive thread monitoring.');
+        } else if (
+            !supportInactiveWarningTime ||
+            isNaN(Number(supportInactiveWarningTime)) ||
+            Number(supportInactiveWarningTime) <= 0
+        ) {
+            console.warn(
+                'Invalid or missing support_inactive_warning_time configuration. Skipping inactive thread monitoring.',
+            );
+        } else if (
+            !supportInactiveGraceTime ||
+            isNaN(Number(supportInactiveGraceTime)) ||
+            Number(supportInactiveGraceTime) <= 0
+        ) {
+            console.warn(
+                'Invalid or missing support_inactive_grace_time configuration. Skipping inactive thread monitoring.',
+            );
         } else {
-            console.log('Inactive thread monitoring enabled. Running initial check and then every minute.');
+            console.log(
+                'Inactive thread monitoring enabled. Running initial check and then every minute.',
+            );
 
             const warningTime = Number(supportInactiveWarningTime);
             const graceTime = Number(supportInactiveGraceTime);
@@ -36,8 +50,7 @@ export default class ReadyListener extends Listener<'ready'> {
                 try {
                     await cleanUpExpiredThreads(this.ctx);
                     await cleanUpInactiveThreads(this.ctx, warningTime, graceTime);
-                }
-                catch (error) {
+                } catch (error) {
                     console.error('Error during initial inactive thread check:', error);
                 }
             })();
@@ -46,8 +59,7 @@ export default class ReadyListener extends Listener<'ready'> {
                 try {
                     await cleanUpExpiredThreads(this.ctx);
                     await cleanUpInactiveThreads(this.ctx, warningTime, graceTime);
-                }
-                catch (error) {
+                } catch (error) {
                     console.error('Error during inactive thread check:', error);
                 }
             }, 60 * 1000);
