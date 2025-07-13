@@ -12,6 +12,7 @@ import {
 
 import { Command, Plugin } from '../define';
 import { State } from '../plugins/types';
+import InactiveThreadsService from '../services/inactiveThreadsService';
 import SettingsService from '../services/settingsService';
 import TagService from '../services/tagService';
 
@@ -20,11 +21,13 @@ import { Store } from './store';
 import WebServer from './webserver';
 
 class Services {
+    public readonly inactiveThreads: InactiveThreadsService;
     public readonly settings: SettingsService;
     public readonly tags: TagService;
     constructor(public ctx: Context) {
         this.tags = new TagService(ctx);
         this.settings = new SettingsService(ctx);
+        this.inactiveThreads = new InactiveThreadsService(ctx);
     }
 }
 
@@ -126,6 +129,9 @@ export class Context extends Client {
             { aliases: ['slowmode_reset_time'], env: 'SLOWMODE_RESET_TIME' },
             { aliases: ['jasper_api_url'], env: 'JASPER_API_URL' },
             { aliases: ['jasper_api_key'], env: 'JASPER_API_KEY' },
+            { aliases: ['support_inactive_check'], env: 'SUPPORT_INACTIVE_CHECK' },
+            { aliases: ['support_inactive_warning_time'], env: 'SUPPORT_INACTIVE_WARNING_TIME' },
+            { aliases: ['support_inactive_grace_time'], env: 'SUPPORT_INACTIVE_GRACE_TIME' },
         );
         this.webserver = new WebServer(this);
         this.store = new Store(this);

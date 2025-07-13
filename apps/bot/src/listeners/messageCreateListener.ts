@@ -2,7 +2,11 @@ import { Message, TextChannel } from 'discord.js';
 
 import { Context } from '../classes/context';
 import { defineEvent } from '../define';
-import { Options } from '../services/settingsService';
+import {
+    InactiveThread,
+    Options as InactiveThreadOptions,
+} from '../services/inactiveThreadsService';
+import { Options as SettingsOptions } from '../services/settingsService';
 
 import { Listener } from './listener';
 
@@ -35,8 +39,12 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
     public async execute(message: Message): Promise<void> {
         if (message.author.bot) return;
 
+        await this.handleThreadTracking(message);
+
         if (message.guild) {
-            await this.ctx.services.settings.configure<Options>({ guildId: message.guild.id });
+            await this.ctx.services.settings.configure<SettingsOptions>({
+                guildId: message.guild.id,
+            });
             const { Channels } = this.ctx.services.settings.getSettings();
 
             if (Channels.AutomaticSlowmodeChannels?.includes(message.channel.id)) {
@@ -94,5 +102,75 @@ export default class MessageCreateListener extends Listener<'messageCreate'> {
             },
             on: (message: Message) => this.execute(message),
         });
+    }
+
+    private async handleThreadTracking(message: Message): Promise<void> {
+        try {
+            if (!message.channel || !message.channel.isThread()) return;
+
+            await this.ctx.services.settings.configure<InactiveThreadOptions>({
+                guildId: message.guild.id,
+            });
+            const { Channels } = this.ctx.services.settings.getSettings();
+            const allowedTagChannels = Channels?.AllowedTagChannels;
+
+            if (!allowedTagChannels.includes(message.channel.parentId)) return;
+            const guildId = message.guild.id;
+            const threadId = message.channel.id;
+            const authorId = message.author.id;
+            const messageId = message.id;
+            const timestamp = Date.now().toString();
+
+            const existingThread = await this.ctx.services.inactiveThreads.getValues<
+                InactiveThreadOptions,
+                InactiveThread | null
+            >({
+                guildId,
+                threadId,
+            });
+
+            if (existingThread) {
+                const updateData: Partial<InactiveThread> = {
+                    authorId,
+                    lastMessageId: messageId,
+                    lastMessageTimestamp: timestamp,
+                };
+
+                if (authorId === message.channel.ownerId && existingThread.warnTimestamp) {
+                    updateData.warnMessageId = undefined;
+                    updateData.warnTimestamp = undefined;
+                }
+
+                await this.ctx.services.inactiveThreads.modify<
+                    InactiveThreadOptions & { inactiveThread?: Partial<InactiveThread> },
+                    InactiveThread | null
+                >({
+                    guildId,
+                    inactiveThread: updateData,
+                    threadId,
+                });
+            } else {
+                const newThread: InactiveThread = {
+                    authorId,
+                    lastMessageId: messageId,
+                    lastMessageTimestamp: timestamp,
+                    threadId,
+                };
+
+                await this.ctx.services.inactiveThreads.create<
+                    InactiveThreadOptions & { inactiveThread?: InactiveThread },
+                    InactiveThread
+                >({
+                    guildId,
+                    inactiveThread: newThread,
+                    threadId,
+                });
+            }
+        } catch (error) {
+            console.error(
+                `[Error] Failed to handle thread tracking for thread ${message.channel.id}:`,
+                error,
+            );
+        }
     }
 }
