@@ -4,7 +4,14 @@ import {
     Permissions,
     PermissionsToHuman,
 } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    ContainerBuilder,
+    MessageFlags,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+} from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineCommand } from '../../../define';
@@ -19,19 +26,40 @@ export = {
             type: ApplicationCommandType.CHAT_INPUT,
         },
         on: (ctx: Context, interaction) => {
+            const commands = Array.from(ctx.interactions).map((x) => `- \`${x[1].command.name}\``);
+            const permissions = PermissionsToHuman(interaction.appPermissions.bitfield).map(
+                (p) => `- \`${p}\``,
+            );
+
+            const secretComponents = [
+                new ContainerBuilder()
+                    .setAccentColor(global.embedColor)
+                    .addTextDisplayComponents(new TextDisplayBuilder().setContent('## Secret'))
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Small)
+                            .setDivider(true),
+                    )
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `**### Commands:**\n${commands.join('\n')}`,
+                        ),
+                    )
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Small)
+                            .setDivider(true),
+                    )
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `**### Permissions:**\n${permissions.join('\n')}`,
+                        ),
+                    ),
+            ];
+
             return interaction.reply({
-                embeds: [
-                    {
-                        color: global.embedColor,
-                        description: `**• Commands:** ${Array.from(ctx.interactions)
-                            .map((x) => x[1].command.name)
-                            .join(', ')}\n**• Permissions:** ${PermissionsToHuman(
-                            interaction.appPermissions.bitfield,
-                        ).join(', ')} `,
-                        title: 'Secret',
-                    },
-                ],
-                flags: MessageFlags.Ephemeral,
+                components: secretComponents,
+                flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
             });
         },
     }),

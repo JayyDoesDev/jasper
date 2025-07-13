@@ -1,5 +1,16 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from 'discord.js';
+import {
+    ButtonStyle,
+    ChatInputCommandInteraction,
+    ComponentType,
+    ContainerBuilder,
+    MessageFlags,
+    SectionBuilder,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+    ThumbnailBuilder,
+} from 'discord.js';
 
 import { chunk } from '../../../array';
 import { Context } from '../../../classes/context';
@@ -59,25 +70,49 @@ export const ViewTopicsSubCommand = defineSubCommand({
             ];
         }
 
-        await interaction.reply({
-            components,
-            embeds: [
-                {
-                    color: global.embedColor,
-                    description:
+        const viewTopicsComponents = [
+            new ContainerBuilder()
+                .setAccentColor(global.embedColor)
+                .addSectionComponents(
+                    new SectionBuilder()
+                        .setThumbnailAccessory(
+                            new ThumbnailBuilder().setURL(interaction.guild?.iconURL()),
+                        )
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                '## Current Topics in Configuration',
+                            ),
+                        ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
                         (state.addTopicPages.pages[state.addTopicPages.page] || [])
                             .map(
                                 (string, i) =>
                                     `**${state.addTopicPages.page * 10 + i + 1}.** *${string}*`,
                             )
                             .join('\n') || 'There are no topics configured.',
-                    footer: {
-                        text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${topicsExistInDB.length}`,
-                    },
-                    thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Topics in Configuration',
-                },
-            ],
+                    ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `-# Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${topicsExistInDB.length}`,
+                    ),
+                ),
+        ];
+
+        await interaction.reply({
+            components:
+                components.length > 0
+                    ? [...viewTopicsComponents, ...components]
+                    : viewTopicsComponents,
+            flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
         });
     },
     name: 'view_topics',

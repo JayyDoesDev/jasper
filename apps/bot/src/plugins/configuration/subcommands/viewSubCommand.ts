@@ -1,5 +1,14 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { ChatInputCommandInteraction } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    ContainerBuilder,
+    MessageFlags,
+    SectionBuilder,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+    ThumbnailBuilder,
+} from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
@@ -8,7 +17,7 @@ import { Options } from '../../../services/settingsService';
 
 const createTable = (table: string, fields: string[], locked: boolean) => {
     if (fields.length === 0) return '';
-    return `**${table}** ${locked ? Emojis.LOCK : Emojis.UNLOCKED}\n${fields.join('')}\n`;
+    return `### ${table} ${locked ? Emojis.LOCK : Emojis.UNLOCKED}\n${fields.join('')}\n`;
 };
 
 const createField = (
@@ -40,11 +49,25 @@ export const ViewChannelSubCommand = defineSubCommand({
         await ctx.services.settings.configure<Options>({ guildId: interaction.guildId! });
         const { Channels, Roles, Skullboard, Users } = ctx.services.settings.getSettings();
 
-        await interaction.reply({
-            embeds: [
-                {
-                    color: global.embedColor,
-                    description:
+        const viewComponents = [
+            new ContainerBuilder()
+                .setAccentColor(global.embedColor)
+                .addSectionComponents(
+                    new SectionBuilder()
+                        .setThumbnailAccessory(
+                            new ThumbnailBuilder().setURL(interaction.guild?.iconURL()),
+                        )
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                `## ${interaction.guild?.name} Configuration`,
+                            ),
+                        ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
                         createTable(
                             'Channels',
                             [
@@ -64,7 +87,14 @@ export const ViewChannelSubCommand = defineSubCommand({
                                 ),
                             ],
                             false,
-                        ) +
+                        ),
+                    ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
                         createTable(
                             'Roles',
                             [
@@ -100,7 +130,14 @@ export const ViewChannelSubCommand = defineSubCommand({
                                 }),
                             ],
                             false,
-                        ) +
+                        ),
+                    ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
                         createTable(
                             'Users',
                             [
@@ -111,7 +148,14 @@ export const ViewChannelSubCommand = defineSubCommand({
                                 }),
                             ],
                             false,
-                        ) +
+                        ),
+                    ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
                         createTable(
                             'Skullboard',
                             [
@@ -120,7 +164,14 @@ export const ViewChannelSubCommand = defineSubCommand({
                                 `- **Reaction Threshold:** ${Skullboard.SkullboardReactionThreshold}\n`,
                             ],
                             false,
-                        ) +
+                        ),
+                    ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
                         createTable(
                             'Slowmode',
                             [
@@ -139,14 +190,21 @@ export const ViewChannelSubCommand = defineSubCommand({
                             ],
                             true,
                         ),
-                    footer: {
-                        icon_url: interaction.user.displayAvatarURL(),
-                        text: `Locked = Locked Configuration | Unlocked = Configurable Configuration`,
-                    },
-                    thumbnail: { url: interaction.guild?.iconURL() },
-                    title: `${interaction.guild?.name} Configuration`,
-                },
-            ],
+                    ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `-# ${Emojis.LOCK} = Locked Configuration | ${Emojis.UNLOCKED} = Configurable Configuration`,
+                    ),
+                ),
+        ];
+
+        await interaction.reply({
+            components: viewComponents,
+            flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
         });
     },
     name: 'view',
