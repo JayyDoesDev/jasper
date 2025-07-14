@@ -2,7 +2,18 @@ import fs from 'fs';
 import path from 'path';
 
 import { ApplicationCommandOptionType, ApplicationCommandType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ChatInputCommandInteraction,
+    ContainerBuilder,
+    MessageActionRowComponentBuilder,
+    MessageFlags,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+} from 'discord.js';
 
 import { defineCommand } from '../../../define';
 import { documentationAutocomplete } from '../controllers/documentationAutocomplete';
@@ -53,13 +64,38 @@ export = {
             const choices = documentationAutocomplete(documentationContent);
 
             const choice = choices.find((c) => c.name === section);
-            const embed = {
-                color: global.embedColor,
-                description: choice.value,
-                title: choice.name,
-            };
+            const helpComponents = [
+                new ContainerBuilder()
+                    .addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(`## ${choice.name}`),
+                    )
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Small)
+                            .setDivider(true),
+                    )
+                    .addTextDisplayComponents(new TextDisplayBuilder().setContent(choice.value))
+                    .addSeparatorComponents(
+                        new SeparatorBuilder()
+                            .setSpacing(SeparatorSpacingSize.Small)
+                            .setDivider(true),
+                    )
+                    .addActionRowComponents(
+                        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setStyle(ButtonStyle.Link)
+                                .setLabel('View Full Documentation')
+                                .setURL(
+                                    'https://github.com/JayyDoesDev/jasper/blob/main/DOCUMENTATION.md',
+                                ),
+                        ),
+                    ),
+            ];
 
-            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+            await interaction.reply({
+                components: helpComponents,
+                flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
+            });
         },
     }),
 };
