@@ -8,28 +8,28 @@ type GuildSnowflake = Record<'guild', Snowflake>;
 type UserSnowflake = Record<'user', Snowflake>;
 
 export class Store extends Redis {
-    #connected: boolean = false;
-    #ctx: Context;
+    private connected: boolean = false;
+    private ctx: Context;
 
-    constructor(protected ctx: Context) {
+    constructor(protected context: Context) {
         super({
-            host: ctx.env.get('redis_host'),
-            port: ctx.env.get('redis_port') as number,
+            host: context.env.get('redis_host'),
+            port: context.env.get('redis_port') as number,
             retryStrategy: (times) => {
                 console.error(`Redis retry attempt ${times}`);
                 return Math.min(times * 100, 3000);
             },
         });
-        this.#ctx = ctx;
+        this.ctx = context;
 
         this.on('connect', () => {
             console.log('Redis connected');
-            this.#connected = true;
+            this.connected = true;
         });
 
         this.on('error', (err) => {
             console.error('Redis error:', err);
-            this.#connected = false;
+            this.connected = false;
         });
     }
 
@@ -114,10 +114,10 @@ export class Store extends Redis {
     }
 
     private async ensureConnection(): Promise<void> {
-        if (!this.#connected) {
+        if (!this.connected) {
             console.log('Waiting for Redis connection...');
             await new Promise<void>((resolve) => {
-                if (this.#connected) resolve();
+                if (this.connected) resolve();
                 else this.once('connect', () => resolve());
             });
         }

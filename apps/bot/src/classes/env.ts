@@ -15,14 +15,14 @@ interface EnvValidationResult {
 }
 
 export class Env {
-    #tokens: EnvToken[];
+    private tokens: EnvToken[];
 
     constructor(...tokens: EnvToken[]) {
-        this.#tokens = tokens;
+        this.tokens = tokens;
     }
 
     public get<T extends string, R = string>(env: T): Nullable<R> {
-        const matchingToken = this.#tokens.find((t) => t.env === env || t.aliases.includes(env));
+        const matchingToken = this.tokens.find((t) => t.env === env || t.aliases.includes(env));
 
         if (!matchingToken) {
             return null;
@@ -41,7 +41,7 @@ export class Env {
         const results: EnvValidationResult[] = [];
         const errors: string[] = [];
 
-        for (const token of this.#tokens) {
+        for (const token of this.tokens) {
             const value = this.get<string, string>(token.env);
 
             if (!value && token.required) {
