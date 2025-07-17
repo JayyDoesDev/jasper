@@ -3,7 +3,7 @@ import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags }
 
 import { chunk } from '../../../array';
 import { Context } from '../../../classes/context';
-import { ConfigurationRoles } from '../../../container';
+import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 import { Tag } from '../../../models/guildSchema';
 import { TagResponse } from '../../../services/tagService';
@@ -101,6 +101,7 @@ export const ListSubCommand = defineSubCommand({
         });
     },
     name: 'list',
+    restrictToConfigChannels: [ConfigurationChannels.AllowedTagChannels],
     restrictToConfigRoles: [
         ConfigurationRoles.SupportRoles,
         ConfigurationRoles.StaffRoles,

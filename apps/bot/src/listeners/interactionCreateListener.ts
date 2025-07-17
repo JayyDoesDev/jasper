@@ -22,7 +22,7 @@ import {
 } from 'discord.js';
 
 import { Context } from '../classes/context';
-import { withConfigurationRoles } from '../db';
+import { withConfiguration } from '../db';
 import { Command, defineEvent, message } from '../define';
 import { Emojis } from '../enums';
 import {
@@ -83,9 +83,10 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 > = this.ctx.interactions.get(interaction.commandName);
                 if (command) {
                     if (command.restrictToConfigRoles?.length) {
-                        const { noRolesNoConfig, noRolesWithConfig } = await withConfigurationRoles(
+                        const { noRolesNoConfig, noRolesWithConfig } = await withConfiguration(
                             this.ctx,
                             interaction,
+                            'roles',
                             ...command.restrictToConfigRoles,
                         );
 
@@ -106,6 +107,34 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                             return;
                         }
                     }
+
+                    if (command.restrictToConfigChannels?.length) {
+                        const { noChannelsNoConfig, noChannelsWithConfig } =
+                            await withConfiguration(
+                                this.ctx,
+                                interaction,
+                                'channels',
+                                ...command.restrictToConfigChannels,
+                            );
+
+                        let configError = false;
+                        noChannelsWithConfig(interaction, () => {
+                            configError = true;
+                        });
+
+                        noChannelsNoConfig(interaction, () => {
+                            message.content +=
+                                ' Configuration of channels required. Please check with the server administrator.';
+                            configError = true;
+                        });
+
+                        if (configError) {
+                            await interaction.reply(message);
+                            message.content = "Sorry but you can't use this command.";
+                            return;
+                        }
+                    }
+
                     if (command.permissions) {
                         const perms: any[] = [];
                         if (!interaction.appPermissions.has(command.permissions)) {

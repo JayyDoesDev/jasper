@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from '@antibot/interactions';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 import { Context } from '../../../classes/context';
-import { ConfigurationRoles } from '../../../container';
+import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 import { Options, TagResponse } from '../../../services/tagService';
 
@@ -36,6 +36,7 @@ export const DeleteSubCommand = defineSubCommand({
         await interaction.editReply('Tag deleted successfully.');
     },
     name: 'delete',
+    restrictToConfigChannels: [ConfigurationChannels.AllowedTagChannels],
     restrictToConfigRoles: [
         ConfigurationRoles.StaffRoles,
         ConfigurationRoles.AdminRoles,

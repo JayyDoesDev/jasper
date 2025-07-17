@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from '@antibot/interactions';
 import { ChatInputCommandInteraction, ComponentType, TextInputStyle } from 'discord.js';
 
 import { Context } from '../../../classes/context';
-import { ConfigurationRoles } from '../../../container';
+import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 
 export const CreateSubCommand = defineSubCommand({
@@ -86,6 +86,7 @@ export const CreateSubCommand = defineSubCommand({
         });
     },
     name: 'create',
+    restrictToConfigChannels: [ConfigurationChannels.AllowedTagChannels],
     restrictToConfigRoles: [
         ConfigurationRoles.SupportRoles,
         ConfigurationRoles.StaffRoles,

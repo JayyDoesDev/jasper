@@ -10,8 +10,8 @@ import {
 } from 'discord.js';
 
 import { Context } from './classes/context';
-import { ConfigurationRoles } from './container';
-import { withConfigurationRoles } from './db';
+import { ConfigurationChannels, ConfigurationRoles } from './container';
+import { withConfiguration } from './db';
 import { checkForRoles } from './roles';
 
 export interface Command<
@@ -21,6 +21,7 @@ export interface Command<
     command: ICommand;
     on: (ctx: Context, interaction: Interaction) => void;
     permissions?: PermissionResolvable[] | PermissionsBitField[];
+    restrictToConfigChannels?: ConfigurationChannels[];
     restrictToConfigRoles?: ConfigurationRoles[];
     subCommands?: { [key: string]: SubCommand };
 }
@@ -48,6 +49,7 @@ export interface SubCommand {
     handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
     name: string;
     permissions?: PermissionResolvable[] | PermissionsBitField[];
+    restrictToConfigChannels?: ConfigurationChannels[];
     restrictToConfigRoles?: ConfigurationRoles[];
 }
 
@@ -88,9 +90,10 @@ export function defineCommand<
                     }
 
                     if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
-                        const { noRolesNoConfig, noRolesWithConfig } = await withConfigurationRoles(
+                        const { noRolesNoConfig, noRolesWithConfig } = await withConfiguration(
                             ctx,
                             interaction,
+                            'roles',
                             ...options.subCommands[subCommandName].restrictToConfigRoles,
                         );
 
@@ -102,6 +105,33 @@ export function defineCommand<
                         noRolesNoConfig(interaction, () => {
                             message.content +=
                                 ' Configuration of roles required. Please check with the server administrator.';
+                            configError = true;
+                        });
+
+                        if (configError) {
+                            await interaction.reply(message);
+                            message.content = "Sorry but you can't use this command.";
+                            return;
+                        }
+                    }
+
+                    if (options.subCommands[subCommandName].restrictToConfigChannels?.length) {
+                        const { noChannelsNoConfig, noChannelsWithConfig } =
+                            await withConfiguration(
+                                ctx,
+                                interaction,
+                                'channels',
+                                ...options.subCommands[subCommandName].restrictToConfigChannels,
+                            );
+
+                        let configError = false;
+                        noChannelsWithConfig(interaction, () => {
+                            configError = true;
+                        });
+
+                        noChannelsNoConfig(interaction, () => {
+                            message.content +=
+                                ' Configuration of channels required. Please check with the server administrator.';
                             configError = true;
                         });
 
@@ -147,12 +177,12 @@ export function defineCommand<
                         }
 
                         if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
-                            const { noRolesNoConfig, noRolesWithConfig } =
-                                await withConfigurationRoles(
-                                    ctx,
-                                    interaction,
-                                    ...options.subCommands[subCommandName].restrictToConfigRoles,
-                                );
+                            const { noRolesNoConfig, noRolesWithConfig } = await withConfiguration(
+                                ctx,
+                                interaction,
+                                'roles',
+                                ...options.subCommands[subCommandName].restrictToConfigRoles,
+                            );
 
                             let configError = false;
                             noRolesWithConfig(interaction, () => {

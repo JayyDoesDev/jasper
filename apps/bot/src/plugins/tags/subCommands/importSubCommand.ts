@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from '@antibot/interactions';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 import { Context } from '../../../classes/context';
-import { ConfigurationRoles } from '../../../container';
+import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 import { Emojis } from '../../../enums';
 import { Options, Tag } from '../../../services/tagService';
@@ -96,6 +96,7 @@ export const ImportSubCommand = defineSubCommand({
         });
     },
     name: 'import',
+    restrictToConfigChannels: [ConfigurationChannels.AllowedTagChannels],
     restrictToConfigRoles: [
         ConfigurationRoles.StaffRoles,
         ConfigurationRoles.AdminRoles,

@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType } from '@antibot/interactions';
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 import { Context } from '../../../classes/context';
-import { ConfigurationRoles } from '../../../container';
+import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 import { Emojis } from '../../../enums';
 import { Options, TagResponse } from '../../../services/tagService';
@@ -64,6 +64,7 @@ export const InfoSubCommand = defineSubCommand({
         await interaction.editReply({ embeds: [embed] });
     },
     name: 'info',
+    restrictToConfigChannels: [ConfigurationChannels.AllowedTagChannels],
     restrictToConfigRoles: [
         ConfigurationRoles.SupportRoles,
         ConfigurationRoles.StaffRoles,

@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 
 import { Context } from '../../../classes/context';
-import { ConfigurationRoles } from '../../../container';
+import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineCommand } from '../../../define';
 
 export = {
@@ -134,6 +134,7 @@ export = {
                 flags: MessageFlags.IsComponentsV2,
             });
         },
+        restrictToConfigChannels: [ConfigurationChannels.AllowedSnipeChannels],
         restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],
     }),
 };

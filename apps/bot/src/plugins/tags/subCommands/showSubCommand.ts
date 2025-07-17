@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 
 import { Context } from '../../../classes/context';
-import { ConfigurationRoles } from '../../../container';
+import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 import { Options, TagResponse } from '../../../services/tagService';
 
@@ -76,6 +76,7 @@ export const ShowSubCommand = defineSubCommand({
         });
     },
     name: 'show',
+    restrictToConfigChannels: [ConfigurationChannels.AllowedTagChannels],
     restrictToConfigRoles: [
         ConfigurationRoles.SupportRoles,
         ConfigurationRoles.StaffRoles,
