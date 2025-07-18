@@ -67,6 +67,8 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
                         Text: { Topics: [] },
                         Users: { IgnoreSnipedUsers: [] },
                     },
+                    InactiveThreads: [],
+                    Tags: [],
                 });
                 await newGuild.save();
 
