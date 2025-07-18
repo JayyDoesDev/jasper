@@ -102,7 +102,7 @@ All commands in Jasper are slash commands. Required parameters are wrapped in `<
 
 > **Description**: Retrieve the last deleted message from a channel
 
-## `/topic`
+### `/topic`
 
 > **Permissions**: `Send Messages`
 
