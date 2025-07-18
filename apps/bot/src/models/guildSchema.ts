@@ -25,6 +25,11 @@ export type Settings = {
         AllowedTagChannels: Snowflake[];
         AutomaticSlowmodeChannels: Snowflake[];
     };
+    InactiveThreads: {
+        graceTime: number;
+        warningCheck: boolean;
+        warningTime: number;
+    };
     Roles: {
         AllowedAdminRoles: Snowflake[];
         AllowedStaffRoles: Snowflake[];
@@ -69,6 +74,11 @@ export default model<GuildDocument>(
                     AllowedSnipeChannels: { default: [], type: [] },
                     AllowedTagChannels: { default: [], type: [] },
                     AutomaticSlowmodeChannels: { default: [], type: [] },
+                },
+                InactiveThreads: {
+                    graceTime: { default: 1440, type: Number },
+                    warningCheck: { default: false, type: Boolean },
+                    warningTime: { default: 2880, type: Number },
                 },
                 Roles: {
                     AllowedAdminRoles: { default: [], type: [] },
