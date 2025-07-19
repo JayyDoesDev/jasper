@@ -1,4 +1,6 @@
+import { commandOptions as addActionOptions, AddActionSubCommand } from './addActionSubCommand';
 import { commandOptions as addChannelOptions, AddChannelSubCommand } from './addChannelSubCommand';
+import { commandOptions as addObjectOptions, AddObjectSubCommand } from './addObjectSubCommand';
 import { commandOptions as addRoleOptions, AddRoleSubCommand } from './addRoleSubCommand';
 import {
     commandOptions as addSkullboardChannelOptions,
@@ -7,9 +9,17 @@ import {
 import { commandOptions as addTopicOptions, AddTopicSubCommand } from './addTopicSubCommand';
 import { commandOptions as addUserOptions, AddUserSubCommand } from './addUserSubCommand';
 import {
+    commandOptions as removeActionOptions,
+    RemoveActionSubCommand,
+} from './removeActionSubCommand';
+import {
     commandOptions as removeChannelOptions,
     RemoveChannelSubCommand,
 } from './removeChannelSubCommand';
+import {
+    commandOptions as removeObjectOptions,
+    RemoveObjectSubCommand,
+} from './removeObjectSubCommand';
 import { commandOptions as removeRoleOptions, RemoveRoleSubCommand } from './removeRoleSubCommand';
 import {
     commandOptions as removeTopicOptions,
@@ -28,8 +38,12 @@ import { ViewChannelSubCommand, commandOptions as viewOptions } from './viewSubC
 import { commandOptions as viewTopicsOptions, ViewTopicsSubCommand } from './viewTopicsSubCommand';
 
 export const subCommandOptions = [
+    addActionOptions,
+    removeActionOptions,
     addChannelOptions,
     removeChannelOptions,
+    addObjectOptions,
+    removeObjectOptions,
     addRoleOptions,
     removeRoleOptions,
     viewOptions,
@@ -44,12 +58,16 @@ export const subCommandOptions = [
 ];
 
 export {
+    AddActionSubCommand,
     AddChannelSubCommand,
+    AddObjectSubCommand,
     AddRoleSubCommand,
     AddSkullboardChannelSubCommand,
     AddTopicSubCommand,
     AddUserSubCommand,
+    RemoveActionSubCommand,
     RemoveChannelSubCommand,
+    RemoveObjectSubCommand,
     RemoveRoleSubCommand,
     RemoveTopicSubCommand,
     RemoveUserSubCommand,

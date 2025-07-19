@@ -3,12 +3,16 @@ import { ChatInputCommandInteraction } from 'discord.js';
 
 import { defineCommand } from '../../../define';
 import {
+    AddActionSubCommand,
     AddChannelSubCommand,
+    AddObjectSubCommand,
     AddRoleSubCommand,
     AddSkullboardChannelSubCommand,
     AddTopicSubCommand,
     AddUserSubCommand,
+    RemoveActionSubCommand,
     RemoveChannelSubCommand,
+    RemoveObjectSubCommand,
     RemoveRoleSubCommand,
     RemoveTopicSubCommand,
     RemoveUserSubCommand,
@@ -29,11 +33,15 @@ export = {
             }
 
             const subCommandHandler = {
+                add_action: AddActionSubCommand,
                 add_channel: AddChannelSubCommand,
+                add_object: AddObjectSubCommand,
                 add_role: AddRoleSubCommand,
                 add_topic: AddTopicSubCommand,
                 add_user: AddUserSubCommand,
+                remove_action: RemoveActionSubCommand,
                 remove_channel: RemoveChannelSubCommand,
+                remove_object: RemoveObjectSubCommand,
                 remove_role: RemoveRoleSubCommand,
                 remove_topic: RemoveTopicSubCommand,
                 remove_user: RemoveUserSubCommand,
@@ -59,12 +67,16 @@ export = {
         },
         on: async () => {},
         subCommands: {
+            add_action: AddActionSubCommand,
             add_channel: AddChannelSubCommand,
+            add_object: AddObjectSubCommand,
             add_role: AddRoleSubCommand,
             add_skullboard_channel: AddSkullboardChannelSubCommand,
             add_topic: AddTopicSubCommand,
             add_user: AddUserSubCommand,
+            remove_action: RemoveActionSubCommand,
             remove_channel: RemoveChannelSubCommand,
+            remove_object: RemoveObjectSubCommand,
             remove_role: RemoveRoleSubCommand,
             remove_topic: RemoveTopicSubCommand,
             remove_user: RemoveUserSubCommand,
