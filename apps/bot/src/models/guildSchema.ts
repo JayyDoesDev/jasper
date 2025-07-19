@@ -97,17 +97,46 @@ export default model<GuildDocument>(
                     SkullboardReactionThreshold: { default: 4, type: Number },
                 },
                 Text: {
-                    Actions:{
-                        default:[
-                            "bonked", "wacked", "slapped", "hit", "jumped", "smacked", "spun", "knocked", "socked", "thwacked", "punched", "fried", "donked", "kicked", "tapped", "struck"
+                    Actions: {
+                        default: [
+                            'bonked',
+                            'wacked',
+                            'slapped',
+                            'hit',
+                            'jumped',
+                            'smacked',
+                            'spun',
+                            'knocked',
+                            'socked',
+                            'thwacked',
+                            'punched',
+                            'fried',
+                            'donked',
+                            'kicked',
+                            'tapped',
+                            'struck',
                         ],
-                        type: []
+                        type: [],
                     },
-                    Objects:{
-                        default:[
-                            "a fish", "a frying pan", "a bat", "a pancake", "a toaster", "a single fry", "a chocolate bar", "their bank balance", "some glasses", "a tomato", "an apple", "a couch", "a bed", "an egg", "a harmonica"
+                    Objects: {
+                        default: [
+                            'a fish',
+                            'a frying pan',
+                            'a bat',
+                            'a pancake',
+                            'a toaster',
+                            'a single fry',
+                            'a chocolate bar',
+                            'their bank balance',
+                            'some glasses',
+                            'a tomato',
+                            'an apple',
+                            'a couch',
+                            'a bed',
+                            'an egg',
+                            'a harmonica',
                         ],
-                        type: []
+                        type: [],
                     },
                     Topics: {
                         default: [

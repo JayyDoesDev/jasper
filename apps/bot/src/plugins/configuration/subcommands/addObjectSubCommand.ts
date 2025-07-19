@@ -46,7 +46,8 @@ export const AddObjectSubCommand = defineSubCommand({
                     },
                     {
                         customId: `add_object_subcommandbutton_next_${interaction.user.id}`,
-                        disabled: state.addObjectPages.page === state.addObjectPages.pages.length - 1,
+                        disabled:
+                            state.addObjectPages.page === state.addObjectPages.pages.length - 1,
                         label: 'Next',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,
@@ -84,7 +85,7 @@ export const AddObjectSubCommand = defineSubCommand({
 
         await ctx.services.settings.setText<SetTextOptions>({
             guildId,
-            ...{ key: 'Objects', values: object},
+            ...{ key: 'Objects', values: object },
         });
 
         const updatedObjects = await ctx.services.settings.getText<string>(guildId, 'Objects');

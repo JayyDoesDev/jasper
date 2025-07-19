@@ -347,14 +347,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     );
                 }
                 if (footer) {
-                    container.addSeparatorComponents(
+                    (container.addSeparatorComponents(
                         new SeparatorBuilder()
                             .setSpacing(SeparatorSpacingSize.Small)
                             .setDivider(true),
                     ),
                         container.addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(`-# ${footer}`),
-                        );
+                        ));
                 }
                 await interaction.reply({
                     components: [confirmContent, container],
@@ -437,14 +437,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     );
                 }
                 if (footer) {
-                    container.addSeparatorComponents(
+                    (container.addSeparatorComponents(
                         new SeparatorBuilder()
                             .setSpacing(SeparatorSpacingSize.Small)
                             .setDivider(true),
                     ),
                         container.addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(`-# ${TagEmbedFooter}`),
-                        );
+                        ));
                 }
 
                 await interaction.reply({
@@ -491,12 +491,8 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${
                 currentUserState.addTopicPages.pages.length
             } • Total Topics: ${
-                (
-                    await this.ctx.services.settings.getText<string>(
-                        interaction.guild!.id,
-                        'Topics',
-                    )
-                ).length
+                (await this.ctx.services.settings.getText<string>(interaction.guild!.id, 'Topics'))
+                    .length
             }`;
 
             const row = {

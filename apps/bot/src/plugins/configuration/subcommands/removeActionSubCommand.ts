@@ -57,7 +57,8 @@ export const RemoveActionSubCommand = defineSubCommand({
                     },
                     {
                         customId: `add_action_subcommand_button_next_${interaction.user.id}`,
-                        disabled: state.addActionPages.page === state.addActionPages.pages.length - 1,
+                        disabled:
+                            state.addActionPages.page === state.addActionPages.pages.length - 1,
                         label: 'Next',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,

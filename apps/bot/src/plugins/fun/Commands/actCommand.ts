@@ -17,7 +17,7 @@ export = {
                     name: 'user',
                     required: true,
                     type: ApplicationCommandOptionType.USER,
-                }
+                },
             ],
             type: ApplicationCommandType.CHAT_INPUT,
         },
@@ -34,7 +34,10 @@ export = {
                 const action = actions[Math.floor(Math.random() * actions.length)];
                 const object = objects[Math.floor(Math.random() * objects.length)];
 
-                await interaction.reply({ allowedMentions: { users: [] }, content: `<@!${author}> ${action} <@!${user.id}> with ${object}`});
+                await interaction.reply({
+                    allowedMentions: { users: [] },
+                    content: `<@!${author}> ${action} <@!${user.id}> with ${object}`,
+                });
             } else {
                 await interaction.reply(`Couldn't find that user.`);
             }
