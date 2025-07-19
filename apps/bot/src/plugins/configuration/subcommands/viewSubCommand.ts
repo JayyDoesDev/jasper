@@ -44,10 +44,15 @@ const createField = (
     return `- **${field}:** ${formattedData.join(', ')}${suffix}\n`;
 };
 
+const bool = (bool: boolean) => {
+    return `${bool ? Emojis.CHECK_MARK : Emojis.CROSS_MARK}`;
+};
+
 export const ViewChannelSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await ctx.services.settings.configure<Options>({ guildId: interaction.guildId! });
-        const { Channels, Roles, Skullboard, Users } = ctx.services.settings.getSettings();
+        const { Channels, InactiveThreads, Roles, Skullboard, Users } =
+            ctx.services.settings.getSettings();
 
         const viewComponents = [
             new ContainerBuilder()
@@ -162,6 +167,22 @@ export const ViewChannelSubCommand = defineSubCommand({
                                 `- **Skullboard Channel:** ${Skullboard.SkullboardChannel ? `<#${Skullboard.SkullboardChannel}>` : 'None'}\n`,
                                 `- **Emoji:** ${Skullboard.SkullboardEmoji ?? '💀'}\n`,
                                 `- **Reaction Threshold:** ${Skullboard.SkullboardReactionThreshold}\n`,
+                            ],
+                            false,
+                        ),
+                    ),
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        createTable(
+                            'Inactive Threads (support thread)',
+                            [
+                                `- **Inactive Check**: ${bool(InactiveThreads.warningCheck)}\n`,
+                                `- **Warning Time**: ${InactiveThreads.warningTime} (in mins)\n`,
+                                `- **Grace Time**: ${InactiveThreads.graceTime} (in mins)\n`,
                             ],
                             false,
                         ),

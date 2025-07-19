@@ -2,7 +2,7 @@ import { Snowflake } from '@antibot/interactions';
 
 import { Context } from '../classes/context';
 import { getGuild } from '../db';
-import TagSchema, { GuildDocument, Settings } from '../models/guildSchema';
+import GuildSchema, { GuildDocument, Settings } from '../models/guildSchema';
 import { Nullable } from '../types';
 
 import { CommonCondition, Service } from './service';
@@ -27,8 +27,14 @@ export interface SetChannelOptions extends GuildSettingsWithKey<'Channels'> {
     channels: Snowflake | Snowflake[];
 }
 
+
 export interface SetObjectOptions extends GuildSettingsWithKey<'Text'> {
     objects: string | string[];
+
+export interface SetInactiveThreadOptions extends GuildSettingsWithKey<'InactiveThreads'> {
+    graceTime: number;
+    warningCheck: boolean;
+    warningTime: number;
 }
 
 export interface SetRoleOptions extends GuildSettingsWithKey<'Roles'> {
@@ -62,6 +68,11 @@ class SettingsService extends Service {
                 AllowedTagChannels: [],
                 AutomaticSlowmodeChannels: [],
             },
+            InactiveThreads: {
+                graceTime: 1440,
+                warningCheck: false,
+                warningTime: 2880,
+            },
             Roles: {
                 AllowedAdminRoles: [],
                 AllowedStaffRoles: [],
@@ -88,7 +99,7 @@ class SettingsService extends Service {
         }
 
         const {
-            GuildSettings: { Channels, Roles, Skullboard, Text, Users },
+            GuildSettings: { Channels, InactiveThreads, Roles, Skullboard, Text, Users },
         } = await getGuild<GuildDocument>(this.ctx, this.guildId);
 
         this.guildSettings = {
@@ -96,6 +107,11 @@ class SettingsService extends Service {
                 AllowedSnipeChannels: Channels.AllowedSnipeChannels,
                 AllowedTagChannels: Channels.AllowedTagChannels,
                 AutomaticSlowmodeChannels: Channels.AutomaticSlowmodeChannels,
+            },
+            InactiveThreads: {
+                graceTime: InactiveThreads.graceTime,
+                warningCheck: InactiveThreads.warningCheck,
+                warningTime: InactiveThreads.warningTime,
             },
             Roles: {
                 AllowedAdminRoles: Roles.AllowedAdminRoles,
@@ -135,12 +151,20 @@ class SettingsService extends Service {
         return this.getFromSettings('Channels', key, validatedGuildId);
     }
 
+
     public async getObjects<T>(
         guildId: T extends Snowflake ? Snowflake : null,
         key: keyof Settings['Text'],
     ): Promise<CommonCondition<string[]>> {
         const validatedGuildId = this.validateGuildId(guildId, 'get objects');
         return this.getFromSettings('Text', key, validatedGuildId);
+
+    public async getInactiveThreads<T>(
+        guildId: T extends Snowflake ? Snowflake : null,
+    ): Promise<CommonCondition<Settings['InactiveThreads']>> {
+        const validatedGuildId = this.validateGuildId(guildId, 'get inactiveThreads');
+        const guild = await getGuild<GuildDocument>(this.ctx, validatedGuildId);
+        return guild.GuildSettings.InactiveThreads;
     }
 
     public async getRoles<T>(
@@ -196,12 +220,32 @@ class SettingsService extends Service {
         return this.removeFromSettings('Channels', key, guildId, options?.channels ?? []);
     }
 
+
     public async removeObjects<T>(
         options: T extends SetObjectOptions ? SetObjectOptions : null,
     ): Promise<CommonCondition<string[]>> {
         const guildId = this.validateGuildId(options?.guildId, 'remove objects');
         const key = this.validateKey<'Text'>(options?.key, 'Object');
         return this.removeFromSettings('Text', key, guildId, options?.objects ?? []);
+
+    public async removeInactiveThreads<T>(
+        options: T extends SetInactiveThreadOptions ? SetInactiveThreadOptions : null,
+    ): Promise<CommonCondition<Settings['InactiveThreads']>> {
+        const guildId = this.validateGuildId(options?.guildId, 'remove inactiveThreads');
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+
+        guild.GuildSettings.InactiveThreads.warningCheck = false;
+        guild.GuildSettings.InactiveThreads.warningTime = 2880;
+        guild.GuildSettings.InactiveThreads.graceTime = 1440;
+
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
+        await GuildSchema.updateOne(
+            { _id: guildId },
+            { $set: { 'GuildSettings.InactiveThreads': guild.GuildSettings.InactiveThreads } },
+            { upsert: true },
+        );
+
+        return guild.GuildSettings.InactiveThreads;
     }
 
     public async removeRoles<T>(
@@ -223,7 +267,7 @@ class SettingsService extends Service {
         guild.GuildSettings.Skullboard.SkullboardReactionThreshold = 4;
 
         await this.ctx.store.setForeignKey({ guild: guildId }, guild);
-        await TagSchema.updateOne(
+        await GuildSchema.updateOne(
             { _id: guildId },
             {
                 $set: {
@@ -267,6 +311,7 @@ class SettingsService extends Service {
         return this.updateSettings('Channels', key, guildId, options?.channels ?? []);
     }
 
+
     public async setObjects<T>(
         options: T extends SetObjectOptions ? SetObjectOptions : null,
     ): Promise<CommonCondition<string[]>> {
@@ -275,6 +320,37 @@ class SettingsService extends Service {
         return this.updateSettings('Text', key, guildId, options?.objects ?? []);
     }
 
+    public async setInactiveThreads<T>(
+        options: T extends SetInactiveThreadOptions ? SetInactiveThreadOptions : null,
+    ): Promise<CommonCondition<Settings['InactiveThreads']>> {
+        const guildId = this.validateGuildId(options?.guildId, 'set inactiveThreads');
+        const guild = await getGuild<GuildDocument>(this.ctx, guildId);
+
+        if (options?.warningCheck !== undefined) {
+            guild.GuildSettings.InactiveThreads.warningCheck = options.warningCheck;
+        }
+
+        if (options?.warningTime !== undefined) {
+            guild.GuildSettings.InactiveThreads.warningTime = options.warningTime;
+        }
+
+        if (options?.graceTime !== undefined) {
+            guild.GuildSettings.InactiveThreads.graceTime = options.graceTime;
+        }
+
+        await this.ctx.store.setForeignKey({ guild: guildId }, guild);
+        await GuildSchema.updateOne(
+            { _id: guildId },
+            {
+                $set: {
+                    'GuildSettings.InactiveThreads': guild.GuildSettings.InactiveThreads,
+                },
+            },
+            { upsert: true },
+        );
+
+        return guild.GuildSettings.InactiveThreads;
+    }
 
     public async setRoles<T>(
         options: T extends SetRoleOptions ? SetRoleOptions : null,
@@ -301,7 +377,7 @@ class SettingsService extends Service {
         }
 
         await this.ctx.store.setForeignKey({ guild: guildId }, guild);
-        await TagSchema.updateOne(
+        await GuildSchema.updateOne(
             { _id: guildId },
             {
                 $set: {
@@ -357,7 +433,7 @@ class SettingsService extends Service {
         guild.GuildSettings[category][key] = updatedValues;
         await this.ctx.store.setForeignKey({ guild: guildId }, guild);
 
-        await TagSchema.updateOne(
+        await GuildSchema.updateOne(
             { _id: guildId },
             { $set: { [`GuildSettings.${String(category)}.${String(key)}`]: updatedValues } },
         );
@@ -384,7 +460,7 @@ class SettingsService extends Service {
         guild.GuildSettings[category][key] = updatedValues;
         await this.ctx.store.setForeignKey({ guild: guildId }, guild);
 
-        await TagSchema.updateOne(
+        await GuildSchema.updateOne(
             { _id: guildId },
             { $set: { [`GuildSettings.${String(category)}.${String(key)}`]: updatedValues } },
             { upsert: true },
