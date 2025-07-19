@@ -19,17 +19,9 @@ export interface Options extends GuildSnowflake {
     GuildSettings?: Settings;
 }
 
-export interface SetActionOptions extends GuildSettingsWithKey<'Text'> {
-    actions: string | string[];
-}
-
 export interface SetChannelOptions extends GuildSettingsWithKey<'Channels'> {
     channels: Snowflake | Snowflake[];
 }
-
-
-export interface SetObjectOptions extends GuildSettingsWithKey<'Text'> {
-    objects: string | string[];
 
 export interface SetInactiveThreadOptions extends GuildSettingsWithKey<'InactiveThreads'> {
     graceTime: number;
@@ -47,8 +39,8 @@ export interface SetSkullboardOptions extends GuildSnowflake {
     threshold?: number;
 }
 
-export interface SetTopicOptions extends GuildSettingsWithKey<'Text'> {
-    topics: string | string[];
+export interface SetTextOptions extends GuildSettingsWithKey<'Text'> {
+    values: string | string[];
 }
 
 export interface SetUsersOptions extends GuildSnowflake {
@@ -87,7 +79,7 @@ class SettingsService extends Service {
                 SkullboardEmoji: '💀',
                 SkullboardReactionThreshold: 4,
             },
-            Text: { Actions: [], Objects: [], Topics: []},
+            Text: { Actions: [], Objects: [], Topics: [] },
             Users: { IgnoreSnipedUsers: [] },
         };
     }
@@ -134,15 +126,6 @@ class SettingsService extends Service {
         return this;
     }
 
-
-    public async getActions<T>(
-        guildId: T extends Snowflake ? Snowflake : null,
-        key: keyof Settings['Text'],
-    ): Promise<CommonCondition<string[]>> {
-        const validatedGuildId = this.validateGuildId(guildId, 'get actions');
-        return this.getFromSettings('Text', key, validatedGuildId);
-    }
-
     public async getChannels<T>(
         guildId: T extends Snowflake ? Snowflake : null,
         key: keyof Settings['Channels'],
@@ -150,14 +133,6 @@ class SettingsService extends Service {
         const validatedGuildId = this.validateGuildId(guildId, 'get channels');
         return this.getFromSettings('Channels', key, validatedGuildId);
     }
-
-
-    public async getObjects<T>(
-        guildId: T extends Snowflake ? Snowflake : null,
-        key: keyof Settings['Text'],
-    ): Promise<CommonCondition<string[]>> {
-        const validatedGuildId = this.validateGuildId(guildId, 'get objects');
-        return this.getFromSettings('Text', key, validatedGuildId);
 
     public async getInactiveThreads<T>(
         guildId: T extends Snowflake ? Snowflake : null,
@@ -187,11 +162,11 @@ class SettingsService extends Service {
         return guild.GuildSettings.Skullboard;
     }
 
-    public async getTopics<T>(
+    public async getText<T>(
         guildId: T extends Snowflake ? Snowflake : null,
         key: keyof Settings['Text'],
     ): Promise<CommonCondition<string[]>> {
-        const validatedGuildId = this.validateGuildId(guildId, 'get topics');
+        const validatedGuildId = this.validateGuildId(guildId, 'get text');
         return this.getFromSettings('Text', key, validatedGuildId);
     }
 
@@ -203,15 +178,6 @@ class SettingsService extends Service {
         return this.getFromSettings('Users', key, validatedGuildId);
     }
 
-
-    public async removeActions<T>(
-        options: T extends SetActionOptions ? SetActionOptions : null,
-    ): Promise<CommonCondition<string[]>> {
-        const guildId = this.validateGuildId(options?.guildId, 'remove actions');
-        const key = this.validateKey<'Text'>(options?.key, 'Action');
-        return this.removeFromSettings('Text', key, guildId, options?.actions ?? []);
-    }
-
     public async removeChannels<T>(
         options: T extends SetChannelOptions ? SetChannelOptions : null,
     ): Promise<CommonCondition<Snowflake[]>> {
@@ -219,14 +185,6 @@ class SettingsService extends Service {
         const key = this.validateKey<'Channels'>(options?.key, 'Channel');
         return this.removeFromSettings('Channels', key, guildId, options?.channels ?? []);
     }
-
-
-    public async removeObjects<T>(
-        options: T extends SetObjectOptions ? SetObjectOptions : null,
-    ): Promise<CommonCondition<string[]>> {
-        const guildId = this.validateGuildId(options?.guildId, 'remove objects');
-        const key = this.validateKey<'Text'>(options?.key, 'Object');
-        return this.removeFromSettings('Text', key, guildId, options?.objects ?? []);
 
     public async removeInactiveThreads<T>(
         options: T extends SetInactiveThreadOptions ? SetInactiveThreadOptions : null,
@@ -280,12 +238,12 @@ class SettingsService extends Service {
         return guild.GuildSettings.Skullboard;
     }
 
-    public async removeTopics<T>(
-        options: T extends SetTopicOptions ? SetTopicOptions : null,
+    public async removeText<T>(
+        options: T extends SetTextOptions ? SetTextOptions : null,
     ): Promise<CommonCondition<string[]>> {
         const guildId = this.validateGuildId(options?.guildId, 'remove topics');
         const key = this.validateKey<'Text'>(options?.key, 'Topic');
-        return this.removeFromSettings('Text', key, guildId, options?.topics ?? []);
+        return this.removeFromSettings('Text', key, guildId, options?.values ?? []);
     }
 
     public async removeUsers<T>(
@@ -295,29 +253,12 @@ class SettingsService extends Service {
         return this.removeFromSettings('Users', 'IgnoreSnipedUsers', guildId, options?.users ?? []);
     }
 
-    public async setActions<T>(
-        options: T extends SetActionOptions ? SetActionOptions : null,
-    ): Promise<CommonCondition<string[]>> {
-        const guildId = this.validateGuildId(options?.guildId, 'set actions');
-        const key = this.validateKey<'Text'>(options?.key, 'Action');
-        return this.updateSettings('Text', key, guildId, options?.actions ?? []);
-    }
-
     public async setChannels<T>(
         options: T extends SetChannelOptions ? SetChannelOptions : null,
     ): Promise<CommonCondition<Snowflake[]>> {
         const guildId = this.validateGuildId(options?.guildId, 'set channels');
         const key = this.validateKey<'Channels'>(options?.key, 'Channel');
         return this.updateSettings('Channels', key, guildId, options?.channels ?? []);
-    }
-
-
-    public async setObjects<T>(
-        options: T extends SetObjectOptions ? SetObjectOptions : null,
-    ): Promise<CommonCondition<string[]>> {
-        const guildId = this.validateGuildId(options?.guildId, 'set objects');
-        const key = this.validateKey<'Text'>(options?.key, 'Object');
-        return this.updateSettings('Text', key, guildId, options?.objects ?? []);
     }
 
     public async setInactiveThreads<T>(
@@ -390,15 +331,12 @@ class SettingsService extends Service {
         return guild.GuildSettings.Skullboard;
     }
 
-
-
-    public async setTopics<T>(
-        options: T extends SetTopicOptions ? SetTopicOptions : null,
+    public async setText<T>(
+        options: T extends SetTextOptions ? SetTextOptions : null,
     ): Promise<CommonCondition<string[]>> {
         const guildId = this.validateGuildId(options?.guildId, 'set topics');
         const key = this.validateKey<'Text'>(options?.key, 'Topic');
-        return this.updateSettings('Text', key, guildId, options?.topics ?? []);
-
+        return this.updateSettings('Text', key, guildId, options?.values ?? []);
     }
 
     public async setUsers<T>(

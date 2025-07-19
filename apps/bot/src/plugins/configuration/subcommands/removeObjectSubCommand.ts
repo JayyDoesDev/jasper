@@ -4,13 +4,13 @@ import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags }
 import { chunk } from '../../../array';
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
-import { Options, SetObjectOptions } from '../../../services/settingsService';
+import { Options, SetTextOptions } from '../../../services/settingsService';
 
 export const RemoveObjectSubCommand = defineSubCommand({
     autocomplete: async (ctx: Context, interaction) => {
         const query = interaction.options.getString('object') || '';
         const filtered = (
-            await ctx.services.settings.getObjects<string>(interaction.guildId!, 'Objects')
+            await ctx.services.settings.getText<string>(interaction.guildId!, 'Objects')
         )
             .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
             .slice(0, 25)
@@ -23,7 +23,7 @@ export const RemoveObjectSubCommand = defineSubCommand({
         const input = interaction.options.getString('object')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const objectsExistInDB = await ctx.services.settings.getObjects<string>(guildId, 'Objects');
+        const objectsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Objects');
 
         const pages = chunk(objectsExistInDB, 10);
         const initialState = { addObjectPages: { page: 0, pages } };
@@ -82,13 +82,13 @@ export const RemoveObjectSubCommand = defineSubCommand({
             }
         }
 
-        await ctx.services.settings.removeObjects<SetObjectOptions>({
+        await ctx.services.settings.removeText<SetTextOptions>({
             guildId,
             key: 'Objects',
-            objects: object,
+            values: object,
         });
 
-        const updatedObjects = await ctx.services.settings.getObjects<string>(guildId, 'Objects');
+        const updatedObjects = await ctx.services.settings.getText<string>(guildId, 'Objects');
 
         const updatedPages = chunk(updatedObjects, 10);
         state.addObjectPages.pages = updatedPages;

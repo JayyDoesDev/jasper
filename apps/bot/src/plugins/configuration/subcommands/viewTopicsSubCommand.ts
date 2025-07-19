@@ -21,7 +21,7 @@ export const ViewTopicsSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         await ctx.services.settings.configure<Options>({ guildId });
-        const topicsExistInDB = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
+        const topicsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Topics');
 
         const pages = chunk(topicsExistInDB, 10);
         const initialState = { addTopicPages: { page: 0, pages } };

@@ -4,13 +4,13 @@ import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags }
 import { chunk } from '../../../array';
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
-import { Options, SetTopicOptions } from '../../../services/settingsService';
+import { Options, SetTextOptions } from '../../../services/settingsService';
 
 export const RemoveTopicSubCommand = defineSubCommand({
     autocomplete: async (ctx: Context, interaction) => {
         const query = interaction.options.getString('topic') || '';
         const filtered = (
-            await ctx.services.settings.getTopics<string>(interaction.guildId!, 'Topics')
+            await ctx.services.settings.getText<string>(interaction.guildId!, 'Topics')
         )
             .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
             .slice(0, 25)
@@ -23,7 +23,7 @@ export const RemoveTopicSubCommand = defineSubCommand({
         const input = interaction.options.getString('topic')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const topicsExistInDB = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
+        const topicsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Topics');
 
         const pages = chunk(topicsExistInDB, 10);
         const initialState = { addTopicPages: { page: 0, pages } };
@@ -82,13 +82,13 @@ export const RemoveTopicSubCommand = defineSubCommand({
             }
         }
 
-        await ctx.services.settings.removeTopics<SetTopicOptions>({
+        await ctx.services.settings.removeText<SetTextOptions>({
             guildId,
             key: 'Topics',
-            topics: topic,
+            values: topic,
         });
 
-        const updatedTopics = await ctx.services.settings.getTopics<string>(guildId, 'Topics');
+        const updatedTopics = await ctx.services.settings.getText<string>(guildId, 'Topics');
 
         const updatedPages = chunk(updatedTopics, 10);
         state.addTopicPages.pages = updatedPages;

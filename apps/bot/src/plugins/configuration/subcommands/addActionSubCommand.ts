@@ -4,7 +4,7 @@ import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags }
 import { chunk } from '../../../array';
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
-import { Options, SetActionOptions } from '../../../services/settingsService';
+import { Options, SetTextOptions } from '../../../services/settingsService';
 
 export const AddActionSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
@@ -12,7 +12,7 @@ export const AddActionSubCommand = defineSubCommand({
         const action = interaction.options.getString('action')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const actionsExistInDB = await ctx.services.settings.getActions<string>(guildId, 'Actions');
+        const actionsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
         const pages = chunk(actionsExistInDB, 10);
         const initialState = { addActionPages: { page: 0, pages } };
@@ -82,12 +82,12 @@ export const AddActionSubCommand = defineSubCommand({
             return;
         }
 
-        await ctx.services.settings.setActions<SetActionOptions>({
+        await ctx.services.settings.setText<SetTextOptions>({
             guildId,
-            ...{ actions: action, key: 'Actions'},
+            ...{ key: 'Actions', values: action},
         });
 
-        const updatedActions = await ctx.services.settings.getActions<string>(guildId, 'Actions');
+        const updatedActions = await ctx.services.settings.getText<string>(guildId, 'Actions');
         const updatedPages = chunk(updatedActions, 10);
         state.addActionPages.pages = updatedPages;
 

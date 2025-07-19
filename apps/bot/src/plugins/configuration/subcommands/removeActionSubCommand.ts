@@ -4,13 +4,13 @@ import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags }
 import { chunk } from '../../../array';
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
-import { Options, SetActionOptions } from '../../../services/settingsService';
+import { Options, SetTextOptions } from '../../../services/settingsService';
 
 export const RemoveActionSubCommand = defineSubCommand({
     autocomplete: async (ctx: Context, interaction) => {
         const query = interaction.options.getString('action') || '';
         const filtered = (
-            await ctx.services.settings.getActions<string>(interaction.guildId!, 'Actions')
+            await ctx.services.settings.getText<string>(interaction.guildId!, 'Actions')
         )
             .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
             .slice(0, 25)
@@ -23,7 +23,7 @@ export const RemoveActionSubCommand = defineSubCommand({
         const input = interaction.options.getString('action')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const actionsExistInDB = await ctx.services.settings.getActions<string>(guildId, 'Actions');
+        const actionsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
         const pages = chunk(actionsExistInDB, 10);
         const initialState = { addActionPages: { page: 0, pages } };
@@ -82,13 +82,13 @@ export const RemoveActionSubCommand = defineSubCommand({
             }
         }
 
-        await ctx.services.settings.removeActions<SetActionOptions>({
-            actions: action,
+        await ctx.services.settings.removeText<SetTextOptions>({
             guildId,
             key: 'Actions',
+            values: action,
         });
 
-        const updatedActions = await ctx.services.settings.getActions<string>(guildId, 'Actions');
+        const updatedActions = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
         const updatedPages = chunk(updatedActions, 10);
         state.addActionPages.pages = updatedPages;

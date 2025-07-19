@@ -492,7 +492,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 currentUserState.addTopicPages.pages.length
             } • Total Topics: ${
                 (
-                    await this.ctx.services.settings.getTopics<string>(
+                    await this.ctx.services.settings.getText<string>(
                         interaction.guild!.id,
                         'Topics',
                     )
