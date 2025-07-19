@@ -25,6 +25,10 @@ All commands in Jasper are slash commands. Required parameters are wrapped in `<
 
 - `add_channel`: Add a channel to configuration
 - `remove_channel`: Remove a channel from configuration
+- `add_action`: Add an action to configuration for Act command
+- `remove_action`: Remove an action from configuration for Act command
+- `add_object`: Add an object to the configuration for Act command
+- `remove_object`: Remove an object from the configuration for Act command
 - `add_role`: Add a role to configuration
 - `remove_role`: Remove a role from configuration
 - `add_skullboard_channel`: Add a channel for skullboard
@@ -34,7 +38,7 @@ All commands in Jasper are slash commands. Required parameters are wrapped in `<
 - `remove_topics`: Remove a topic from the configuration
 - `view_topics`: View the current topics in the configuration
 - `view`: View current settings
-  
+
 ## Core
 
 ### `/help <section>`
@@ -69,6 +73,14 @@ All commands in Jasper are slash commands. Required parameters are wrapped in `<
 > **Description**: Displays all registered commands and the bot's permissions
 
 ## Fun
+
+### `/act <target>`
+
+> **Permissions**: `Send Messages`, `AttachFiles`
+
+> **Description**: Performs a random action on a user
+
+> **Features**: `User Option`
 
 ### `/caption <text> <image> [font_size] [position]`
 
@@ -114,7 +126,7 @@ All commands in Jasper are slash commands. Required parameters are wrapped in `<
 
 > **Description**: Manage server tags
 
-> **Subcommands**: Send Messages, 
+> **Subcommands**: Send Messages,
 
 - `create`: Create a new tag (**Modal**)
 - `delete <tag_name>`: Delete a tag (**Staff+**, **Autocomplete**)
