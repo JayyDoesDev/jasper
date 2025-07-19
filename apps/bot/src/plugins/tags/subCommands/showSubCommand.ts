@@ -62,12 +62,12 @@ export const ShowSubCommand = defineSubCommand({
             );
         }
         if (tag.TagEmbedFooter) {
-            container.addSeparatorComponents(
+            (container.addSeparatorComponents(
                 new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
             ),
                 container.addTextDisplayComponents(
                     new TextDisplayBuilder().setContent(`-# ${tag.TagEmbedFooter}`),
-                );
+                ));
         }
 
         await interaction.editReply({

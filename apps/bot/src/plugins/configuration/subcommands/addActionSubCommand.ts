@@ -6,21 +6,21 @@ import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
 import { Options, SetTextOptions } from '../../../services/settingsService';
 
-export const AddTopicSubCommand = defineSubCommand({
+export const AddActionSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const topic = interaction.options.getString('topic')!;
+        const action = interaction.options.getString('action')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const topicsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Topics');
+        const actionsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
-        const pages = chunk(topicsExistInDB, 10);
-        const initialState = { addTopicPages: { page: 0, pages } };
+        const pages = chunk(actionsExistInDB, 10);
+        const initialState = { addActionPages: { page: 0, pages } };
 
         ctx.pagination.set(interaction.user.id, initialState);
         const state = ctx.pagination.get(interaction.user.id);
 
-        if (!state || !state.addTopicPages) {
+        if (!state || !state.addActionPages) {
             await interaction.reply({
                 content: 'Failed to initialize pagination state',
                 flags: MessageFlags.Ephemeral,
@@ -32,21 +32,22 @@ export const AddTopicSubCommand = defineSubCommand({
             {
                 components: [
                     {
-                        customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === 0,
+                        customId: `add_action_subcommand_button_previous_${interaction.user.id}`,
+                        disabled: state.addActionPages.page === 0,
                         label: 'Previous',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,
                     },
                     {
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        customId: `add_action_subcommand_button_home_${interaction.user.id}`,
                         label: 'Home',
                         style: ButtonStyle.Secondary as const,
                         type: ComponentType.Button as const,
                     },
                     {
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                        customId: `add_action_subcommand_button_next_${interaction.user.id}`,
+                        disabled:
+                            state.addActionPages.page === state.addActionPages.pages.length - 1,
                         label: 'Next',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,
@@ -56,25 +57,25 @@ export const AddTopicSubCommand = defineSubCommand({
             },
         ];
 
-        if (topicsExistInDB.includes(topic)) {
+        if (actionsExistInDB.includes(action)) {
             await interaction.reply({
                 components,
-                content: `For the record, **${topic}** is already in the topics list.`,
+                content: `For the record, **${action}** is already in the actions list.`,
                 embeds: [
                     {
                         color: global.embedColor,
                         description:
-                            state.addTopicPages.pages[state.addTopicPages.page]
+                            state.addActionPages.pages[state.addActionPages.page]
                                 .map(
                                     (string, i) =>
-                                        `**${state.addTopicPages.page * 10 + i + 1}.** *${string}*`,
+                                        `**${state.addActionPages.page * 10 + i + 1}.** *${string}*`,
                                 )
-                                .join('\n') || 'No topics',
+                                .join('\n') || 'No actions',
                         footer: {
-                            text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${topicsExistInDB.length}`,
+                            text: `Page: ${state.addActionPages.page + 1}/${state.addActionPages.pages.length} • Total actions: ${actionsExistInDB.length}`,
                         },
                         thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                        title: 'Current Topics in Configuration',
+                        title: 'Current actions in Configuration',
                     },
                 ],
                 flags: MessageFlags.Ephemeral,
@@ -84,46 +85,46 @@ export const AddTopicSubCommand = defineSubCommand({
 
         await ctx.services.settings.setText<SetTextOptions>({
             guildId,
-            ...{ key: 'Topics', values: topic },
+            ...{ key: 'Actions', values: action },
         });
 
-        const updatedTopics = await ctx.services.settings.getText<string>(guildId, 'Topics');
-        const updatedPages = chunk(updatedTopics, 10);
-        state.addTopicPages.pages = updatedPages;
+        const updatedActions = await ctx.services.settings.getText<string>(guildId, 'Actions');
+        const updatedPages = chunk(updatedActions, 10);
+        state.addActionPages.pages = updatedPages;
 
         await interaction.reply({
             components,
-            content: `I've added **${topic}** to the topics list.`,
+            content: `I've added **${action}** to the actions list.`,
             embeds: [
                 {
                     color: global.embedColor,
                     description:
-                        state.addTopicPages.pages[state.addTopicPages.page]
+                        state.addActionPages.pages[state.addActionPages.page]
                             .map(
                                 (string, i) =>
-                                    `**${state.addTopicPages.page * 10 + i + 1}.** *${string}*`,
+                                    `**${state.addActionPages.page * 10 + i + 1}.** *${string}*`,
                             )
-                            .join('\n') || 'No topics',
+                            .join('\n') || 'No actions',
                     footer: {
-                        text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${updatedTopics.length}`,
+                        text: `Page: ${state.addActionPages.page + 1}/${state.addActionPages.pages.length} • Total actions: ${updatedActions.length}`,
                     },
                     thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Topics in Configuration',
+                    title: 'Current Actions in Configuration',
                 },
             ],
             flags: MessageFlags.Ephemeral,
         });
     },
-    name: 'add_topic',
+    name: 'add_action',
 });
 
 export const commandOptions = {
-    description: 'Add a new topic to the list of topics.',
-    name: 'add_topic',
+    description: 'Add a new action to the list for the act command.',
+    name: 'add_action',
     options: [
         {
-            description: 'The topic you want to add to the list.',
-            name: 'topic',
+            description: 'The action you want to add to the list.',
+            name: 'action',
             required: true,
             type: ApplicationCommandOptionType.STRING,
         },

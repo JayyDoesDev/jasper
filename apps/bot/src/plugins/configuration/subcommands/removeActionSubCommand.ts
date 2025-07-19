@@ -6,11 +6,11 @@ import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
 import { Options, SetTextOptions } from '../../../services/settingsService';
 
-export const RemoveTopicSubCommand = defineSubCommand({
+export const RemoveActionSubCommand = defineSubCommand({
     autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('topic') || '';
+        const query = interaction.options.getString('action') || '';
         const filtered = (
-            await ctx.services.settings.getText<string>(interaction.guildId!, 'Topics')
+            await ctx.services.settings.getText<string>(interaction.guildId!, 'Actions')
         )
             .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
             .slice(0, 25)
@@ -20,18 +20,18 @@ export const RemoveTopicSubCommand = defineSubCommand({
     },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const input = interaction.options.getString('topic')!;
+        const input = interaction.options.getString('action')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const topicsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Topics');
+        const actionsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
-        const pages = chunk(topicsExistInDB, 10);
-        const initialState = { addTopicPages: { page: 0, pages } };
+        const pages = chunk(actionsExistInDB, 10);
+        const initialState = { addActionPages: { page: 0, pages } };
 
         ctx.pagination.set(interaction.user.id, initialState);
         const state = ctx.pagination.get(interaction.user.id);
 
-        if (!state || !state.addTopicPages) {
+        if (!state || !state.addActionPages) {
             await interaction.reply({
                 content: 'Failed to initialize pagination state',
                 flags: MessageFlags.Ephemeral,
@@ -43,21 +43,22 @@ export const RemoveTopicSubCommand = defineSubCommand({
             {
                 components: [
                     {
-                        customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === 0,
+                        customId: `add_action_subcommand_button_previous_${interaction.user.id}`,
+                        disabled: state.addActionPages.page === 0,
                         label: 'Previous',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,
                     },
                     {
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        customId: `add_action_subcommand_button_home_${interaction.user.id}`,
                         label: 'Home',
                         style: ButtonStyle.Secondary as const,
                         type: ComponentType.Button as const,
                     },
                     {
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                        customId: `add_action_subcommand_button_next_${interaction.user.id}`,
+                        disabled:
+                            state.addActionPages.page === state.addActionPages.pages.length - 1,
                         label: 'Next',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,
@@ -68,14 +69,14 @@ export const RemoveTopicSubCommand = defineSubCommand({
         ];
 
         const index = Number(input);
-        let topic = topicsExistInDB[Number(index) - 1];
+        let action = actionsExistInDB[Number(index) - 1];
 
         if (Number.isNaN(index)) {
-            topic = input;
+            action = input;
         } else {
-            if (!topicsExistInDB[index - 1] || index <= 0 || index > topicsExistInDB.length) {
+            if (!actionsExistInDB[index - 1] || index <= 0 || index > actionsExistInDB.length) {
                 await interaction.reply({
-                    content: `I couldn't find a topic at index **${index}**`,
+                    content: `I couldn't find an action at index **${index}**`,
                     flags: MessageFlags.Ephemeral,
                 });
                 return;
@@ -84,51 +85,51 @@ export const RemoveTopicSubCommand = defineSubCommand({
 
         await ctx.services.settings.removeText<SetTextOptions>({
             guildId,
-            key: 'Topics',
-            values: topic,
+            key: 'Actions',
+            values: action,
         });
 
-        const updatedTopics = await ctx.services.settings.getText<string>(guildId, 'Topics');
+        const updatedActions = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
-        const updatedPages = chunk(updatedTopics, 10);
-        state.addTopicPages.pages = updatedPages;
-        state.addTopicPages.page = Math.min(state.addTopicPages.page, updatedPages.length - 1);
+        const updatedPages = chunk(updatedActions, 10);
+        state.addActionPages.pages = updatedPages;
+        state.addActionPages.page = Math.min(state.addActionPages.page, updatedPages.length - 1);
 
         await interaction.reply({
             components,
-            content: `I've removed **${topic}** from the topics list.`,
+            content: `I've removed **${action}** from the actions list.`,
             embeds: [
                 {
                     color: global.embedColor,
                     description:
-                        state.addTopicPages.pages[state.addTopicPages.page]
+                        state.addActionPages.pages[state.addActionPages.page]
                             .map(
                                 (string, i) =>
-                                    `**${state.addTopicPages.page * 10 + i + 1}.** *${string}*`,
+                                    `**${state.addActionPages.page * 10 + i + 1}.** *${string}*`,
                             )
-                            .join('\n') || 'No topics',
+                            .join('\n') || 'No actions',
                     footer: {
-                        text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${updatedTopics.length}`,
+                        text: `Page: ${state.addActionPages.page + 1}/${state.addActionPages.pages.length} • Total Actions: ${updatedActions.length}`,
                     },
                     thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Topics in Configuration',
+                    title: 'Current Actions in Configuration',
                 },
             ],
             flags: MessageFlags.Ephemeral,
         });
     },
 
-    name: 'remove_topic',
+    name: 'remove_action',
 });
 
 export const commandOptions = {
-    description: 'Remove a topic from the configuration',
-    name: 'remove_topic',
+    description: 'Remove an action from the configuration',
+    name: 'remove_action',
     options: [
         {
             autocomplete: true,
-            description: 'Provide either the index position or name of the topic to remove',
-            name: 'topic',
+            description: 'Provide either the index position or name of the action to remove',
+            name: 'action',
             required: true,
             type: ApplicationCommandOptionType.STRING,
         },

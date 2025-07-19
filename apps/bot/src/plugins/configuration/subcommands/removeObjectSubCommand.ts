@@ -6,11 +6,11 @@ import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
 import { Options, SetTextOptions } from '../../../services/settingsService';
 
-export const RemoveTopicSubCommand = defineSubCommand({
+export const RemoveObjectSubCommand = defineSubCommand({
     autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('topic') || '';
+        const query = interaction.options.getString('object') || '';
         const filtered = (
-            await ctx.services.settings.getText<string>(interaction.guildId!, 'Topics')
+            await ctx.services.settings.getText<string>(interaction.guildId!, 'Objects')
         )
             .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
             .slice(0, 25)
@@ -20,18 +20,18 @@ export const RemoveTopicSubCommand = defineSubCommand({
     },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const input = interaction.options.getString('topic')!;
+        const input = interaction.options.getString('object')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const topicsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Topics');
+        const objectsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Objects');
 
-        const pages = chunk(topicsExistInDB, 10);
-        const initialState = { addTopicPages: { page: 0, pages } };
+        const pages = chunk(objectsExistInDB, 10);
+        const initialState = { addObjectPages: { page: 0, pages } };
 
         ctx.pagination.set(interaction.user.id, initialState);
         const state = ctx.pagination.get(interaction.user.id);
 
-        if (!state || !state.addTopicPages) {
+        if (!state || !state.addObjectPages) {
             await interaction.reply({
                 content: 'Failed to initialize pagination state',
                 flags: MessageFlags.Ephemeral,
@@ -43,21 +43,22 @@ export const RemoveTopicSubCommand = defineSubCommand({
             {
                 components: [
                     {
-                        customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === 0,
+                        customId: `add_object_subcommand_button_previous_${interaction.user.id}`,
+                        disabled: state.addObjectPages.page === 0,
                         label: 'Previous',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,
                     },
                     {
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
+                        customId: `add_object_subcommand_button_home_${interaction.user.id}`,
                         label: 'Home',
                         style: ButtonStyle.Secondary as const,
                         type: ComponentType.Button as const,
                     },
                     {
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
-                        disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
+                        customId: `add_object_subcommand_button_next_${interaction.user.id}`,
+                        disabled:
+                            state.addObjectPages.page === state.addObjectPages.pages.length - 1,
                         label: 'Next',
                         style: ButtonStyle.Primary as const,
                         type: ComponentType.Button as const,
@@ -68,14 +69,14 @@ export const RemoveTopicSubCommand = defineSubCommand({
         ];
 
         const index = Number(input);
-        let topic = topicsExistInDB[Number(index) - 1];
+        let object = objectsExistInDB[Number(index) - 1];
 
         if (Number.isNaN(index)) {
-            topic = input;
+            object = input;
         } else {
-            if (!topicsExistInDB[index - 1] || index <= 0 || index > topicsExistInDB.length) {
+            if (!objectsExistInDB[index - 1] || index <= 0 || index > objectsExistInDB.length) {
                 await interaction.reply({
-                    content: `I couldn't find a topic at index **${index}**`,
+                    content: `I couldn't find a object at index **${index}**`,
                     flags: MessageFlags.Ephemeral,
                 });
                 return;
@@ -84,51 +85,51 @@ export const RemoveTopicSubCommand = defineSubCommand({
 
         await ctx.services.settings.removeText<SetTextOptions>({
             guildId,
-            key: 'Topics',
-            values: topic,
+            key: 'Objects',
+            values: object,
         });
 
-        const updatedTopics = await ctx.services.settings.getText<string>(guildId, 'Topics');
+        const updatedObjects = await ctx.services.settings.getText<string>(guildId, 'Objects');
 
-        const updatedPages = chunk(updatedTopics, 10);
-        state.addTopicPages.pages = updatedPages;
-        state.addTopicPages.page = Math.min(state.addTopicPages.page, updatedPages.length - 1);
+        const updatedPages = chunk(updatedObjects, 10);
+        state.addObjectPages.pages = updatedPages;
+        state.addObjectPages.page = Math.min(state.addObjectPages.page, updatedPages.length - 1);
 
         await interaction.reply({
             components,
-            content: `I've removed **${topic}** from the topics list.`,
+            content: `I've removed **${object}** from the objects list.`,
             embeds: [
                 {
                     color: global.embedColor,
                     description:
-                        state.addTopicPages.pages[state.addTopicPages.page]
+                        state.addObjectPages.pages[state.addObjectPages.page]
                             .map(
                                 (string, i) =>
-                                    `**${state.addTopicPages.page * 10 + i + 1}.** *${string}*`,
+                                    `**${state.addObjectPages.page * 10 + i + 1}.** *${string}*`,
                             )
-                            .join('\n') || 'No topics',
+                            .join('\n') || 'No objects',
                     footer: {
-                        text: `Page: ${state.addTopicPages.page + 1}/${state.addTopicPages.pages.length} • Total Topics: ${updatedTopics.length}`,
+                        text: `Page: ${state.addObjectPages.page + 1}/${state.addObjectPages.pages.length} • Total Objects: ${updatedObjects.length}`,
                     },
                     thumbnail: { url: interaction.guild.iconURL() ?? '' },
-                    title: 'Current Topics in Configuration',
+                    title: 'Current Objects in Configuration',
                 },
             ],
             flags: MessageFlags.Ephemeral,
         });
     },
 
-    name: 'remove_topic',
+    name: 'remove_object',
 });
 
 export const commandOptions = {
-    description: 'Remove a topic from the configuration',
-    name: 'remove_topic',
+    description: 'Remove a object from the configuration',
+    name: 'remove_object',
     options: [
         {
             autocomplete: true,
-            description: 'Provide either the index position or name of the topic to remove',
-            name: 'topic',
+            description: 'Provide either the index position or name of the object to remove',
+            name: 'object',
             required: true,
             type: ApplicationCommandOptionType.STRING,
         },
