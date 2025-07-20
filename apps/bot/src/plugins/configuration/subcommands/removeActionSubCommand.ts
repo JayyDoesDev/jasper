@@ -5,11 +5,11 @@ import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
 import { Options, SetTextOptions } from '../../../services/settingsService';
 
-export const RemoveTopicSubCommand = defineSubCommand({
+export const RemoveActionSubCommand = defineSubCommand({
     autocomplete: async (ctx: Context, interaction) => {
-        const query = interaction.options.getString('topic') || '';
+        const query = interaction.options.getString('action') || '';
         const filtered = (
-            await ctx.services.settings.getText<string>(interaction.guildId!, 'Topics')
+            await ctx.services.settings.getText<string>(interaction.guildId!, 'Actions')
         )
             .filter((key: string) => key.toLowerCase().includes(query.toLowerCase()))
             .slice(0, 25)
@@ -19,20 +19,20 @@ export const RemoveTopicSubCommand = defineSubCommand({
     },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const input = interaction.options.getString('topic')!;
+        const input = interaction.options.getString('action')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
-        const topicsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Topics');
+        const actionsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
         const index = Number(input);
-        let topic = topicsExistInDB[Number(index) - 1];
+        let action = actionsExistInDB[Number(index) - 1];
 
         if (Number.isNaN(index)) {
-            topic = input;
+            action = input;
         } else {
-            if (!topicsExistInDB[index - 1] || index <= 0 || index > topicsExistInDB.length) {
+            if (!actionsExistInDB[index - 1] || index <= 0 || index > actionsExistInDB.length) {
                 await interaction.reply({
-                    content: `I couldn't find a topic at index **${index}**`,
+                    content: `I couldn't find an action at index **${index}**`,
                     flags: MessageFlags.Ephemeral,
                 });
                 return;
@@ -41,27 +41,27 @@ export const RemoveTopicSubCommand = defineSubCommand({
 
         await ctx.services.settings.removeText<SetTextOptions>({
             guildId,
-            key: 'Topics',
-            values: topic,
+            key: 'Actions',
+            values: action,
         });
 
         await interaction.reply({
-            content: `I've removed **${topic}** from the topics list.`,
+            content: `I've removed **${action}** from the actions list.`,
             flags: MessageFlags.Ephemeral,
         });
     },
 
-    name: 'remove_topic',
+    name: 'remove_action',
 });
 
 export const commandOptions = {
-    description: 'Remove a topic from the configuration',
-    name: 'remove_topic',
+    description: 'Remove an action from the configuration',
+    name: 'remove_action',
     options: [
         {
             autocomplete: true,
-            description: 'Provide either the index position or name of the topic to remove',
-            name: 'topic',
+            description: 'Provide either the index position or name of the action to remove',
+            name: 'action',
             required: true,
             type: ApplicationCommandOptionType.STRING,
         },
