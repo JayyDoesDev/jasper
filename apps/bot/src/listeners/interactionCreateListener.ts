@@ -466,7 +466,6 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         const author = interaction.user.id;
         const currentUserState = this.ctx.pagination.get(author);
         if (!currentUserState) return;
-        console.log(currentUserState);
 
         if (interaction.customId.startsWith('add_topics_subcommand_button')) {
             const newTopicPage = await handlePagination({
