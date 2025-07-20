@@ -34,6 +34,7 @@ import {
     commandOptions as setSkullboardReactionThresholdOptions,
     SetSkullboardReactionThresholdSubCommand,
 } from './setSkullboardReactionThreshold';
+import { commandOptions as viewActionOptions, ViewActionSubCommand } from './viewActionsSubCommand';
 import { ViewChannelSubCommand, commandOptions as viewOptions } from './viewSubCommand';
 import { commandOptions as viewTopicsOptions, ViewTopicsSubCommand } from './viewTopicsSubCommand';
 
@@ -50,6 +51,7 @@ export const subCommandOptions = [
     addTopicOptions,
     removeTopicOptions,
     viewTopicsOptions,
+    viewActionOptions,
     addUserOptions,
     removeUserOptions,
     addSkullboardChannelOptions,
@@ -73,6 +75,7 @@ export {
     RemoveUserSubCommand,
     SetSkullboardEmojiSubCommand,
     SetSkullboardReactionThresholdSubCommand,
+    ViewActionSubCommand,
     ViewChannelSubCommand,
     ViewTopicsSubCommand,
 };

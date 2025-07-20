@@ -14,17 +14,20 @@ import {
     MessageFlags,
     ModalBuilder,
     ModalSubmitInteraction,
+    SectionBuilder,
     SeparatorBuilder,
     SeparatorSpacingSize,
     TextDisplayBuilder,
     TextInputBuilder,
     TextInputStyle,
+    ThumbnailBuilder,
 } from 'discord.js';
 
 import { Context } from '../classes/context';
 import { withConfiguration } from '../db';
 import { Command, defineEvent, message } from '../define';
 import { Emojis } from '../enums';
+import { handlePagination } from '../pagination';
 import {
     InactiveThread,
     Options as InactiveThreadOptions,
@@ -48,10 +51,9 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
     >(interaction: Interaction): Promise<void> {
         await this.handleCommands(interaction);
         if (interaction.isButton()) {
+            this.handlePagination(interaction);
             if (interaction.customId.startsWith('list_subcommand_button_')) {
                 await this.onListSubCommandButtons(interaction);
-            } else if (interaction.customId.startsWith('add_topic_subcommand_button_')) {
-                await this.onAddTopicSubCommandButtons(interaction);
             } else if (interaction.customId.startsWith('keep_thread_')) {
                 await this.onKeepThreadButton(interaction);
             } else if (interaction.customId.startsWith('close_thread_')) {
@@ -347,14 +349,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     );
                 }
                 if (footer) {
-                    (container.addSeparatorComponents(
+                    container.addSeparatorComponents(
                         new SeparatorBuilder()
                             .setSpacing(SeparatorSpacingSize.Small)
                             .setDivider(true),
                     ),
                         container.addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(`-# ${footer}`),
-                        ));
+                        );
                 }
                 await interaction.reply({
                     components: [confirmContent, container],
@@ -437,14 +439,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     );
                 }
                 if (footer) {
-                    (container.addSeparatorComponents(
+                    container.addSeparatorComponents(
                         new SeparatorBuilder()
                             .setSpacing(SeparatorSpacingSize.Small)
                             .setDivider(true),
                     ),
                         container.addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(`-# ${TagEmbedFooter}`),
-                        ));
+                        );
                 }
 
                 await interaction.reply({
@@ -457,103 +459,106 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         }
     }
 
-    private async onAddTopicSubCommandButtons(interaction: ButtonInteraction): Promise<void> {
+    private async handlePagination(interaction: ButtonInteraction): Promise<void> {
         if (!interaction.isButton()) return;
-        const author = interaction.user.id;
-        const title = 'Current Topics in Configuration';
         if (!interaction.guild) return;
-        const thumbnail = { url: interaction.guild.iconURL() ?? '' };
-        const color = global.embedColor;
-        const description = '';
-        const footer = { text: '' };
 
+        const author = interaction.user.id;
         const currentUserState = this.ctx.pagination.get(author);
         if (!currentUserState) return;
+        console.log(currentUserState);
 
-        const embedBase = {
-            color,
-            description,
-            footer,
-            thumbnail,
-            title,
-        };
-
-        const updateEmbed = async () => {
-            embedBase.description = currentUserState.addTopicPages.pages[
-                currentUserState.addTopicPages.page
-            ]
-                .map(
-                    (string, i) =>
-                        `**${currentUserState.addTopicPages.page * 10 + i + 1}.** *${string}*`,
-                )
-                .join('\n');
-
-            embedBase.footer.text = `Page: ${currentUserState.addTopicPages.page + 1}/${
-                currentUserState.addTopicPages.pages.length
-            } • Total Topics: ${
-                (await this.ctx.services.settings.getText<string>(interaction.guild!.id, 'Topics'))
-                    .length
-            }`;
-
-            const row = {
-                components: [
-                    {
-                        customId: `add_topic_subcommand_button_previous_${interaction.user.id}`,
-                        disabled: currentUserState.addTopicPages.page === 0,
-                        label: 'Previous',
-                        style: ButtonStyle.Primary,
-                        type: ComponentType.Button,
-                    } as const,
-                    {
-                        customId: `add_topic_subcommand_button_home_${interaction.user.id}`,
-                        label: 'Home',
-                        style: ButtonStyle.Secondary,
-                        type: ComponentType.Button,
-                    } as const,
-                    {
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
-                        disabled:
-                            currentUserState.addTopicPages.page ===
-                            currentUserState.addTopicPages.pages.length - 1,
-                        label: 'Next',
-                        style: ButtonStyle.Primary,
-                        type: ComponentType.Button,
-                    } as const,
+        if (interaction.customId.startsWith('add_topics_subcommand_button')) {
+            const newTopicPage = await handlePagination({
+                buildContainer: (pageContent, footerText) => [
+                    new ContainerBuilder()
+                        .setAccentColor(global.embedColor)
+                        .addSectionComponents(
+                            new SectionBuilder()
+                                .setThumbnailAccessory(
+                                    new ThumbnailBuilder().setURL(interaction.guild.iconURL()),
+                                )
+                                .addTextDisplayComponents(
+                                    new TextDisplayBuilder().setContent(
+                                        '## Current Topics in Configuration',
+                                    ),
+                                ),
+                        )
+                        .addSeparatorComponents(
+                            new SeparatorBuilder()
+                                .setSpacing(SeparatorSpacingSize.Small)
+                                .setDivider(true),
+                        )
+                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(pageContent))
+                        .addSeparatorComponents(
+                            new SeparatorBuilder()
+                                .setSpacing(SeparatorSpacingSize.Small)
+                                .setDivider(true),
+                        )
+                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(footerText)),
                 ],
-                type: ComponentType.ActionRow,
-            } as const;
-
-            await interaction.update({
-                components: [row],
-                embeds: [embedBase],
+                buttonIdPrefix: 'add_topic_subcommand_button',
+                currentPage: currentUserState.addTopicPages.page,
+                fetchTotalItemCount: async () =>
+                    (
+                        await this.ctx.services.settings.getText<string>(
+                            interaction.guild!.id,
+                            'Topics',
+                        )
+                    ).length,
+                interaction,
+                items: currentUserState.addTopicPages.pages.flat(),
+                totalPages: currentUserState.addTopicPages.pages.length,
+                userId: author,
             });
-        };
-
-        switch (interaction.customId) {
-            case `add_topic_subcommand_button_home_${author}`:
-                currentUserState.addTopicPages.page = 0;
-                break;
-
-            case `add_topic_subcommand_button_next_${author}`:
-                currentUserState.addTopicPages.page =
-                    (currentUserState.addTopicPages.page + 1) %
-                    currentUserState.addTopicPages.pages.length;
-                break;
-
-            case `add_topic_subcommand_button_previous_${author}`:
-                currentUserState.addTopicPages.page =
-                    (currentUserState.addTopicPages.page -
-                        1 +
-                        currentUserState.addTopicPages.pages.length) %
-                    currentUserState.addTopicPages.pages.length;
-                break;
-
-            default:
-                break;
+            currentUserState.addTopicPages.page = newTopicPage as unknown as number;
+        } else if (interaction.customId.startsWith('add_action_subcommand_button')) {
+            const newActionsPage = await handlePagination({
+                buildContainer: (pageContent, footerText) => [
+                    new ContainerBuilder()
+                        .setAccentColor(global.embedColor)
+                        .addSectionComponents(
+                            new SectionBuilder()
+                                .setThumbnailAccessory(
+                                    new ThumbnailBuilder().setURL(interaction.guild.iconURL()),
+                                )
+                                .addTextDisplayComponents(
+                                    new TextDisplayBuilder().setContent(
+                                        '## Current Actions in Configuration',
+                                    ),
+                                ),
+                        )
+                        .addSeparatorComponents(
+                            new SeparatorBuilder()
+                                .setSpacing(SeparatorSpacingSize.Small)
+                                .setDivider(true),
+                        )
+                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(pageContent))
+                        .addSeparatorComponents(
+                            new SeparatorBuilder()
+                                .setSpacing(SeparatorSpacingSize.Small)
+                                .setDivider(true),
+                        )
+                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(footerText)),
+                ],
+                buttonIdPrefix: 'add_action_subcommand_button',
+                currentPage: currentUserState.addActionPages.page,
+                fetchTotalItemCount: async () =>
+                    (
+                        await this.ctx.services.settings.getText<string>(
+                            interaction.guild!.id,
+                            'Actions',
+                        )
+                    ).length,
+                interaction,
+                items: currentUserState.addActionPages.pages.flat(),
+                totalPages: currentUserState.addActionPages.pages.length,
+                userId: author,
+            });
+            currentUserState.addActionPages.page = newActionsPage as unknown as number;
         }
 
         this.ctx.pagination.set(author, currentUserState);
-        await updateEmbed();
     }
 
     private async onCloseThreadButton(interaction: ButtonInteraction): Promise<void> {

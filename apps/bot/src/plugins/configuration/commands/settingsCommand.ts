@@ -19,6 +19,7 @@ import {
     SetSkullboardEmojiSubCommand,
     SetSkullboardReactionThresholdSubCommand,
     subCommandOptions,
+    ViewActionSubCommand,
     ViewChannelSubCommand,
     ViewTopicsSubCommand,
 } from '../subcommands';
@@ -46,6 +47,7 @@ export = {
                 remove_topic: RemoveTopicSubCommand,
                 remove_user: RemoveUserSubCommand,
                 view: ViewChannelSubCommand,
+                view_actions: ViewActionSubCommand,
                 view_topics: ViewTopicsSubCommand,
             }[subCommand];
 
@@ -83,6 +85,7 @@ export = {
             set_skullboard_emoji: SetSkullboardEmojiSubCommand,
             set_skullboard_reaction_thres: SetSkullboardReactionThresholdSubCommand,
             view: ViewChannelSubCommand,
+            view_actions: ViewActionSubCommand,
             view_topics: ViewTopicsSubCommand,
         },
     }),

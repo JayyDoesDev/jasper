@@ -45,7 +45,7 @@ export const AddTopicSubCommand = defineSubCommand({
                         type: ComponentType.Button as const,
                     },
                     {
-                        customId: `add_topic_subcommand_button_next_${interaction.user.id}`,
+                        customId: `add_action_subcommand_button_next_${interaction.user.id}`,
                         disabled: state.addTopicPages.page === state.addTopicPages.pages.length - 1,
                         label: 'Next',
                         style: ButtonStyle.Primary as const,
