@@ -148,8 +148,14 @@ export async function cleanUpInactiveThreads(
                                         flags: MessageFlags.IsComponentsV2,
                                     });
 
-                                    await thread.setLocked(true);
-                                    await thread.setArchived(true);
+                                    await thread.setLocked(
+                                        true,
+                                        `Locking thread <#${thread.id}> (${thread.id}) from <@${threadData.authorId}> (${threadData.authorId}) because the OP left the server.`,
+                                    );
+                                    await thread.setArchived(
+                                        true,
+                                        `Archiving thread <#${thread.id}> (${thread.id}) from <@${threadData.authorId}> (${threadData.authorId}) because the OP left the server.`,
+                                    );
                                     await inactiveThreadService.deleteValue<Options, boolean>({
                                         guildId,
                                         threadId: threadData.threadId,
@@ -212,8 +218,14 @@ export async function cleanUpInactiveThreads(
                                     flags: MessageFlags.IsComponentsV2,
                                 });
 
-                                await thread.setLocked(true);
-                                await thread.setArchived(true);
+                                await thread.setLocked(
+                                    true,
+                                    `Locking the thread <#${thread.id}> (${thread.id}) from OP <@${threadData.authorId}> (${threadData.authorId}) due to OP inactivity.`,
+                                );
+                                await thread.setArchived(
+                                    true,
+                                    `Archiving the thread <#${thread.id}> (${thread.id}) from OP <@${threadData.authorId}> (${threadData.authorId}) due to OP inactivity.`,
+                                );
                                 await inactiveThreadService.deleteValue<Options, boolean>({
                                     guildId,
                                     threadId: threadData.threadId,

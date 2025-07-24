@@ -45,24 +45,28 @@ export = {
                 `Post marked as resolved by <@${interaction.user.id}>`,
             );
 
-            const container = new ContainerBuilder().setAccentColor(global.embedColor);
+            let container: ContainerBuilder | null = null;
 
-            if (originalQuestion) {
-                container.addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(
-                        `**Original Question:**\n${originalQuestion}`,
-                    ),
-                );
-            }
-            if (summarizedAnswer) {
-                container.addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(
-                        `**Summarized Answer:**\n${summarizedAnswer}`,
-                    ),
-                );
+            if (originalQuestion || summarizedAnswer) {
+                container = new ContainerBuilder().setAccentColor(global.embedColor);
+
+                if (originalQuestion) {
+                    container.addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `**Original Question:**\n${originalQuestion}`,
+                        ),
+                    );
+                }
+                if (summarizedAnswer) {
+                    container.addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(
+                            `**Summarized Answer:**\n${summarizedAnswer}`,
+                        ),
+                    );
+                }
             }
             const finalReply: Record<string, any> = {
-                components: [mentionText, container],
+                components: container ? [mentionText, container] : [mentionText],
                 flags: MessageFlags.IsComponentsV2,
             };
 
@@ -100,10 +104,16 @@ export = {
 
                 await interaction.reply(finalReply);
                 if (!interaction.channel.locked) {
-                    await interaction.channel.setLocked(true);
+                    await interaction.channel.setLocked(
+                        true,
+                        `Thread <#${interaction.channel.id}> (${interaction.channel.id}) resolved by <@${interaction.user.id}> (${interaction.user.id})`,
+                    );
                 }
                 if (!interaction.channel.archived) {
-                    await interaction.channel.setArchived(true);
+                    await interaction.channel.setArchived(
+                        true,
+                        `Thread <#${interaction.channel.id}> (${interaction.channel.id}) resolved by <@${interaction.user.id}> (${interaction.user.id})`,
+                    );
                 }
                 return;
             } else {

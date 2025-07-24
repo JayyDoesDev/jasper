@@ -279,8 +279,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 await interaction.deferReply({ flags: MessageFlags.Ephemeral });
                 await interaction.deleteReply();
 
-                await interaction.channel.setLocked(true);
-                await interaction.channel.setArchived(true);
+                await interaction.channel.setLocked(
+                    true,
+                    `Closed the thread <#${threadInfo.threadId}> (${threadInfo.threadId}) since OP <@${interaction.user.id}> (${interaction.user.id}) closed it due the reason: \`${reason || 'No reason provided'}\`.`,
+                );
+                await interaction.channel.setArchived(
+                    true,
+                    `Archiving the thread <#${threadInfo.threadId}> (${threadInfo.threadId}) since OP <@${interaction.user.id}> (${interaction.user.id}) closed it due the reason: \`${reason || 'No reason provided'}\`.`,
+                );
             } catch (error) {
                 console.error(`[Error closing thread ${threadId}]:`, error);
                 await interaction.reply({
