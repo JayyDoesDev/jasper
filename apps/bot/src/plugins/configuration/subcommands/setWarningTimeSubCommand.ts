@@ -7,21 +7,21 @@ import { createConfigurationExistsEmbed, createConfigurationUpdateEmbed } from '
 import { SetInactiveThreadOptions } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
-export const SetWarningCheckSubCommand = defineSubCommand({
+export const SetWarningTimeSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const warningCheck = interaction.options.getBoolean('boolean');
+        const warningTime = interaction.options.getNumber('minutes');
 
         await ctx.services.settings.configure<Options>({ guildId });
         const inactiveThreadSettings =
             await ctx.services.settings.getInactiveThreads<Snowflake>(guildId);
 
-        if (inactiveThreadSettings?.warningCheck === warningCheck) {
+        if (inactiveThreadSettings?.warningTime === warningTime) {
             await interaction.reply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Inactive Threads (support threads)',
-                        description: `${inactiveThreadSettings.warningCheck}`,
+                        description: `${inactiveThreadSettings.warningTime} minutes`,
                     }),
                 ],
                 flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
@@ -31,31 +31,31 @@ export const SetWarningCheckSubCommand = defineSubCommand({
 
         await ctx.services.settings.setInactiveThreads<SetInactiveThreadOptions>({
             guildId,
-            warningCheck,
+            warningTime,
         });
 
         await interaction.reply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Inactive Threads (support threads)',
-                    description: `${warningCheck}`,
+                    description: `${warningTime} minutes`,
                 }),
             ],
             flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
-    name: 'set_warning_check',
+    name: 'set_warning_time',
 });
 
 export const commandOptions = {
-    description: 'Set the warning check for support threads',
-    name: 'set_warning_check',
+    description: 'Set the warning time for support threads',
+    name: 'set_warning_time',
     options: [
         {
-            description: 'Set the warning check to true or false',
-            name: 'boolean',
+            description: 'Set the to warning time',
+            name: 'minutes',
             required: true,
-            type: ApplicationCommandOptionType.BOOLEAN,
+            type: ApplicationCommandOptionType.NUMBER,
         },
     ],
     type: ApplicationCommandOptionType.SUB_COMMAND,

@@ -7,21 +7,21 @@ import { createConfigurationExistsEmbed, createConfigurationUpdateEmbed } from '
 import { SetInactiveThreadOptions } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
-export const SetWarningCheckSubCommand = defineSubCommand({
+export const SetGraceTimeSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
-        const warningCheck = interaction.options.getBoolean('boolean');
+        const graceTime = interaction.options.getNumber('minutes');
 
         await ctx.services.settings.configure<Options>({ guildId });
         const inactiveThreadSettings =
             await ctx.services.settings.getInactiveThreads<Snowflake>(guildId);
 
-        if (inactiveThreadSettings?.warningCheck === warningCheck) {
+        if (inactiveThreadSettings?.graceTime === graceTime) {
             await interaction.reply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Inactive Threads (support threads)',
-                        description: `${inactiveThreadSettings.warningCheck}`,
+                        description: `${inactiveThreadSettings.graceTime} minutes`,
                     }),
                 ],
                 flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
@@ -30,32 +30,32 @@ export const SetWarningCheckSubCommand = defineSubCommand({
         }
 
         await ctx.services.settings.setInactiveThreads<SetInactiveThreadOptions>({
+            graceTime,
             guildId,
-            warningCheck,
         });
 
         await interaction.reply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Inactive Threads (support threads)',
-                    description: `${warningCheck}`,
+                    description: `${graceTime} minutes`,
                 }),
             ],
             flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
-    name: 'set_warning_check',
+    name: 'set_grace_time',
 });
 
 export const commandOptions = {
-    description: 'Set the warning check for support threads',
-    name: 'set_warning_check',
+    description: 'Set the grace time for support threads',
+    name: 'set_grace_time',
     options: [
         {
-            description: 'Set the warning check to true or false',
-            name: 'boolean',
+            description: 'Set the grace time',
+            name: 'minutes',
             required: true,
-            type: ApplicationCommandOptionType.BOOLEAN,
+            type: ApplicationCommandOptionType.NUMBER,
         },
     ],
     type: ApplicationCommandOptionType.SUB_COMMAND,

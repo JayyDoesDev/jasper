@@ -27,6 +27,10 @@ import {
 } from './removeTopicSubCommand';
 import { commandOptions as removeUserOptions, RemoveUserSubCommand } from './removeUserSubCommand';
 import {
+    commandOptions as setGraceTimeOptions,
+    SetGraceTimeSubCommand,
+} from './setGraceTimeSubCommand';
+import {
     commandOptions as setSkullboardEmojiOptions,
     SetSkullboardEmojiSubCommand,
 } from './setSkullboardEmoji';
@@ -38,6 +42,11 @@ import {
     commandOptions as setWarningCheckOptions,
     SetWarningCheckSubCommand,
 } from './setWarningCheckSubCommand';
+import {
+    commandOptions as setWarningTimeOptions,
+    SetWarningTimeSubCommand,
+} from './setWarningTimeSubCommand';
+import { commandOptions as viewActionOptions, ViewActionSubCommand } from './viewActionsSubCommand';
 import { ViewChannelSubCommand, commandOptions as viewOptions } from './viewSubCommand';
 import { commandOptions as viewTopicsOptions, ViewTopicsSubCommand } from './viewTopicsSubCommand';
 
@@ -61,6 +70,8 @@ export const subCommandOptions = [
     setSkullboardEmojiOptions,
     setSkullboardReactionThresholdOptions,
     setWarningCheckOptions,
+    setWarningTimeOptions,
+    setGraceTimeOptions,
 ];
 
 export {
@@ -77,9 +88,12 @@ export {
     RemoveRoleSubCommand,
     RemoveTopicSubCommand,
     RemoveUserSubCommand,
+    SetGraceTimeSubCommand,
     SetSkullboardEmojiSubCommand,
     SetSkullboardReactionThresholdSubCommand,
     SetWarningCheckSubCommand,
+    SetWarningTimeSubCommand,
+    ViewActionSubCommand,
     ViewChannelSubCommand,
     ViewTopicsSubCommand,
 };
