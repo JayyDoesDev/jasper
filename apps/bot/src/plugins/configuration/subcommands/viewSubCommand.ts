@@ -180,7 +180,7 @@ export const ViewChannelSubCommand = defineSubCommand({
                         createTable(
                             'Inactive Threads (support thread)',
                             [
-                                `- **Inactive Check**: ${bool(InactiveThreads.warningCheck)}\n`,
+                                `- **Warning Check**: ${bool(InactiveThreads.warningCheck)}\n`,
                                 `- **Warning Time**: ${InactiveThreads.warningTime} (in mins)\n`,
                                 `- **Grace Time**: ${InactiveThreads.graceTime} (in mins)\n`,
                             ],
