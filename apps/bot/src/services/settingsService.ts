@@ -23,10 +23,10 @@ export interface SetChannelOptions extends GuildSettingsWithKey<'Channels'> {
     channels: Snowflake | Snowflake[];
 }
 
-export interface SetInactiveThreadOptions extends GuildSettingsWithKey<'InactiveThreads'> {
-    graceTime: number;
-    warningCheck: boolean;
-    warningTime: number;
+export interface SetInactiveThreadOptions extends GuildSnowflake {
+    graceTime?: number;
+    warningCheck?: boolean;
+    warningTime?: number;
 }
 
 export interface SetRoleOptions extends GuildSettingsWithKey<'Roles'> {
