@@ -3,12 +3,16 @@ import { ChatInputCommandInteraction } from 'discord.js';
 
 import { defineCommand } from '../../../define';
 import {
+    AddActionSubCommand,
     AddChannelSubCommand,
+    AddObjectSubCommand,
     AddRoleSubCommand,
     AddSkullboardChannelSubCommand,
     AddTopicSubCommand,
     AddUserSubCommand,
+    RemoveActionSubCommand,
     RemoveChannelSubCommand,
+    RemoveObjectSubCommand,
     RemoveRoleSubCommand,
     RemoveTopicSubCommand,
     RemoveUserSubCommand,
@@ -16,6 +20,7 @@ import {
     SetSkullboardReactionThresholdSubCommand,
     SetWarningCheckSubCommand,
     subCommandOptions,
+    ViewActionSubCommand,
     ViewChannelSubCommand,
     ViewTopicsSubCommand,
 } from '../subcommands';
@@ -30,15 +35,20 @@ export = {
             }
 
             const subCommandHandler = {
+                add_action: AddActionSubCommand,
                 add_channel: AddChannelSubCommand,
+                add_object: AddObjectSubCommand,
                 add_role: AddRoleSubCommand,
                 add_topic: AddTopicSubCommand,
                 add_user: AddUserSubCommand,
+                remove_action: RemoveActionSubCommand,
                 remove_channel: RemoveChannelSubCommand,
+                remove_object: RemoveObjectSubCommand,
                 remove_role: RemoveRoleSubCommand,
                 remove_topic: RemoveTopicSubCommand,
                 remove_user: RemoveUserSubCommand,
                 view: ViewChannelSubCommand,
+                view_actions: ViewActionSubCommand,
                 view_topics: ViewTopicsSubCommand,
             }[subCommand];
 
@@ -60,12 +70,16 @@ export = {
         },
         on: async () => {},
         subCommands: {
+            add_action: AddActionSubCommand,
             add_channel: AddChannelSubCommand,
+            add_object: AddObjectSubCommand,
             add_role: AddRoleSubCommand,
             add_skullboard_channel: AddSkullboardChannelSubCommand,
             add_topic: AddTopicSubCommand,
             add_user: AddUserSubCommand,
+            remove_action: RemoveActionSubCommand,
             remove_channel: RemoveChannelSubCommand,
+            remove_object: RemoveObjectSubCommand,
             remove_role: RemoveRoleSubCommand,
             remove_topic: RemoveTopicSubCommand,
             remove_user: RemoveUserSubCommand,
@@ -73,6 +87,7 @@ export = {
             set_skullboard_reaction_thres: SetSkullboardReactionThresholdSubCommand,
             set_warning_check: SetWarningCheckSubCommand,
             view: ViewChannelSubCommand,
+            view_actions: ViewActionSubCommand,
             view_topics: ViewTopicsSubCommand,
         },
     }),

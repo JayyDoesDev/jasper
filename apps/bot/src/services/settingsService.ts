@@ -39,8 +39,8 @@ export interface SetSkullboardOptions extends GuildSnowflake {
     threshold?: number;
 }
 
-export interface SetTopicOptions extends GuildSettingsWithKey<'Text'> {
-    topics: string | string[];
+export interface SetTextOptions extends GuildSettingsWithKey<'Text'> {
+    values: string | string[];
 }
 
 export interface SetUsersOptions extends GuildSnowflake {
@@ -79,7 +79,7 @@ class SettingsService extends Service {
                 SkullboardEmoji: '💀',
                 SkullboardReactionThreshold: 4,
             },
-            Text: { Topics: [] },
+            Text: { Actions: [], Objects: [], Topics: [] },
             Users: { IgnoreSnipedUsers: [] },
         };
     }
@@ -119,7 +119,7 @@ class SettingsService extends Service {
                 SkullboardEmoji: Skullboard.SkullboardEmoji ?? '💀',
                 SkullboardReactionThreshold: Skullboard.SkullboardReactionThreshold,
             },
-            Text: { Topics: Text.Topics },
+            Text: { Actions: Text.Actions, Objects: Text.Objects, Topics: Text.Topics },
             Users: { IgnoreSnipedUsers: Users.IgnoreSnipedUsers },
         };
 
@@ -162,11 +162,11 @@ class SettingsService extends Service {
         return guild.GuildSettings.Skullboard;
     }
 
-    public async getTopics<T>(
+    public async getText<T>(
         guildId: T extends Snowflake ? Snowflake : null,
         key: keyof Settings['Text'],
     ): Promise<CommonCondition<string[]>> {
-        const validatedGuildId = this.validateGuildId(guildId, 'get topics');
+        const validatedGuildId = this.validateGuildId(guildId, 'get text');
         return this.getFromSettings('Text', key, validatedGuildId);
     }
 
@@ -238,12 +238,12 @@ class SettingsService extends Service {
         return guild.GuildSettings.Skullboard;
     }
 
-    public async removeTopics<T>(
-        options: T extends SetTopicOptions ? SetTopicOptions : null,
+    public async removeText<T>(
+        options: T extends SetTextOptions ? SetTextOptions : null,
     ): Promise<CommonCondition<string[]>> {
         const guildId = this.validateGuildId(options?.guildId, 'remove topics');
         const key = this.validateKey<'Text'>(options?.key, 'Topic');
-        return this.removeFromSettings('Text', key, guildId, options?.topics ?? []);
+        return this.removeFromSettings('Text', key, guildId, options?.values ?? []);
     }
 
     public async removeUsers<T>(
@@ -331,12 +331,12 @@ class SettingsService extends Service {
         return guild.GuildSettings.Skullboard;
     }
 
-    public async setTopics<T>(
-        options: T extends SetTopicOptions ? SetTopicOptions : null,
+    public async setText<T>(
+        options: T extends SetTextOptions ? SetTextOptions : null,
     ): Promise<CommonCondition<string[]>> {
         const guildId = this.validateGuildId(options?.guildId, 'set topics');
         const key = this.validateKey<'Text'>(options?.key, 'Topic');
-        return this.updateSettings('Text', key, guildId, options?.topics ?? []);
+        return this.updateSettings('Text', key, guildId, options?.values ?? []);
     }
 
     public async setUsers<T>(
