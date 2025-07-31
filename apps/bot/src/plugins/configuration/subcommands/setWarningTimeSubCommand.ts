@@ -52,7 +52,7 @@ export const commandOptions = {
     name: 'set_warning_time',
     options: [
         {
-            description: 'Set the to warning time',
+            description: 'Set the warning time',
             name: 'minutes',
             required: true,
             type: ApplicationCommandOptionType.NUMBER,

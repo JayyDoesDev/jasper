@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, ApplicationCommandType } from '@antibot/i
 import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
+import { ConfigurationRoles } from '../../../container';
 import { defineCommand } from '../../../define';
 
 export = {
@@ -74,5 +75,10 @@ export = {
                 });
             }
         },
+        restrictToConfigRoles: [
+            ConfigurationRoles.AdminRoles,
+            ConfigurationRoles.StaffRoles,
+            ConfigurationRoles.FunCommandRoles,
+        ],
     }),
 };

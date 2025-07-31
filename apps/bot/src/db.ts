@@ -53,6 +53,7 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
                         },
                         Roles: {
                             AllowedAdminRoles: [],
+                            AllowedFunCommandRoles: [],
                             AllowedStaffRoles: [],
                             AllowedTagAdminRoles: [],
                             AllowedTagRoles: [],

@@ -32,6 +32,7 @@ export type Settings = {
     };
     Roles: {
         AllowedAdminRoles: Snowflake[];
+        AllowedFunCommandRoles: Snowflake[];
         AllowedStaffRoles: Snowflake[];
         AllowedTagAdminRoles: Snowflake[];
         AllowedTagRoles: Snowflake[];
@@ -84,6 +85,7 @@ export default model<GuildDocument>(
                 },
                 Roles: {
                     AllowedAdminRoles: { default: [], type: [] },
+                    AllowedFunCommandRoles: { default: [], type: [] },
                     AllowedStaffRoles: { default: [], type: [] },
                     AllowedTagAdminRoles: { default: [], type: [] },
                     AllowedTagRoles: { default: [], type: [] },

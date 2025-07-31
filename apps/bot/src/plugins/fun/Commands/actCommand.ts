@@ -3,6 +3,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 
 import { shuffle } from '../../../array';
 import { Context } from '../../../classes/context';
+import { ConfigurationRoles } from '../../../container';
 import { defineCommand } from '../../../define';
 import { Options } from '../../../services/tagService';
 
@@ -42,5 +43,10 @@ export = {
                 await interaction.reply(`Couldn't find that user.`);
             }
         },
+        restrictToConfigRoles: [
+            ConfigurationRoles.AdminRoles,
+            ConfigurationRoles.StaffRoles,
+            ConfigurationRoles.FunCommandRoles,
+        ],
     }),
 };

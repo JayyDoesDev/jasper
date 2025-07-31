@@ -67,6 +67,7 @@ class SettingsService extends Service {
             },
             Roles: {
                 AllowedAdminRoles: [],
+                AllowedFunCommandRoles: [],
                 AllowedStaffRoles: [],
                 AllowedTagAdminRoles: [],
                 AllowedTagRoles: [],
@@ -107,6 +108,7 @@ class SettingsService extends Service {
             },
             Roles: {
                 AllowedAdminRoles: Roles.AllowedAdminRoles,
+                AllowedFunCommandRoles: Roles.AllowedFunCommandRoles,
                 AllowedStaffRoles: Roles.AllowedStaffRoles,
                 AllowedTagAdminRoles: Roles.AllowedTagAdminRoles,
                 AllowedTagRoles: Roles.AllowedTagRoles,

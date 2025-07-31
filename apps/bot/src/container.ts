@@ -11,6 +11,7 @@ export enum ConfigurationRoles {
     AdminRoles,
     StaffRoles,
     IgnoredSnipedRoles,
+    FunCommandRoles,
 }
 
 export enum ConfigurationUsers {
@@ -24,6 +25,7 @@ export const configurationRolesContainer = [
     [ConfigurationRoles.TagRoles, 'AllowedTagRoles'],
     [ConfigurationRoles.TagAdminRoles, 'AllowedTagAdminRoles'],
     [ConfigurationRoles.IgnoredSnipedRoles, 'IgnoredSnipedRoles'],
+    [ConfigurationRoles.FunCommandRoles, 'AllowedFunCommandRoles'],
 ] as const;
 
 export const configurationChannelsContainer = [

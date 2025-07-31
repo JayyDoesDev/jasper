@@ -128,6 +128,15 @@ export const ViewChannelSubCommand = defineSubCommand({
                                     isRole: true,
                                     isUser: false,
                                 }),
+                                createField(
+                                    'Allowd Fun Command Roles',
+                                    Roles.AllowedFunCommandRoles,
+                                    {
+                                        isChannel: false,
+                                        isRole: true,
+                                        isUser: false,
+                                    },
+                                ),
                                 createField('Ignored Sniped Roles', Roles.IgnoredSnipedRoles, {
                                     isChannel: false,
                                     isRole: true,
