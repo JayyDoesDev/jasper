@@ -1,0 +1,40 @@
+{
+  "provider": "mistral",
+  "model": "pixtral-large-latest",
+  "productionReady": false,
+  "triggerPatterns": [
+    "(?i)dm (?:me|you|us)",
+    "(?i)reach\\s*out",
+    "(?i)giveaway",
+    "(?i)nitro",
+    "(?i)airdrop",
+    "\\$\\d+(?:\\.\\d{1,2})?",
+    "(?i)wallet|seed|mnemonic|private\\s*key",
+    "(?i)payment|invoice|crypto|btc|eth",
+    "(?i)whatsapp|telegram|line\\s?app|kik"
+  ],
+  "hardBlockRegexes": [
+    "(?i)send\\s+(?:me|us)\\s+your\\s+(?:seed|mnemonic|private\\s*key)"
+  ],
+  "rateLimit": {
+    "maxCallsPerMinute": 60,
+    "perChannelCooldownSec": 10
+  },
+  "moderation": {
+    "minConfidenceToDelete": 0.82,
+    "minConfidenceToFlag": 0.55,
+    "deleteIfHardBlockRegex": true,
+    "actions": {
+      "deleteMessage": true,
+      "dmUserOnDelete": false,
+      "postModAlert": true
+    }
+  },
+  "fewShot": {
+    "maxSeedExamples": 20,
+    "maxLearnedExamples": 60,
+    "maxExamplesPerPrompt": 24,
+    "prioritizeHardNegatives": true
+  },
+  "logging": { "level": "debug" }
+}
