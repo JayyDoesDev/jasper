@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	seedExamplesFile    = "examples/seed_examples.jsonl"
-	learnedExamplesFile = "examples/learned_examples.jsonl"
+	seedExamplesFile    = "safety/examples/seed_examples.jsonl"
+	learnedExamplesFile = "safety/examples/learned_examples.jsonl"
 )
 
 type LabeledExampleJSON struct {
@@ -21,6 +21,7 @@ type LabeledExampleJSON struct {
 	Meta struct {
 		Channel       string `json:"channel,omitempty"`
 		AuthorAgeDays int    `json:"authorAgeDays,omitempty"`
+		MessageID     string `json:"messageId,omitempty"`
 	} `json:"meta,omitempty"`
 	Weight float64 `json:"weight,omitempty"`
 }
@@ -79,20 +80,51 @@ func AdoptExample(input AdoptionInput) error {
 	} else if input.Confidence >= 0.85 {
 		weight = 0.5
 	}
-	jsonLine, _ := json.Marshal(LabeledExampleJSON{
+	newEx := LabeledExampleJSON{
 		Content: input.Content,
 		Label:   chooseLabel(input),
 		Reason:  input.Reason,
-		Meta: struct{ Channel string "json:\"channel,omitempty\""; AuthorAgeDays int "json:\"authorAgeDays,omitempty\"" }{input.Meta.Channel, input.Meta.AuthorAgeDays},
-		Weight:  weight,
-	})
-	f, err := os.OpenFile(learnedExamplesFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		Meta: struct {
+			Channel       string `json:"channel,omitempty"`
+			AuthorAgeDays int    `json:"authorAgeDays,omitempty"`
+			MessageID     string `json:"messageId,omitempty"`
+		}{input.Meta.Channel, input.Meta.AuthorAgeDays, input.Meta.MessageID},
+		Weight: weight,
+	}
+
+    // Load existing learned examples (if any) so we append instead of overwriting.
+    examples, _ := readJsonl(learnedExamplesFile)
+    if examples == nil {
+        examples = []LabeledExampleJSON{}
+    }
+
+    // If this is a rewrite (moderator corrected a specific message), remove any
+    // existing example for the same message ID before appending the new one.
+    if input.GroundTruth != "" && input.Meta.MessageID != "" {
+        filtered := make([]LabeledExampleJSON, 0, len(examples))
+        for _, ex := range examples {
+            if ex.Meta.MessageID != input.Meta.MessageID {
+                filtered = append(filtered, ex)
+            }
+        }
+        examples = filtered
+    }
+
+    examples = append(examples, newEx)
+
+	f, err := os.OpenFile(learnedExamplesFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	_, err = f.Write(append(jsonLine, '\n'))
-	return err
+
+	for _, ex := range examples {
+		jsonLine, _ := json.Marshal(ex)
+		if _, err := f.Write(append(jsonLine, '\n')); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // AdoptionInput struct mirrors TS
@@ -104,6 +136,7 @@ type AdoptionInput struct {
 	Meta       struct {
 		Channel       string `json:"channel,omitempty"`
 		AuthorAgeDays int    `json:"authorAgeDays,omitempty"`
+		MessageID     string `json:"messageId,omitempty"`
 	} `json:"meta"`
 	GroundTruth string `json:"groundTruth,omitempty"`
 	Reason      string `json:"reason,omitempty"`

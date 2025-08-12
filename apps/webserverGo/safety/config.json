@@ -17,8 +17,8 @@
     "(?i)send\\s+(?:me|us)\\s+your\\s+(?:seed|mnemonic|private\\s*key)"
   ],
   "rateLimit": {
-    "maxCallsPerMinute": 60,
-    "perChannelCooldownSec": 10
+    "maxCallsPerMinute": 0,
+    "perChannelCooldownSec": 0
   },
   "moderation": {
     "minConfidenceToDelete": 0.82,

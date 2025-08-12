@@ -75,6 +75,16 @@ func Start() {
 		}
 
 		msg, _ := s.ChannelMessage(channelID, targetMsgID)
+		if msg == nil {
+			msg = MessageCache[targetMsgID]
+		}
+		if msg == nil {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{Content: "Original message could not be found.", Flags: discordgo.MessageFlagsEphemeral},
+			})
+			return
+		}
 
 		authorAge := 0
 		if msg != nil && msg.Author != nil {
@@ -83,7 +93,8 @@ func Start() {
 		meta := struct {
 			Channel       string "json:\"channel,omitempty\""
 			AuthorAgeDays int    "json:\"authorAgeDays,omitempty\""
-		}{channelID, authorAge}
+			MessageID     string `json:"messageId,omitempty"`
+		}{channelID, authorAge, targetMsgID}
 
 		switch action {
 		case "scam_del":
@@ -91,12 +102,11 @@ func Start() {
 				s.ChannelMessageDelete(channelID, targetMsgID)
 			}
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseUpdateMessage,
-				Data: &discordgo.InteractionResponseData{Components: []discordgo.MessageComponent{}},
-			})
-			s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-				Content: fmt.Sprintf("Deleted message %s.", targetMsgID),
-				Flags:   discordgo.MessageFlagsEphemeral,
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Message deleted.",
+					Flags:   discordgo.MessageFlagsEphemeral,
+				},
 			})
 		case "scam_correct":
 			if msg == nil {
@@ -104,28 +114,21 @@ func Start() {
 				return
 			}
 			_ = AdoptExample(AdoptionInput{Content: msg.Content, Predicted: "scam", GroundTruth: "scam", Confidence: 1, Meta: meta, Reason: fmt.Sprintf("mod_%s_approved", i.Member.User.ID)})
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseChannelMessageWithSource, Data: &discordgo.InteractionResponseData{Content: "Marked correct", Flags: discordgo.MessageFlagsEphemeral}})
+			updateEmbed(s, i, "Marked as correct by "+i.Member.User.Username, createModerationComponents(cfg, msg, true, true, true))
 		case "scam_incorrect":
 			if msg == nil {
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseChannelMessageWithSource, Data: &discordgo.InteractionResponseData{Content: "Original message no longer exists.", Flags: discordgo.MessageFlagsEphemeral}})
 				return
 			}
 			_ = AdoptExample(AdoptionInput{Content: msg.Content, Predicted: "scam", GroundTruth: "not_scam", Confidence: 1, Meta: meta, Reason: fmt.Sprintf("mod_%s_rejected", i.Member.User.ID)})
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseChannelMessageWithSource, Data: &discordgo.InteractionResponseData{Content: "Marked incorrect", Flags: discordgo.MessageFlagsEphemeral}})
+			updateEmbed(s, i, "Marked as incorrect by "+i.Member.User.Username, createModerationComponents(cfg, msg, true, true, true))
 		case "flag_false":
 			if msg == nil {
 				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseChannelMessageWithSource, Data: &discordgo.InteractionResponseData{Content: "Original message missing.", Flags: discordgo.MessageFlagsEphemeral}})
 				return
 			}
 			_ = AdoptExample(AdoptionInput{Content: msg.Content, Predicted: "not_scam", GroundTruth: "scam", Confidence: 1, Meta: meta, Reason: fmt.Sprintf("mod_%s_flagged", i.Member.User.ID)})
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseUpdateMessage,
-				Data: &discordgo.InteractionResponseData{Components: []discordgo.MessageComponent{}},
-			})
-			s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-				Content: "Flag submitted, thank you.",
-				Flags:   discordgo.MessageFlagsEphemeral,
-			})
+			updateEmbed(s, i, "Flagged as scam by "+i.Member.User.Username, []discordgo.MessageComponent{})
 		}
 	})
 
@@ -140,4 +143,30 @@ func Start() {
 
 	_ = sess.Close()
 	Logger.Info("Shutdown complete")
+}
+
+func updateEmbed(s *discordgo.Session, i *discordgo.InteractionCreate, text string, components []discordgo.MessageComponent) {
+	if i.Message == nil || len(i.Message.Embeds) == 0 {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Action recorded: " + text,
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
+		return
+	}
+	embed := i.Message.Embeds[0]
+	if embed.Footer == nil {
+		embed.Footer = &discordgo.MessageEmbedFooter{}
+	}
+	embed.Footer.Text = text
+	embeds := []*discordgo.MessageEmbed{embed}
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseUpdateMessage,
+		Data: &discordgo.InteractionResponseData{
+			Embeds:     embeds,
+			Components: components,
+		},
+	})
 }
