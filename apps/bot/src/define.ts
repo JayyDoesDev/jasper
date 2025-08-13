@@ -32,7 +32,7 @@ export interface Event<
         : unknown,
 > {
     event: { name: string; once: boolean };
-    on: (event: T, ctx: Context) => void;
+    on: (event: T, ctx: Context, ...args: any[]) => void;
 }
 
 export type Plugin = {

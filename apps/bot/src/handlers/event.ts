@@ -6,6 +6,21 @@ import { Context } from '../classes/context';
 import { Plugin } from '../define';
 import { Combine } from '../types';
 
+type FileRequire =
+    | Combine<
+          [
+              NodeRequire,
+              Record<
+                  'events',
+                  {
+                      event: { name: string; on: (args: [], ctx: Context) => void };
+                  }[]
+              >,
+              Record<'commands', []>,
+          ]
+      >
+    | Plugin;
+
 export default function (ctx: Context): void {
     try {
         let events: string[] = [];
@@ -15,20 +30,7 @@ export default function (ctx: Context): void {
         for (let i = 0; i < events.length; i++) {
             try {
                 const filePath = path.resolve(events[i]);
-                const file:
-                    | Combine<
-                          [
-                              NodeRequire,
-                              Record<
-                                  'events',
-                                  {
-                                      event: { name: string; on: (args: [], ctx: Context) => void };
-                                  }[]
-                              >,
-                              Record<'commands', []>,
-                          ]
-                      >
-                    | Plugin = require(filePath);
+                const file: FileRequire = require(filePath);
                 if (file.events || file.commands) {
                     file.events.forEach((x) => {
                         if (x.once !== true) {
