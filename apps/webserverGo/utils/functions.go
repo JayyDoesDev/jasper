@@ -6,8 +6,11 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+	"io"
 	"net/http"
+	"net/url"
 	"os"
+	"time"
 
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -16,10 +19,22 @@ import (
 	"golang.org/x/image/draw"
 )
 
-func LoadImageFromURL(url string) (image.Image, error) {
-	resp, err := http.Get(url)
+func LoadImageFromURL(rawURL string) (image.Image, error) {
+	parsed, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid URL: %w", err)
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return nil, fmt.Errorf("unsupported URL scheme: %s", parsed.Scheme)
+	}
+
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	resp, err := client.Get(parsed.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch image: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -27,10 +42,13 @@ func LoadImageFromURL(url string) (image.Image, error) {
 		return nil, fmt.Errorf("failed to fetch image: status code %d", resp.StatusCode)
 	}
 
-	img, _, err := image.Decode(resp.Body)
+	limitedReader := io.LimitReader(resp.Body, 5*1024*1024) // 5 MB max
+
+	img, _, err := image.Decode(limitedReader)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to decode image: %w", err)
 	}
+
 	return img, nil
 }
 
