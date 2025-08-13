@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 import { ICommand, Snowflake } from '@antibot/interactions';
 import {
     AutocompleteInteraction,
