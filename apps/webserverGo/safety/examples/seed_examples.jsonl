@@ -1,0 +1,4 @@
+{"content":"DM me, I can recover your account fast. Just send your 12-word seed.","label":"scam","reason":"Requests seed phrase","weight":2}
+{"content":"Hey team, does anyone know why the server is down?","label":"not_scam","reason":"Benign question","weight":1}
+{"content":"Limited-time giveaway! Claim Nitro here: http://bit.ly/sus-nitro","label":"scam","reason":"Suspicious link + giveaway","weight":2}
+{"content":"Mods: please reach out, I found a bug but won’t share details here.","label":"not_scam","reason":"Not overtly malicious; no link or credential request","weight":1}
