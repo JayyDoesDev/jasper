@@ -31,7 +31,7 @@
     "dependencies": {
         "@antibot/interactions": "^1.4.6",
         "@antibot/zilla": "^1.0.2",
-        "@playwright/test": "^1.52.0",
+        "@playwright/test": "^1.54.2",
         "@types/lodash": "^4.17.16",
         "@types/minimatch": "^5.1.2",
         "discord.js": "^14.21.0",
