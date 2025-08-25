@@ -7,6 +7,7 @@ export interface GuildDocument extends Document {
     _id: Snowflake;
     GuildSettings: Settings;
     InactiveThreads?: InactiveThread[];
+    SkulledMessages?: Snowflake[];
     Tags: Tag[];
 }
 
@@ -224,6 +225,7 @@ export default model<GuildDocument>(
                     },
                 ],
             },
+            SkulledMessages: { default: [], type: [] },
             Tags: {
                 default: [],
                 type: [

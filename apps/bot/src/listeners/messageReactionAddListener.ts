@@ -36,6 +36,10 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
             const guildId = reaction.message.guildId!;
             await this.ctx.services.settings.configure<Options>({ guildId });
             const { Skullboard } = this.ctx.services.settings.getSettings();
+            const skulledService = this.ctx.services.skulledMessages.configure({ guildId });
+
+            const isNewSkulledMessage = await skulledService.add(reaction.message.id);
+            if (!isNewSkulledMessage) return;
 
             if (
                 reaction.emoji.name !== Skullboard.SkullboardEmoji ||
