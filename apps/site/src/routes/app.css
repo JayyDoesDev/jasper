@@ -1,0 +1,50 @@
+:root{
+    background-color:  	#23272a;
+    color: #363f44;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.username{
+    color: #7289da;
+    font-size: 1.1em;
+}
+.id{
+    color: #636b70;
+    font-size: 0.8em;
+}
+.timestamp{
+    color: #99aab5;
+    font-size: 1em;
+}
+.messageid{
+    color: #636b70;
+    font-size: 0.8em;
+}
+.content{
+    color: #fff;
+    font-size: 1em;
+}
+
+.reply{
+    .username, .content{
+        font-size: 0.8em;
+    }
+}
+
+button{
+    margin-left: 1.5em;
+    background-color: #3d4146;
+    color: #fff;
+    padding: 0.8em;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    font-size: 1em;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    border: none;
+    border-radius: 1em;
+    cursor: pointer;
+}
+
+button:hover{
+    background-color: #363a3f;
+}
