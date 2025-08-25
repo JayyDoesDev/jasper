@@ -19,6 +19,12 @@ export interface Options extends GuildSnowflake {
     GuildSettings?: Settings;
 }
 
+export interface SetBulkDeleteOptions extends GuildSnowflake {
+    BulkDelLoggingBoolean?: boolean;
+    IgnoredLoggingChannels?: Snowflake[];
+    LogChannel?: null | Snowflake;
+}
+
 export interface SetChannelOptions extends GuildSettingsWithKey<'Channels'> {
     channels: Snowflake | Snowflake[];
 }
@@ -55,6 +61,11 @@ class SettingsService extends Service {
         super(ctx);
         this.guildId = '';
         this.guildSettings = {
+            BulkDeleteLogging: {
+                BulkDelLoggingBoolean: false,
+                IgnoredLoggingChannels: [],
+                LogChannel: null,
+            },
             Channels: {
                 AllowedSnipeChannels: [],
                 AllowedTagChannels: [],
@@ -92,10 +103,23 @@ class SettingsService extends Service {
         }
 
         const {
-            GuildSettings: { Channels, InactiveThreads, Roles, Skullboard, Text, Users },
+            GuildSettings: {
+                BulkDeleteLogging,
+                Channels,
+                InactiveThreads,
+                Roles,
+                Skullboard,
+                Text,
+                Users,
+            },
         } = await getGuild<GuildDocument>(this.ctx, this.guildId);
 
         this.guildSettings = {
+            BulkDeleteLogging: {
+                BulkDelLoggingBoolean: BulkDeleteLogging.BulkDelLoggingBoolean,
+                IgnoredLoggingChannels: BulkDeleteLogging.IgnoredLoggingChannels,
+                LogChannel: BulkDeleteLogging.LogChannel,
+            },
             Channels: {
                 AllowedSnipeChannels: Channels.AllowedSnipeChannels,
                 AllowedTagChannels: Channels.AllowedTagChannels,
@@ -126,6 +150,14 @@ class SettingsService extends Service {
         };
 
         return this;
+    }
+
+    public async getBulkDeleteLogging<T>(
+        guildId: T extends Snowflake ? Snowflake : null,
+    ): Promise<CommonCondition<Settings['BulkDeleteLogging']>> {
+        const validatedGuildId = this.validateGuildId(guildId, 'get bulk delete logging');
+        const guild = await getGuild<GuildDocument>(this.ctx, validatedGuildId);
+        return guild.GuildSettings.BulkDeleteLogging;
     }
 
     public async getChannels<T>(
@@ -178,6 +210,26 @@ class SettingsService extends Service {
     ): Promise<CommonCondition<Snowflake[]>> {
         const validatedGuildId = this.validateGuildId(guildId, 'get users');
         return this.getFromSettings('Users', key, validatedGuildId);
+    }
+
+    public async removeBulkDeleteLogging<T>(
+        guildId: T extends Snowflake ? Snowflake : null,
+    ): Promise<CommonCondition<Settings['BulkDeleteLogging']>> {
+        const validatedGuildId = this.validateGuildId(guildId, 'remove bulk delete logging');
+        const guild = await getGuild<GuildDocument>(this.ctx, validatedGuildId);
+
+        guild.GuildSettings.BulkDeleteLogging.BulkDelLoggingBoolean = false;
+        guild.GuildSettings.BulkDeleteLogging.IgnoredLoggingChannels = [];
+        guild.GuildSettings.BulkDeleteLogging.LogChannel = null;
+
+        await this.ctx.store.setForeignKey({ guild: validatedGuildId }, guild);
+        await GuildSchema.updateOne(
+            { _id: validatedGuildId },
+            { $set: { 'GuildSettings.BulkDeleteLogging': guild.GuildSettings.BulkDeleteLogging } },
+            { upsert: true },
+        );
+
+        return guild.GuildSettings.BulkDeleteLogging;
     }
 
     public async removeChannels<T>(
@@ -253,6 +305,35 @@ class SettingsService extends Service {
     ): Promise<CommonCondition<Snowflake[]>> {
         const guildId = this.validateGuildId(options?.guildId, 'remove users');
         return this.removeFromSettings('Users', 'IgnoreSnipedUsers', guildId, options?.users ?? []);
+    }
+
+    public async setBulkDeleteLogging<T>(
+        options: T extends SetBulkDeleteOptions ? SetBulkDeleteOptions : null,
+    ): Promise<CommonCondition<Settings['BulkDeleteLogging']>> {
+        const validatedGuildId = this.validateGuildId(options?.guildId, 'set bulk delete logging');
+        const guild = await getGuild<GuildDocument>(this.ctx, validatedGuildId);
+
+        if (options.BulkDelLoggingBoolean !== undefined) {
+            guild.GuildSettings.BulkDeleteLogging.BulkDelLoggingBoolean =
+                options.BulkDelLoggingBoolean;
+        }
+        if (options.IgnoredLoggingChannels !== undefined) {
+            guild.GuildSettings.BulkDeleteLogging.IgnoredLoggingChannels =
+                options.IgnoredLoggingChannels;
+        }
+        if (options.LogChannel !== undefined) {
+            guild.GuildSettings.BulkDeleteLogging.LogChannel = options.LogChannel;
+        }
+
+        await this.ctx.store.setForeignKey({ guild: validatedGuildId }, guild);
+
+        await GuildSchema.updateOne(
+            { _id: validatedGuildId },
+            { $set: { 'GuildSettings.BulkDeleteLogging': guild.GuildSettings.BulkDeleteLogging } },
+            { upsert: true },
+        );
+
+        return guild.GuildSettings.BulkDeleteLogging;
     }
 
     public async setChannels<T>(

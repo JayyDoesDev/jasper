@@ -4,7 +4,9 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import { defineCommand } from '../../../define';
 import {
     AddActionSubCommand,
+    AddBulkDelChannelSubCommand,
     AddChannelSubCommand,
+    AddLogIgnoreChannelSubCommand,
     AddObjectSubCommand,
     AddRoleSubCommand,
     AddSkullboardChannelSubCommand,
@@ -38,7 +40,9 @@ export = {
 
             const subCommandHandler = {
                 add_action: AddActionSubCommand,
+                add_bulk_del_channel: AddBulkDelChannelSubCommand,
                 add_channel: AddChannelSubCommand,
+                add_log_ignore: AddLogIgnoreChannelSubCommand,
                 add_object: AddObjectSubCommand,
                 add_role: AddRoleSubCommand,
                 add_topic: AddTopicSubCommand,
@@ -73,7 +77,9 @@ export = {
         on: async () => {},
         subCommands: {
             add_action: AddActionSubCommand,
+            add_bulk_del_channel: AddBulkDelChannelSubCommand,
             add_channel: AddChannelSubCommand,
+            add_log_ignore: AddLogIgnoreChannelSubCommand,
             add_object: AddObjectSubCommand,
             add_role: AddRoleSubCommand,
             add_skullboard_channel: AddSkullboardChannelSubCommand,

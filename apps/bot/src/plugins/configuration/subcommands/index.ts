@@ -1,5 +1,13 @@
 import { commandOptions as addActionOptions, AddActionSubCommand } from './addActionSubCommand';
+import {
+    AddBulkDelChannelSubCommand,
+    commandOptions as addBulkDelOptions,
+} from './addBulkDelChannelSubCommand';
 import { commandOptions as addChannelOptions, AddChannelSubCommand } from './addChannelSubCommand';
+import {
+    AddLogIgnoreChannelSubCommand,
+    commandOptions as addLogIgnoreOptions,
+} from './addLogIgnoreChannelSubCommand';
 import { commandOptions as addObjectOptions, AddObjectSubCommand } from './addObjectSubCommand';
 import { commandOptions as addRoleOptions, AddRoleSubCommand } from './addRoleSubCommand';
 import {
@@ -53,6 +61,8 @@ import { commandOptions as viewTopicsOptions, ViewTopicsSubCommand } from './vie
 export const subCommandOptions = [
     addActionOptions,
     removeActionOptions,
+    addBulkDelOptions,
+    addLogIgnoreOptions,
     addChannelOptions,
     removeChannelOptions,
     addObjectOptions,
@@ -76,7 +86,9 @@ export const subCommandOptions = [
 
 export {
     AddActionSubCommand,
+    AddBulkDelChannelSubCommand,
     AddChannelSubCommand,
+    AddLogIgnoreChannelSubCommand,
     AddObjectSubCommand,
     AddRoleSubCommand,
     AddSkullboardChannelSubCommand,

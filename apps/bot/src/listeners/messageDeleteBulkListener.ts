@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import path from 'path';
 
-import { Message, PartialMessage, ReadonlyCollection, Snowflake } from 'discord.js';
+import { Message, PartialMessage, ReadonlyCollection, Snowflake, TextChannel } from 'discord.js';
 
 import { Context } from '../classes/context';
 import { defineEvent } from '../define';
@@ -17,8 +17,11 @@ export default class MessageDeleteBulkListener extends Listener<'messageDeleteBu
         messages: ReadonlyCollection<Snowflake, Message | PartialMessage>,
     ): Promise<void> {
         const groupedMessages = new Map<string, string[]>();
+
+        const { BulkDeleteLogging } = this.ctx.services.settings.getSettings();
         for (const message of messages.values()) {
             const channelId = message.channelId ?? 'unknown';
+            if (BulkDeleteLogging.IgnoredLoggingChannels?.includes(channelId)) return;
             const messageId = message.id ?? 'unknown';
             const username = message.author.username ?? 'unknown';
             const userId = message.author.id ?? 'unknown';
@@ -33,10 +36,12 @@ export default class MessageDeleteBulkListener extends Listener<'messageDeleteBu
             groupedMessages.get(channelId)?.push(line);
         }
 
+        const logChannel = (await this.ctx.channels.fetch(
+            BulkDeleteLogging.LogChannel,
+        )) as TextChannel;
+
         for (const [channelId, messages] of groupedMessages) {
             const filePath = path.join(__dirname, `deletedMessages-${channelId}.txt`);
-            writeFileSync(filePath, messages.join('\n') + '\n\n', { encoding: 'utf-8' });
-
             const channel = await this.ctx.channels.fetch(channelId);
             if (channel && channel.isTextBased()) {
                 const surroundingMessages = await channel.messages.fetch({
@@ -64,6 +69,9 @@ export default class MessageDeleteBulkListener extends Listener<'messageDeleteBu
                     return tsA - tsB;
                 }) ?? [],
             );
+            const orderedMsgs = groupedMessages.get(channelId) ?? [];
+            writeFileSync(filePath, orderedMsgs.join('\n') + '\n\n', { encoding: 'utf-8' });
+            await logChannel.send({ files: [filePath] });
         }
 
         await console.log(groupedMessages);
