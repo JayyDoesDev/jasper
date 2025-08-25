@@ -3,27 +3,31 @@ import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
-import { createConfigurationExistsEmbed, createConfigurationUpdateEmbed } from '../../../embeds';
+import { createConfigurationUpdateEmbed } from '../../../embeds';
 import { GuildSnowflake } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
-export const AddLogIgnoreChannelSubCommand = defineSubCommand({
+export const RemoveLogIgnoreChannelSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const channel = interaction.options.getChannel('channel')!;
 
         await ctx.services.settings.configure<Options>({ guildId });
+
         const bulkDelSettings =
             await ctx.services.settings.getBulkDeleteLogging<Snowflake>(guildId);
 
-        const ignored = bulkDelSettings?.IgnoredLoggingChannels ?? [];
+        let ignored = bulkDelSettings?.IgnoredLoggingChannels ?? [];
 
-        if (ignored.includes(channel.id)) {
+        if (!ignored.includes(channel.id)) {
             await interaction.reply({
                 components: [
-                    createConfigurationExistsEmbed({
+                    createConfigurationUpdateEmbed({
                         configName: 'Ignored Channels',
-                        description: `<#${channel.id}> is already ignored.`,
+                        description:
+                            ignored.length > 0
+                                ? ignored.map((id) => `<#${id}>`).join(', ')
+                                : `I'm not ignoring any channels.`,
                     }),
                 ],
                 flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
@@ -31,32 +35,37 @@ export const AddLogIgnoreChannelSubCommand = defineSubCommand({
             return;
         }
 
-        ignored.push(channel.id);
+        ignored = ignored.filter((id) => id !== channel.id);
 
         await ctx.services.settings.setBulkDeleteLogging<GuildSnowflake>({
             guildId,
             IgnoredLoggingChannels: ignored,
         });
 
+        const description =
+            ignored.length > 0
+                ? ignored.map((id) => `<#${id}>`).join(', ')
+                : `I'm not ignoring any channels.`;
+
         await interaction.reply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Ignored Channels',
-                    description: `Now ignoring bulk delete logs in <#${channel.id}>.`,
+                    description,
                 }),
             ],
-            flags: MessageFlags.IsComponentsV2,
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
         });
     },
-    name: 'add_log_ignore',
+    name: 'remove_log_ignore',
 });
 
 export const commandOptions = {
-    description: 'Ignore a channel from bulk delete logging',
-    name: 'add_log_ignore',
+    description: 'Remove a channel currently being ignored',
+    name: 'remove_log_ignore',
     options: [
         {
-            description: 'The channel to ignore',
+            description: 'The channel to remove',
             name: 'channel',
             required: true,
             type: ApplicationCommandOptionType.CHANNEL,

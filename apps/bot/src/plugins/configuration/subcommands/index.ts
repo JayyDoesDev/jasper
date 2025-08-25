@@ -25,6 +25,10 @@ import {
     RemoveChannelSubCommand,
 } from './removeChannelSubCommand';
 import {
+    RemoveLogIgnoreChannelSubCommand,
+    commandOptions as removeLogIgnoreOptions,
+} from './removeLogIgnoreChannelSubCommand';
+import {
     commandOptions as removeObjectOptions,
     RemoveObjectSubCommand,
 } from './removeObjectSubCommand';
@@ -63,6 +67,7 @@ export const subCommandOptions = [
     removeActionOptions,
     addBulkDelOptions,
     addLogIgnoreOptions,
+    removeLogIgnoreOptions,
     addChannelOptions,
     removeChannelOptions,
     addObjectOptions,
@@ -96,6 +101,7 @@ export {
     AddUserSubCommand,
     RemoveActionSubCommand,
     RemoveChannelSubCommand,
+    RemoveLogIgnoreChannelSubCommand,
     RemoveObjectSubCommand,
     RemoveRoleSubCommand,
     RemoveTopicSubCommand,
