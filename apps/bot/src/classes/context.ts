@@ -14,6 +14,7 @@ import { Command, Plugin } from '../define';
 import { State } from '../plugins/types';
 import InactiveThreadsService from '../services/inactiveThreadsService';
 import SettingsService from '../services/settingsService';
+import SkulledMessageService from '../services/skulledMessageService';
 import TagService from '../services/tagService';
 
 import { Env } from './env';
@@ -23,10 +24,12 @@ import WebServer from './webserver';
 class Services {
     public readonly inactiveThreads: InactiveThreadsService;
     public readonly settings: SettingsService;
+    skulledMessages: SkulledMessageService;
     public readonly tags: TagService;
     constructor(public ctx: Context) {
         this.tags = new TagService(ctx);
         this.settings = new SettingsService(ctx);
+        this.skulledMessages = new SkulledMessageService(ctx);
         this.inactiveThreads = new InactiveThreadsService(ctx);
     }
 }
