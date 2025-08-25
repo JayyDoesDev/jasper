@@ -42,7 +42,7 @@ func LoadImageFromURL(rawURL string) (image.Image, error) {
 		return nil, fmt.Errorf("failed to fetch image: status code %d", resp.StatusCode)
 	}
 
-	limitedReader := io.LimitReader(resp.Body, 5*1024*1024) // 5 MB max
+	limitedReader := io.LimitReader(resp.Body, 25*1024*1024)
 
 	img, _, err := image.Decode(limitedReader)
 	if err != nil {

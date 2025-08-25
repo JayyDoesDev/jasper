@@ -8,10 +8,7 @@ import { Listener } from '../listeners/listener';
 
 export default function (ctx: Context): void {
     try {
-        let listeners: string[] = [];
-        process.platform == 'linux'
-            ? (listeners = sync('./listeners/*.js'))
-            : (listeners = sync('./dist/listeners/*.js'));
+        const listeners: string[] = sync('./dist/listeners/*.js');
 
         for (const listenerPath of listeners) {
             try {
