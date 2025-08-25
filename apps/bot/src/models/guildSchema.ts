@@ -20,6 +20,11 @@ export interface InactiveThread {
 }
 
 export type Settings = {
+    BulkDeleteLogging: {
+        BulkDelLoggingBoolean: boolean;
+        IgnoredLoggingChannels: Snowflake[];
+        LogChannel: Nullable<Snowflake>;
+    };
     Channels: {
         AllowedSnipeChannels: Snowflake[];
         AllowedTagChannels: Snowflake[];
@@ -73,6 +78,11 @@ export default model<GuildDocument>(
         {
             _id: String,
             GuildSettings: {
+                BulkDeleteLogging: {
+                    BulkDelLoggingBoolean: { default: false, type: Boolean },
+                    IgnoredLoggingChannels: { default: [], type: [] },
+                    LogChannel: { default: null, type: String },
+                },
                 Channels: {
                     AllowedSnipeChannels: { default: [], type: [] },
                     AllowedTagChannels: { default: [], type: [] },

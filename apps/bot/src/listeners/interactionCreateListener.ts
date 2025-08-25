@@ -355,14 +355,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     );
                 }
                 if (footer) {
-                    container.addSeparatorComponents(
+                    (container.addSeparatorComponents(
                         new SeparatorBuilder()
                             .setSpacing(SeparatorSpacingSize.Small)
                             .setDivider(true),
                     ),
                         container.addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(`-# ${footer}`),
-                        );
+                        ));
                 }
                 await interaction.reply({
                     components: [confirmContent, container],
@@ -445,14 +445,14 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     );
                 }
                 if (footer) {
-                    container.addSeparatorComponents(
+                    (container.addSeparatorComponents(
                         new SeparatorBuilder()
                             .setSpacing(SeparatorSpacingSize.Small)
                             .setDivider(true),
                     ),
                         container.addTextDisplayComponents(
                             new TextDisplayBuilder().setContent(`-# ${TagEmbedFooter}`),
-                        );
+                        ));
                 }
 
                 await interaction.reply({

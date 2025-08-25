@@ -34,6 +34,10 @@ All commands in Jasper are slash commands. Required parameters are wrapped in `<
 - `add_skullboard_channel`: Add a channel for skullboard
 - `set_skullboard_emoji`: Set the emoji for the skullboard
 - `set_skullboard_reaction_thres`: Set a required number of reactions for skullboard
+- `add_bulk_del_channel`: Add the channel to send logs of purged messages
+- `add_log_ignore`: Add a channel to ignore for bulk delete logging
+- `remove_log_ignore`: Remove a currently ignored channel for bulk delete logging
+- `remove_action`: Remove an action from configuration for Act command
 - `add_topics`: Add a new topic to the list of topics
 - `remove_topics`: Remove a topic from the configuration
 - `view_topics`: View the current topics in the configuration
