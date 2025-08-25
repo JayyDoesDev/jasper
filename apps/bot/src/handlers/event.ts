@@ -23,10 +23,8 @@ type FileRequire =
 
 export default function (ctx: Context): void {
     try {
-        let events: string[] = [];
-        process.platform == 'linux'
-            ? (events = sync('./plugins/**/*.js'))
-            : (events = sync('./dist/plugins/**/*.js'));
+        const events: string[] = sync('./dist/plugins/**/*.js');
+
         for (let i = 0; i < events.length; i++) {
             try {
                 const filePath = path.resolve(events[i]);
