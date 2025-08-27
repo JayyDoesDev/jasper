@@ -129,9 +129,9 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 
 
 func GenerateDiscordMessage(data MessageData) (image.Image, error) {
-	font, err := utils.LoadFont("./generators/skullboard/Roboto-Regular.ttf", fontSize)
+	font, err := utils.LoadFont("./fonts/Roboto-Regular.ttf", fontSize)
 	if err != nil {
-		slog.Error("Failed to load font", "fontPath", "./generators/skullboard/Roboto-Regular.ttf", "error", err)
+		slog.Error("Failed to load font", "fontPath", "./fonts/Roboto-Regular.ttf", "error", err)
 		return nil, err
 	}
 

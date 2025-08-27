@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	fontPath   = "./generators/meme/impact.ttf"
+	fontPath   = "./fonts/impact.ttf"
 	lineHeight = 1.5
 	textMargin = 30
 )
@@ -56,7 +56,7 @@ func MakeCaptionImage(URL string, fontSize float64, caption string, position str
 	imgHeight := img.Bounds().Dy()
 
 	dc := gg.NewContext(imgWidth, 1000)
-	font, err := utils.LoadFont("./generators/meme/impact.ttf", fontSize)
+	font, err := utils.LoadFont("./fonts/impact.ttf", fontSize)
 	if err != nil {
 		slog.Error("Failed to load font", "fontPath", fontPath, "error", err)
 		return nil, err
