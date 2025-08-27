@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	fontPath   = "./generators/fun/impact.ttf"
+	fontPath   = "./fonts/impact.ttf"
 	lineHeight = 1.5
 	textMargin = 30
 )
@@ -72,7 +72,7 @@ func GenImage(URL string, fontSize float64, topText string, bottomText string) (
 
 	fontSize = fontSize * float64(imgWidth) / 500.0
 	dc := gg.NewContext(imgWidth, imgHeight)
-	font, err := utils.LoadFont("./generators/meme/impact.ttf", fontSize)
+	font, err := utils.LoadFont("./fonts/impact.ttf", fontSize)
 	if err != nil {
 		slog.Error("Failed to load font", "fontPath", fontPath, "error", err)
 		return nil, err
