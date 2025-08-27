@@ -177,7 +177,10 @@ export async function withConfiguration<
                     if (channels?.length) {
                         notConfigured = false;
                         for (const dbChannel of channels) {
-                            if (interaction.channel.id === dbChannel) {
+                            const channelIdToCheck = interaction.channel.isThread()
+                                ? interaction.channel.parentId
+                                : interaction.channel.id;
+                            if (channelIdToCheck === dbChannel) {
                                 hasAny = true;
                             }
                         }
