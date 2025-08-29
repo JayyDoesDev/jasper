@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -10,14 +11,96 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
+	"strings"
 	"time"
 
+	"golang.org/x/image/draw"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	_ "golang.org/x/image/webp"
-
-	"golang.org/x/image/draw"
 )
+
+var allowedImageTypes = map[string]struct{}{
+	"image/jpeg": {},
+	"image/webp": {},
+	".jpg":       {},
+	".jpeg":      {},
+	".webp":      {},
+}
+
+func IsSupportedImageURL(rawURL string) (bool, string, error) {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return false, "", fmt.Errorf("invalid URL: %w", err)
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return false, "", fmt.Errorf("unsupported URL scheme: %s", parsed.Scheme)
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	req, err := http.NewRequest(http.MethodHead, parsed.String(), nil)
+	if err != nil {
+		return false, "", err
+	}
+	resp, err := client.Do(req)
+	if err == nil {
+		resp.Body.Close()
+		if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
+			ct := strings.ToLower(strings.TrimSpace(resp.Header.Get("Content-Type")))
+			if idx := strings.Index(ct, ";"); idx >= 0 {
+				ct = strings.TrimSpace(ct[:idx])
+			}
+			if strings.HasPrefix(ct, "image/") {
+				_, ok := allowedImageTypes[ct]
+				return ok, ct, nil
+			}
+		}
+	}
+
+	getReq, err := http.NewRequest(http.MethodGet, parsed.String(), nil)
+	if err != nil {
+		return false, "", err
+	}
+	getReq.Header.Set("Range", "bytes=0-511")
+	getResp, err := client.Do(getReq)
+	if err != nil {
+		return false, "", fmt.Errorf("failed to fetch bytes to sniff: %w", err)
+	}
+	defer getResp.Body.Close()
+
+	if getResp.StatusCode != http.StatusOK && getResp.StatusCode != http.StatusPartialContent {
+		return false, "", fmt.Errorf("failed to fetch image: status code %d", getResp.StatusCode)
+	}
+
+	buf := make([]byte, 512)
+	n, _ := io.ReadFull(getResp.Body, buf)
+	buf = buf[:n]
+	if n == 0 {
+		return false, "", errors.New("empty response")
+	}
+
+	sniffed := http.DetectContentType(buf)
+	sniffed = strings.ToLower(strings.TrimSpace(sniffed))
+	if idx := strings.Index(sniffed, ";"); idx >= 0 {
+		sniffed = strings.TrimSpace(sniffed[:idx])
+	}
+
+	if strings.HasPrefix(sniffed, "image/") {
+		if _, ok := allowedImageTypes[sniffed]; !ok {
+			return false, sniffed, fmt.Errorf("image type %s not allowed", sniffed)
+		}
+		return true, sniffed, nil
+	}
+
+	ext := strings.ToLower(path.Ext(parsed.Path))
+	if _, ok := allowedImageTypes[ext]; ok {
+		return true, "", nil
+	}
+
+	return false, sniffed, fmt.Errorf("URL does not appear to be an allowed image (sniffed: %s)", sniffed)
+}
 
 func LoadImageFromURL(rawURL string) (image.Image, error) {
 	parsed, err := url.Parse(rawURL)
@@ -28,9 +111,18 @@ func LoadImageFromURL(rawURL string) (image.Image, error) {
 		return nil, fmt.Errorf("unsupported URL scheme: %s", parsed.Scheme)
 	}
 
-	client := &http.Client{
-		Timeout: 10 * time.Second,
+	ok, mime, err := IsSupportedImageURL(rawURL)
+	if err != nil {
+		return nil, err
 	}
+	if !ok {
+		if mime == "" {
+			return nil, errors.New("URL is not a supported image")
+		}
+		return nil, fmt.Errorf("URL is not a supported image (type %s)", mime)
+	}
+
+	client := &http.Client{Timeout: 15 * time.Second}
 
 	resp, err := client.Get(parsed.String())
 	if err != nil {
@@ -42,7 +134,8 @@ func LoadImageFromURL(rawURL string) (image.Image, error) {
 		return nil, fmt.Errorf("failed to fetch image: status code %d", resp.StatusCode)
 	}
 
-	limitedReader := io.LimitReader(resp.Body, 25*1024*1024)
+	const maxBytes = 25 * 1024 * 1024
+	limitedReader := io.LimitReader(resp.Body, maxBytes)
 
 	img, _, err := image.Decode(limitedReader)
 	if err != nil {

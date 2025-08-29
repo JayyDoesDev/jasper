@@ -87,6 +87,15 @@ export = {
                     true,
                 );
 
+                if (!response.ok) {
+                    const message =
+                        (await response.text().catch(() => '')) ||
+                        'There was an error generating the caption.';
+                    return interaction.editReply({
+                        content: message,
+                    });
+                }
+
                 const buffer = await response.arrayBuffer();
                 const imageBuffer = Buffer.from(buffer);
 
