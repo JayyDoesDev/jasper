@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ApplicationCommandType } from '@antibot/interactions';
-import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { AttachmentBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationRoles } from '../../../container';
@@ -40,8 +40,18 @@ export = {
             const image = interaction.options.getAttachment('image', true);
             const position = interaction.options.getString('position') ?? 'top';
 
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const contentType = image.contentType?.toLowerCase() ?? '';
+            if (!allowedTypes.includes(contentType)) {
+                return interaction.reply({
+                    content: 'Please upload a valid image (JPEG, PNG or WebP).',
+                    flags: MessageFlags.Ephemeral,
+                });
+            }
+
             try {
                 await interaction.deferReply();
+
                 const response = await ctx.webserver.request(
                     'POST',
                     '/fun/speechbubble',
