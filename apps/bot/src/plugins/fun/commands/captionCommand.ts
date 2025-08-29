@@ -54,7 +54,7 @@ export = {
             const fontSize = interaction.options.getInteger('font_size') ?? 72;
             const position = interaction.options.getString('position') ?? 'top';
 
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
             const contentType = image.contentType?.toLowerCase() ?? '';
             if (!allowedTypes.includes(contentType)) {
                 return interaction.reply({
