@@ -37,7 +37,7 @@ func CaptionHandler(w http.ResponseWriter, r *http.Request) {
 	img, err := fun.MakeCaptionImage(requestBody.Img, requestBody.FontSize, requestBody.Text, requestBody.Position)
 
 	if err != nil {
-		http.Error(w, "Failed to generate meme image: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to generate caption image: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
