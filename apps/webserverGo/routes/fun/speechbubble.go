@@ -25,7 +25,7 @@ func BubbleHandler(w http.ResponseWriter, r *http.Request) {
 	img, err := speechbubble.GenImage(requestBody.Img, requestBody.Position)
 
 	if err != nil {
-		http.Error(w, "Failed to generate meme image: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Failed to generate speechbubble image: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
