@@ -8,6 +8,8 @@ import { GuildSnowflake } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
 export const SetSkullboardReactionThresholdSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const threshold = interaction.options.getInteger('threshold')!;
@@ -16,7 +18,7 @@ export const SetSkullboardReactionThresholdSubCommand = defineSubCommand({
         const skullboardSettings = await ctx.services.settings.getSkullboard<Snowflake>(guildId);
 
         if (skullboardSettings?.SkullboardReactionThreshold === threshold) {
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Skullboard',
@@ -33,7 +35,7 @@ export const SetSkullboardReactionThresholdSubCommand = defineSubCommand({
             threshold: threshold,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Skullboard',

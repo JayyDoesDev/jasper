@@ -14,19 +14,13 @@ import { Context } from '../../../classes/context';
 import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 import { Options, TagResponse } from '../../../services/tagService';
+import { handleTagAutocomplete } from '../../../utils/tagCache';
 
 export const UseSubCommand = defineSubCommand({
-    autocomplete: async (ctx: Context, interaction) => {
-        const guildId = interaction.guildId!;
-        const query = interaction.options.getString('tag-name') || '';
-
-        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
-        const filtered = tags
-            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 25)
-            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
-
-        await interaction.respond(filtered);
+    autocomplete: handleTagAutocomplete,
+    deferral: {
+        defer: true,
+        ephemeral: false,
     },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
@@ -37,11 +31,10 @@ export const UseSubCommand = defineSubCommand({
         const tag = await ctx.services.tags.getValues<Options, TagResponse>();
 
         if (!tag) {
-            await interaction.reply({ content: 'Tag not found.', ephemeral: true });
+            await interaction.editReply({ content: 'Tag not found.' });
             return;
         }
 
-        await interaction.deferReply();
         const container = new ContainerBuilder().setAccentColor(global.embedColor);
 
         let mentionText = null;

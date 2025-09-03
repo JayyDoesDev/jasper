@@ -2,6 +2,7 @@ import { PermissionsToHuman, PlantPermission } from '@antibot/interactions';
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import {
     ActionRowBuilder,
+    AutocompleteInteraction,
     ButtonInteraction,
     ButtonStyle,
     ChatInputCommandInteraction,
@@ -25,7 +26,7 @@ import {
 
 import { Context } from '../classes/context';
 import { withConfiguration } from '../db';
-import { Command, defineEvent, message } from '../define';
+import { Command, defineEvent, handleInteractionDeferral } from '../define';
 import { Emojis } from '../enums';
 import { handlePagination } from '../pagination';
 import {
@@ -33,6 +34,8 @@ import {
     Options as InactiveThreadOptions,
 } from '../services/inactiveThreadsService';
 import { Options, Tag, TagResponse } from '../services/tagService';
+import { safeReply } from '../utils/interactionSafeguards';
+import { invalidateTagCache } from '../utils/tagCache';
 
 import { Listener } from './listener';
 
@@ -43,13 +46,22 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
     public async execute<
         Interaction extends
+            | AutocompleteInteraction
             | ButtonInteraction
             | ChatInputCommandInteraction
             | ContextMenuCommandInteraction
             | InteractionEvent
             | ModalSubmitInteraction,
     >(interaction: Interaction): Promise<void> {
-        await this.handleCommands(interaction);
+        // Only handle commands for actual command interactions and autocomplete, not buttons or modals
+        if (
+            interaction.isChatInputCommand() ||
+            interaction.isContextMenuCommand() ||
+            interaction.isAutocomplete()
+        ) {
+            await this.handleCommands(interaction);
+        }
+
         if (interaction.isButton()) {
             this.handlePagination(interaction);
             if (interaction.customId.startsWith('list_subcommand_button_')) {
@@ -58,6 +70,8 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 await this.onKeepThreadButton(interaction);
             } else if (interaction.customId.startsWith('close_thread_')) {
                 await this.onCloseThreadButton(interaction);
+            } else if (interaction.customId.startsWith('tag_create_button_')) {
+                await this.onTagCreateButton(interaction);
             }
         }
         if (interaction.isModalSubmit()) {
@@ -76,7 +90,11 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
     }
 
     private async handleCommands(
-        interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction | InteractionEvent,
+        interaction:
+            | AutocompleteInteraction
+            | ChatInputCommandInteraction
+            | ContextMenuCommandInteraction
+            | InteractionEvent,
     ): Promise<void> {
         switch (true) {
             case interaction.isChatInputCommand() || interaction.isContextMenuCommand(): {
@@ -84,6 +102,17 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                     ChatInputCommandInteraction | ContextMenuCommandInteraction
                 > = this.ctx.interactions.get(interaction.commandName);
                 if (command) {
+                    const isSubCommandInteraction =
+                        interaction instanceof ChatInputCommandInteraction &&
+                        interaction.options.getSubcommand(false) !== null;
+
+                    if (!isSubCommandInteraction) {
+                        await handleInteractionDeferral(
+                            interaction,
+                            command.deferral,
+                            interaction.commandName,
+                        );
+                    }
                     if (command.restrictToConfigRoles?.length) {
                         const { noRolesNoConfig, noRolesWithConfig } = await withConfiguration(
                             this.ctx,
@@ -93,19 +122,23 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                         );
 
                         let configError = false;
+                        let suffix = '';
                         noRolesWithConfig(interaction, () => {
                             configError = true;
                         });
 
                         noRolesNoConfig(interaction, () => {
-                            message.content +=
+                            suffix =
                                 ' Configuration of roles required. Please check with the server administrator.';
                             configError = true;
                         });
 
                         if (configError) {
-                            await interaction.reply(message);
-                            message.content = "Sorry but you can't use this command.";
+                            const content = "Sorry but you can't use this command." + suffix;
+                            await safeReply(interaction, {
+                                content,
+                                flags: MessageFlags.Ephemeral,
+                            });
                             return;
                         }
                     }
@@ -120,19 +153,23 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                             );
 
                         let configError = false;
+                        let suffix = '';
                         noChannelsWithConfig(interaction, () => {
                             configError = true;
                         });
 
                         noChannelsNoConfig(interaction, () => {
-                            message.content +=
+                            suffix =
                                 ' Configuration of channels required. Please check with the server administrator.';
                             configError = true;
                         });
 
                         if (configError) {
-                            await interaction.reply(message);
-                            message.content = "Sorry but you can't use this command.";
+                            const content = "Sorry but you can't use this command." + suffix;
+                            await safeReply(interaction, {
+                                content,
+                                flags: MessageFlags.Ephemeral,
+                            });
                             return;
                         }
                     }
@@ -145,7 +182,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                                     PermissionsToHuman(PlantPermission(permission.toString())),
                                 );
                             }
-                            await interaction.reply({
+                            await safeReply(interaction, {
                                 content: `I'm missing permissions! (${
                                     perms.length <= 2 ? perms.join(' & ') : perms.join(', ')
                                 })`,
@@ -155,7 +192,20 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                         }
                     }
 
-                    command.on(this.ctx, interaction);
+                    try {
+                        command.on(this.ctx, interaction);
+                    } catch {
+                        // swallow
+
+                        try {
+                            await safeReply(interaction, {
+                                content: 'An error occurred while processing your command.',
+                                flags: MessageFlags.Ephemeral,
+                            });
+                        } catch (replyError) {
+                            console.error(`[LISTENER] Failed to send error reply:`, replyError);
+                        }
+                    }
                 }
                 break;
             }
@@ -169,7 +219,13 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                             return interaction.respond([]);
                         }
                     }
-                    command.autocomplete(this.ctx, interaction);
+                    try {
+                        await command.autocomplete(this.ctx, interaction);
+                    } catch {
+                        try {
+                            await interaction.respond([]);
+                        } catch {}
+                    }
                 }
                 break;
             }
@@ -298,6 +354,17 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         }
 
         if (interaction.customId === `tag_create_${interaction.user.id}`) {
+            try {
+                if (!interaction.deferred && !interaction.replied) {
+                    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+                }
+            } catch {
+                await safeReply(interaction as any, {
+                    content: 'An error occurred while processing your request.',
+                    flags: MessageFlags.Ephemeral,
+                });
+                return;
+            }
             const name = interaction.fields.getTextInputValue('tag_create_embed_name');
             const title = interaction.fields.getTextInputValue('tag_create_embed_title');
             const author = interaction.user.id;
@@ -316,20 +383,21 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
             });
 
             if (await this.ctx.services.tags.itemExists<Options>()) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `> The support tag \`${name}\` already exists!`,
-                    flags: MessageFlags.Ephemeral,
                 });
                 return;
             }
 
             if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `> The provided image link is not a valid image URL!`,
-                    flags: MessageFlags.Ephemeral,
                 });
             } else {
                 await this.ctx.services.tags.create<Options & { tag: Tag }, void>();
+
+                // Invalidate cache after successful creation
+                invalidateTagCache(interaction.guild.id);
 
                 const confirmContent = new TextDisplayBuilder().setContent(
                     `${Emojis.CHECK_MARK} Successfully created \`${name}\`!`,
@@ -364,14 +432,25 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                             new TextDisplayBuilder().setContent(`-# ${footer}`),
                         ));
                 }
-                await interaction.reply({
+                await interaction.editReply({
                     components: [confirmContent, container],
-                    flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+                    flags: MessageFlags.IsComponentsV2,
                 });
             }
         }
 
         if (interaction.customId === `tag_edit_${interaction.user.id}`) {
+            try {
+                if (!interaction.deferred && !interaction.replied) {
+                    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+                }
+            } catch {
+                await safeReply(interaction as any, {
+                    content: 'An error occurred while processing your request.',
+                    flags: MessageFlags.Ephemeral,
+                });
+                return;
+            }
             try {
                 const name = interaction.fields.getTextInputValue('tag_edit_embed_name');
                 const title =
@@ -390,17 +469,15 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 const guildId = interaction.guild.id;
 
                 if (!(await this.ctx.services.tags.itemExists<Options>({ guildId, name }))) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: `> The support tag \`${name}\` doesn't exist!`,
-                        flags: MessageFlags.Ephemeral,
                     });
                     return;
                 }
 
                 if (image_url && !/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i.test(image_url)) {
-                    await interaction.reply({
+                    await interaction.editReply({
                         content: `> The provided image link is not a valid image URL!`,
-                        flags: MessageFlags.Ephemeral,
                     });
                     return;
                 }
@@ -412,6 +489,9 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                 });
 
                 await this.ctx.services.tags.modify<Options & { tag: Tag }, void>();
+
+                // Invalidate cache after successful modification
+                invalidateTagCache(guildId);
 
                 const { TagEmbedDescription, TagEmbedFooter, TagEmbedImageURL, TagEmbedTitle } =
                     await this.ctx.services.tags.getValues<Options, TagResponse>({
@@ -455,9 +535,9 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                         ));
                 }
 
-                await interaction.reply({
+                await interaction.editReply({
                     components: [confirmContent, container],
-                    flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+                    flags: MessageFlags.IsComponentsV2,
                 });
             } catch (error) {
                 throw 'Error on TagEditModal ' + error.stack || error;
@@ -790,5 +870,98 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
 
         this.ctx.pagination.set(author, currentUserState);
         await updateEmbed();
+    }
+
+    private async onTagCreateButton(interaction: ButtonInteraction): Promise<void> {
+        // Extract user ID from the custom ID
+        const expectedUserId = interaction.customId.replace('tag_create_button_', '');
+
+        // Verify that the user clicking the button is the same user who triggered the command
+        if (interaction.user.id !== expectedUserId) {
+            await interaction.reply({
+                content: 'You can only use your own tag creation button.',
+                flags: [MessageFlags.Ephemeral],
+            });
+            return;
+        }
+
+        // Show the modal for creating a tag
+        await interaction.showModal({
+            components: [
+                {
+                    components: [
+                        {
+                            customId: 'tag_create_embed_name',
+                            label: 'Tag',
+                            maxLength: 80,
+                            placeholder: 'support',
+                            required: true,
+                            style: TextInputStyle.Short,
+                            type: ComponentType.TextInput,
+                        },
+                    ],
+                    type: ComponentType.ActionRow,
+                },
+                {
+                    components: [
+                        {
+                            customId: 'tag_create_embed_title',
+                            label: 'Embed Title',
+                            maxLength: 200,
+                            placeholder: 'How do I contact support?',
+                            required: true,
+                            style: TextInputStyle.Short,
+                            type: ComponentType.TextInput,
+                        },
+                    ],
+                    type: ComponentType.ActionRow,
+                },
+                {
+                    components: [
+                        {
+                            customId: 'tag_create_embed_description',
+                            label: 'Embed Description',
+                            maxLength: 3000,
+                            placeholder: 'You can contact us in the support threads!',
+                            required: false,
+                            style: TextInputStyle.Paragraph,
+                            type: ComponentType.TextInput,
+                        },
+                    ],
+                    type: ComponentType.ActionRow,
+                },
+                {
+                    components: [
+                        {
+                            customId: 'tag_create_embed_image_url',
+                            label: 'Embed Image URL',
+                            maxLength: 500,
+                            placeholder:
+                                'https://i.pinimg.com/originals/ba/92/7f/ba927ff34cd961ce2c184d47e8ead9f6.jpg',
+                            required: false,
+                            style: TextInputStyle.Short,
+                            type: ComponentType.TextInput,
+                        },
+                    ],
+                    type: ComponentType.ActionRow,
+                },
+                {
+                    components: [
+                        {
+                            customId: 'tag_create_embed_footer',
+                            label: 'Embed Footer',
+                            maxLength: 40,
+                            placeholder: 'Make sure to be patient!',
+                            required: false,
+                            style: TextInputStyle.Short,
+                            type: ComponentType.TextInput,
+                        },
+                    ],
+                    type: ComponentType.ActionRow,
+                },
+            ],
+            customId: `tag_create_${interaction.user.id}`,
+            title: 'Create a support tag',
+        });
     }
 }

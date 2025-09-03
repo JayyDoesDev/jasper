@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
@@ -17,6 +17,8 @@ export const RemoveObjectSubCommand = defineSubCommand({
 
         await interaction.respond(filtered);
     },
+
+    deferral: { defer: true, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const input = interaction.options.getString('object')!;
@@ -31,9 +33,8 @@ export const RemoveObjectSubCommand = defineSubCommand({
             object = input;
         } else {
             if (!objectsExistInDB[index - 1] || index <= 0 || index > objectsExistInDB.length) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `I couldn't find a object at index **${index}**`,
-                    flags: MessageFlags.Ephemeral,
                 });
                 return;
             }
@@ -45,9 +46,8 @@ export const RemoveObjectSubCommand = defineSubCommand({
             values: object,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             content: `I've removed **${object}** from the objects list.`,
-            flags: MessageFlags.Ephemeral,
         });
     },
 

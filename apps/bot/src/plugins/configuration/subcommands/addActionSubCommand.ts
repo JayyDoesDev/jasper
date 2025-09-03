@@ -1,11 +1,12 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
 import { Options, SetTextOptions } from '../../../services/settingsService';
 
 export const AddActionSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const action = interaction.options.getString('action')!;
@@ -14,9 +15,8 @@ export const AddActionSubCommand = defineSubCommand({
         const actionsExistInDB = await ctx.services.settings.getText<string>(guildId, 'Actions');
 
         if (actionsExistInDB.includes(action)) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `For the record, **${action}** is already in the actions list.`,
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -26,9 +26,8 @@ export const AddActionSubCommand = defineSubCommand({
             ...{ key: 'Actions', values: action },
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             content: `I've added **${action}** to the actions list.`,
-            flags: MessageFlags.Ephemeral,
         });
     },
     name: 'add_action',

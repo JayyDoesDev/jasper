@@ -8,6 +8,8 @@ import { GuildSnowflake } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
 export const AddLogIgnoreChannelSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const channel = interaction.options.getChannel('channel')!;
@@ -19,7 +21,7 @@ export const AddLogIgnoreChannelSubCommand = defineSubCommand({
         const ignored = bulkDelSettings?.IgnoredLoggingChannels ?? [];
 
         if (ignored.includes(channel.id)) {
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Ignored Channels',
@@ -38,7 +40,7 @@ export const AddLogIgnoreChannelSubCommand = defineSubCommand({
             IgnoredLoggingChannels: ignored,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Ignored Channels',

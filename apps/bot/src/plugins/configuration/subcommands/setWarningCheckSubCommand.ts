@@ -8,6 +8,8 @@ import { SetInactiveThreadOptions } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
 export const SetWarningCheckSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const warningCheck = interaction.options.getBoolean('boolean');
@@ -17,7 +19,7 @@ export const SetWarningCheckSubCommand = defineSubCommand({
             await ctx.services.settings.getInactiveThreads<Snowflake>(guildId);
 
         if (inactiveThreadSettings?.warningCheck === warningCheck) {
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Inactive Threads (support threads)',
@@ -34,7 +36,7 @@ export const SetWarningCheckSubCommand = defineSubCommand({
             warningCheck,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Inactive Threads (support threads)',

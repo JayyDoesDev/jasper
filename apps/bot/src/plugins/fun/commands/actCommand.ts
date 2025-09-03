@@ -22,6 +22,7 @@ export = {
             ],
             type: ApplicationCommandType.CHAT_INPUT,
         },
+        deferral: { defer: true, ephemeral: false },
         on: async (ctx: Context, interaction) => {
             const user = interaction.options.getUser('user') ?? 'top';
 
@@ -35,12 +36,12 @@ export = {
                 const action = actions[Math.floor(Math.random() * actions.length)];
                 const object = objects[Math.floor(Math.random() * objects.length)];
 
-                await interaction.reply({
+                await interaction.editReply({
                     allowedMentions: { users: [] },
                     content: `<@!${author}> ${action} <@!${user.id}> with ${object}`,
                 });
             } else {
-                await interaction.reply(`Couldn't find that user.`);
+                await interaction.editReply(`Couldn't find that user.`);
             }
         },
         restrictToConfigRoles: [

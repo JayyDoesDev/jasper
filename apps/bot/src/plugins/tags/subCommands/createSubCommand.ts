@@ -6,6 +6,7 @@ import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 
 export const CreateSubCommand = defineSubCommand({
+    deferral: { defer: false, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await interaction.showModal({
             components: [
@@ -95,7 +96,6 @@ export const CreateSubCommand = defineSubCommand({
         ConfigurationRoles.TagRoles,
     ],
 });
-
 export const commandOptions = {
     description: 'Create a tag!',
     name: CreateSubCommand.name,

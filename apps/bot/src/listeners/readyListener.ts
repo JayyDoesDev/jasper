@@ -1,5 +1,6 @@
 import { Context } from '../classes/context';
 import { defineEvent } from '../define';
+import { Options } from '../services/settingsService';
 import { cleanUpExpiredThreads, cleanUpInactiveThreads } from '../threadInactiveCheck';
 import { updateSubCountChannel } from '../youtube';
 
@@ -11,6 +12,13 @@ export default class ReadyListener extends Listener<'ready'> {
     }
 
     public execute(): void {
+        try {
+            for (const guild of this.ctx.guilds.cache.values()) {
+                this.ctx.services.settings
+                    .configure<Options>({ guildId: guild.id })
+                    .catch(() => {});
+            }
+        } catch {}
         if (this.ctx.env.get('sub_update') === '1') {
             updateSubCountChannel(this.ctx, this.ctx.env.get('youtube_id'));
         }

@@ -8,6 +8,8 @@ import { SetInactiveThreadOptions } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
 export const SetGraceTimeSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const graceTime = interaction.options.getNumber('minutes');
@@ -17,7 +19,7 @@ export const SetGraceTimeSubCommand = defineSubCommand({
             await ctx.services.settings.getInactiveThreads<Snowflake>(guildId);
 
         if (inactiveThreadSettings?.graceTime === graceTime) {
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Inactive Threads (support threads)',
@@ -34,7 +36,7 @@ export const SetGraceTimeSubCommand = defineSubCommand({
             guildId,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Inactive Threads (support threads)',

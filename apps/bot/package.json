@@ -5,6 +5,7 @@
         "build": "gulp js && tsc",
         "start": "node dist/index.js",
         "dev": "yarn pretty && yarn build && yarn eslint && node dist/index.js",
+        "dev-fast": "yarn build && node dist/index.js",
         "eslint": "eslint \"**/*.{ts,mjs,cjs}\" --fix",
         "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
         "builddocker": "docker build -t jasper .",

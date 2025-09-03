@@ -8,6 +8,8 @@ import { SetInactiveThreadOptions } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
 export const SetWarningTimeSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const warningTime = interaction.options.getNumber('minutes');
@@ -17,7 +19,7 @@ export const SetWarningTimeSubCommand = defineSubCommand({
             await ctx.services.settings.getInactiveThreads<Snowflake>(guildId);
 
         if (inactiveThreadSettings?.warningTime === warningTime) {
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Inactive Threads (support threads)',
@@ -34,7 +36,7 @@ export const SetWarningTimeSubCommand = defineSubCommand({
             warningTime,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Inactive Threads (support threads)',
