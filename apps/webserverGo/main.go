@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -21,7 +22,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.Use(middleware.AuthMiddleware)
-    r.Use(middleware.LoggingMiddleware)
+	r.Use(middleware.LoggingMiddleware)
 
 	r.HandleFunc("/youtube/{id}", routes_yt.ChannelInfoHandler).Methods("GET")
 	r.HandleFunc("/youtube/{id}/subscribers", routes_yt.SubscriberCountHandler).Methods("GET")
@@ -32,5 +33,5 @@ func main() {
 	r.HandleFunc("/fun/skullboard", routes_fun.SkullboardHandler).Methods("POST")
 
 	fmt.Println("Server is running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(os.Getenv("PORT"), r))
 }
