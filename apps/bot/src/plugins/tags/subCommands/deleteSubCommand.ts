@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
@@ -13,8 +13,6 @@ export const DeleteSubCommand = defineSubCommand({
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name', true);
-
-        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         ctx.services.tags.configure<Options>({ guildId, name });
         const isDeleted = await ctx.services.tags.deleteValue<Options, boolean>();
