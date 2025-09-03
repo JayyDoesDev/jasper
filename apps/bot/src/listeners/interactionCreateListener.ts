@@ -36,6 +36,7 @@ import {
 import { Options, Tag, TagResponse } from '../services/tagService';
 import { safeReply } from '../utils/interactionSafeguards';
 import { invalidateTagCache } from '../utils/tagCache';
+import { truncateForTextDisplay } from '../utils/text';
 
 import { Listener } from './listener';
 
@@ -574,13 +575,21 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                                 .setSpacing(SeparatorSpacingSize.Small)
                                 .setDivider(true),
                         )
-                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(pageContent))
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                truncateForTextDisplay(pageContent),
+                            ),
+                        )
                         .addSeparatorComponents(
                             new SeparatorBuilder()
                                 .setSpacing(SeparatorSpacingSize.Small)
                                 .setDivider(true),
                         )
-                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(footerText)),
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                truncateForTextDisplay(footerText),
+                            ),
+                        ),
                 ],
                 buttonIdPrefix: 'add_topic_subcommand_button',
                 currentPage: currentUserState.addTopicPages.page,
@@ -618,13 +627,21 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
                                 .setSpacing(SeparatorSpacingSize.Small)
                                 .setDivider(true),
                         )
-                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(pageContent))
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                truncateForTextDisplay(pageContent),
+                            ),
+                        )
                         .addSeparatorComponents(
                             new SeparatorBuilder()
                                 .setSpacing(SeparatorSpacingSize.Small)
                                 .setDivider(true),
                         )
-                        .addTextDisplayComponents(new TextDisplayBuilder().setContent(footerText)),
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(
+                                truncateForTextDisplay(footerText),
+                            ),
+                        ),
                 ],
                 buttonIdPrefix: 'add_action_subcommand_button',
                 currentPage: currentUserState.addActionPages.page,

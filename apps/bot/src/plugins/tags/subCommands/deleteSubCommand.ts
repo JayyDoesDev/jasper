@@ -25,7 +25,7 @@ export const DeleteSubCommand = defineSubCommand({
         // Invalidate cache after successful deletion
         invalidateTagCache(guildId);
 
-        await interaction.editReply('Tag deleted successfully.');
+        await interaction.editReply(`Tag \`${name}\` deleted successfully.`);
     },
     name: 'delete',
     restrictToConfigChannels: [ConfigurationChannels.AllowedTagChannels],
