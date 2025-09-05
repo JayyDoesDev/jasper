@@ -8,6 +8,8 @@ import { GuildSnowflake } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
 export const AddBulkDelChannelSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const channel = interaction.options.getChannel('channel')!;
@@ -19,7 +21,7 @@ export const AddBulkDelChannelSubCommand = defineSubCommand({
             await ctx.services.settings.getBulkDeleteLogging<Snowflake>(guildId);
 
         if (bulkDelSettings?.LogChannel === channel.id) {
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Bulk Delete Logging',
@@ -40,7 +42,7 @@ export const AddBulkDelChannelSubCommand = defineSubCommand({
 
         console.log('hi');
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Bulk Delete Logging',

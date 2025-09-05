@@ -14,11 +14,13 @@ export class Store extends Redis {
     constructor(protected context: Context) {
         super({
             host: context.env.get('redis_host'),
+            password: 'LenW6q9oXlekeSYm4OMUnHfuXEtTgacM',
             port: context.env.get('redis_port') as number,
             retryStrategy: (times) => {
                 console.error(`Redis retry attempt ${times}`);
                 return Math.min(times * 100, 3000);
             },
+            username: 'default',
         });
         this.ctx = context;
 

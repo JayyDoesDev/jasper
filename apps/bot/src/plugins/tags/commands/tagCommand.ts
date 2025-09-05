@@ -47,6 +47,7 @@ export = {
             options: subCommandOptions,
             type: ApplicationCommandType.CHAT_INPUT,
         },
+        deferral: { defer: true, ephemeral: false },
         on: async () => {},
         subCommands: {
             create: CreateSubCommand,

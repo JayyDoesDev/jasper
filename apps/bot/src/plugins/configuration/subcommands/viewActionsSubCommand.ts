@@ -18,6 +18,8 @@ import { defineSubCommand } from '../../../define';
 import { Options } from '../../../services/settingsService';
 
 export const ViewActionSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         await ctx.services.settings.configure<Options>({ guildId });
@@ -30,9 +32,8 @@ export const ViewActionSubCommand = defineSubCommand({
         const state = ctx.pagination.get(interaction.user.id);
 
         if (!state || !state.addActionPages) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Failed to initialize pagination state',
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -107,12 +108,12 @@ export const ViewActionSubCommand = defineSubCommand({
                 ),
         ];
 
-        await interaction.reply({
+        await interaction.editReply({
             components:
                 components.length > 0
                     ? [...viewActionsComponents, ...components]
                     : viewActionsComponents,
-            flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
+            flags: [MessageFlags.IsComponentsV2],
         });
     },
     name: 'view_actions',

@@ -37,6 +37,10 @@ export = {
             ],
             type: ApplicationCommandType.CHAT_INPUT,
         },
+        deferral: {
+            defer: true,
+            ephemeral: false,
+        },
         on: async (ctx, interaction) => {
             const originalQuestion: string = interaction.options.getString('original_question');
             const summarizedAnswer: string = interaction.options.getString('summarized_answer');
@@ -73,10 +77,9 @@ export = {
             const appliedTags = (interaction.channel as any).appliedTags;
             if (interaction.channel.type == ChannelType.PublicThread) {
                 if (appliedTags.length >= 5) {
-                    return interaction.reply({
+                    return interaction.editReply({
                         content:
                             'This thread already has 5 tags applied.\nPlease remove one tag before executing `/resolve` again!',
-                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -84,10 +87,9 @@ export = {
                 const { Channels } = await ctx.services.settings.getSettings();
                 const allowedTagChannels = Channels.AllowedTagChannels;
                 if (!allowedTagChannels.includes(interaction.channel.parentId)) {
-                    return interaction.reply({
+                    return interaction.editReply({
                         content:
                             'This thread is not in a tag channel. Please move this thread to a tag channel before executing `/resolve`!',
-                        flags: MessageFlags.Ephemeral,
                     });
                 }
 
@@ -102,7 +104,7 @@ export = {
                     ]);
                 }
 
-                await interaction.reply(finalReply);
+                await interaction.editReply(finalReply);
                 if (!interaction.channel.locked) {
                     await interaction.channel.setLocked(
                         true,
@@ -117,10 +119,9 @@ export = {
                 }
                 return;
             } else {
-                return interaction.reply({
+                return interaction.editReply({
                     content:
                         'Channel is not a thread. This command **must be** executed in Forum Posts!',
-                    flags: MessageFlags.Ephemeral,
                 });
             }
         },

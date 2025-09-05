@@ -1,32 +1,22 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 import { Emojis } from '../../../enums';
 import { Options, TagResponse } from '../../../services/tagService';
+import { handleTagAutocomplete } from '../../../utils/tagCache';
 
 export const InfoSubCommand = defineSubCommand({
-    autocomplete: async (ctx: Context, interaction) => {
-        const guildId = interaction.guildId!;
-        const query = interaction.options.getString('tag-name') || '';
-
-        const tags = await ctx.services.tags.getMultiValues<string, TagResponse[]>(guildId);
-        const filtered = tags
-            .filter((tag) => tag.TagName.toLowerCase().includes(query.toLowerCase()))
-            .slice(0, 25)
-            .map((tag) => ({ name: tag.TagName, value: tag.TagName }));
-
-        await interaction.respond(filtered);
+    autocomplete: handleTagAutocomplete,
+    deferral: {
+        defer: true,
+        ephemeral: true,
     },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const name = interaction.options.getString('tag-name');
-
-        if (!interaction.deferred) {
-            await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-        }
 
         ctx.services.tags.configure<Options>({ guildId, name });
         const tag = await ctx.services.tags.getValues<Options, TagResponse>();

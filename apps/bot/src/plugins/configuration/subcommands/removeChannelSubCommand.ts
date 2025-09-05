@@ -17,15 +17,16 @@ export const RemoveChannelSubCommand = defineSubCommand({
 
         await interaction.respond(filtered);
     },
+
+    deferral: { defer: true, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Channels'];
         const channel = interaction.options.getChannel('channel')!;
 
         if (!getChannelConfigurationContainer().includes(config)) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `The configuration **${config}** does not exist.`,
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -48,7 +49,7 @@ export const RemoveChannelSubCommand = defineSubCommand({
             );
             const description = updatedChannels.map((k) => `<#${k}>`).join(', ') || 'No channels';
 
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationUpdateEmbed({
                         configName: 'Channels',
@@ -62,7 +63,7 @@ export const RemoveChannelSubCommand = defineSubCommand({
 
         const description = channelExistsInDB.map((k) => `<#${k}>`).join(', ') || 'No channels';
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Channels',

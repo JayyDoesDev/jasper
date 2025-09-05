@@ -6,6 +6,7 @@ import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
 import { defineSubCommand } from '../../../define';
 
 export const EditSubCommand = defineSubCommand({
+    deferral: { defer: false, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await interaction.showModal({
             components: [

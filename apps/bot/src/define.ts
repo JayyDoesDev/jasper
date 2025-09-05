@@ -11,20 +11,33 @@ import {
 } from 'discord.js';
 
 import { Context } from './classes/context';
-import { ConfigurationChannels, ConfigurationRoles } from './container';
+import {
+    ConfigurationChannels,
+    configurationChannelsContainer,
+    ConfigurationRoles,
+    configurationRolesContainer,
+} from './container';
 import { withConfiguration } from './db';
 import { checkForRoles } from './roles';
+import { safeAutocompleteRespond, safeDeferReply, safeReply } from './utils/interactionSafeguards';
 
 export interface Command<
     Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
 > {
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => void;
     command: ICommand;
+    deferral?: DeferralOptions;
     on: (ctx: Context, interaction: Interaction) => void;
     permissions?: PermissionResolvable[] | PermissionsBitField[];
     restrictToConfigChannels?: ConfigurationChannels[];
     restrictToConfigRoles?: ConfigurationRoles[];
     subCommands?: { [key: string]: SubCommand };
+}
+
+// Deferral system types
+export interface DeferralOptions {
+    defer: boolean;
+    ephemeral: boolean;
 }
 
 export interface Event<
@@ -47,6 +60,7 @@ export type Plugin = {
 export interface SubCommand {
     allowedRoles?: Snowflake[];
     autocomplete?: (ctx: Context, interaction: AutocompleteInteraction) => Promise<void>;
+    deferral?: DeferralOptions;
     handler: (ctx: Context, interaction: ChatInputCommandInteraction) => Promise<void>;
     name: string;
     permissions?: PermissionResolvable[] | PermissionsBitField[];
@@ -57,7 +71,7 @@ export interface SubCommand {
 export const message = {
     content: "Sorry but you can't use this command.",
     flags: MessageFlags.Ephemeral,
-} as { content: string; flags: MessageFlags.Ephemeral };
+} as const;
 
 export function defineCommand<
     Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction,
@@ -71,10 +85,19 @@ export function defineCommand<
             if (interaction instanceof ChatInputCommandInteraction) {
                 const subCommandName = interaction.options.getSubcommand(false);
                 if (subCommandName && options.subCommands?.[subCommandName]) {
+                    // Only defer if subcommand requests deferral
+                    if (options.subCommands[subCommandName].deferral?.defer) {
+                        await handleInteractionDeferral(
+                            interaction,
+                            options.subCommands[subCommandName].deferral,
+                            `${interaction.commandName}/${subCommandName}`,
+                        );
+                    }
                     if (options.subCommands[subCommandName].permissions) {
                         for (const permission of options.subCommands[subCommandName].permissions) {
                             if (!interaction.memberPermissions.has(permission)) {
-                                return interaction.reply(message);
+                                await safeReply(interaction, message);
+                                return;
                             }
                         }
                     }
@@ -86,60 +109,190 @@ export function defineCommand<
                                 ...options.subCommands[subCommandName].allowedRoles,
                             )
                         ) {
-                            return interaction.reply(message);
+                            await safeReply(interaction, message);
+                            return;
+                        }
+                    }
+
+                    // Skip DB-backed configuration checks when subcommand needs immediate response (e.g., modal)
+                    let shouldSkipConfigChecks = false;
+                    if (options.subCommands[subCommandName].deferral?.defer === false) {
+                        try {
+                            const hasCachedGuild = await ctx.store.findGuild({
+                                guild: interaction.guild.id,
+                            });
+                            shouldSkipConfigChecks = !hasCachedGuild;
+                        } catch {
+                            shouldSkipConfigChecks = true;
                         }
                     }
 
                     if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
-                        const { noRolesNoConfig, noRolesWithConfig } = await withConfiguration(
-                            ctx,
-                            interaction,
-                            'roles',
-                            ...options.subCommands[subCommandName].restrictToConfigRoles,
-                        );
+                        const isModalFirst =
+                            options.subCommands[subCommandName].deferral?.defer === false;
+                        let handled = false;
+                        if (isModalFirst && !shouldSkipConfigChecks) {
+                            // Fast path using cached guild settings only
+                            try {
+                                const guildData: any = await ctx.store.getGuild({
+                                    guild: interaction.guild.id,
+                                });
+                                const roleConfigKeys = options.subCommands[
+                                    subCommandName
+                                ].restrictToConfigRoles
+                                    .map((req) => {
+                                        return (configurationRolesContainer.find(
+                                            (t) => t[0] === req,
+                                        ) || [null, null])[1];
+                                    })
+                                    .filter(Boolean) as string[];
+                                const configuredArrays = roleConfigKeys.map(
+                                    (k) => guildData?.GuildSettings?.Roles?.[k] ?? [],
+                                );
+                                const hasAnyConfigured = configuredArrays.some(
+                                    (arr: string[]) => arr.length > 0,
+                                );
+                                let allowed = false;
+                                for (const arr of configuredArrays) {
+                                    if (arr.length && checkForRoles(interaction, ...arr)) {
+                                        allowed = true;
+                                        break;
+                                    }
+                                }
 
-                        let configError = false;
-                        noRolesWithConfig(interaction, () => {
-                            configError = true;
-                        });
+                                if (!hasAnyConfigured) {
+                                    const content =
+                                        "Sorry but you can't use this command." +
+                                        ' Configuration of roles required. Please check with the server administrator.';
+                                    await safeReply(interaction, {
+                                        content,
+                                        flags: MessageFlags.Ephemeral,
+                                    });
+                                    return;
+                                }
 
-                        noRolesNoConfig(interaction, () => {
-                            message.content +=
-                                ' Configuration of roles required. Please check with the server administrator.';
-                            configError = true;
-                        });
+                                if (!allowed) {
+                                    await safeReply(interaction, message);
+                                    return;
+                                }
+                                handled = true;
+                            } catch {}
+                        }
 
-                        if (configError) {
-                            await interaction.reply(message);
-                            message.content = "Sorry but you can't use this command.";
-                            return;
+                        if (!handled && !shouldSkipConfigChecks) {
+                            const { noRolesNoConfig, noRolesWithConfig } = await withConfiguration(
+                                ctx,
+                                interaction,
+                                'roles',
+                                ...options.subCommands[subCommandName].restrictToConfigRoles,
+                            );
+
+                            let configError = false;
+                            let suffix = '';
+                            noRolesWithConfig(interaction, () => {
+                                configError = true;
+                            });
+
+                            noRolesNoConfig(interaction, () => {
+                                suffix =
+                                    ' Configuration of roles required. Please check with the server administrator.';
+                                configError = true;
+                            });
+
+                            if (configError) {
+                                const content = "Sorry but you can't use this command." + suffix;
+                                await safeReply(interaction, {
+                                    content,
+                                    flags: MessageFlags.Ephemeral,
+                                });
+                                return;
+                            }
                         }
                     }
 
                     if (options.subCommands[subCommandName].restrictToConfigChannels?.length) {
-                        const { noChannelsNoConfig, noChannelsWithConfig } =
-                            await withConfiguration(
-                                ctx,
-                                interaction,
-                                'channels',
-                                ...options.subCommands[subCommandName].restrictToConfigChannels,
-                            );
+                        const isModalFirst =
+                            options.subCommands[subCommandName].deferral?.defer === false;
+                        let handled = false;
+                        if (isModalFirst && !shouldSkipConfigChecks) {
+                            try {
+                                const guildData: any = await ctx.store.getGuild({
+                                    guild: interaction.guild.id,
+                                });
+                                const chanConfigKeys = options.subCommands[
+                                    subCommandName
+                                ].restrictToConfigChannels
+                                    .map((req) => {
+                                        return (configurationChannelsContainer.find(
+                                            (t) => t[0] === req,
+                                        ) || [null, null])[1];
+                                    })
+                                    .filter(Boolean) as string[];
+                                const configuredArrays = chanConfigKeys.map(
+                                    (k) => guildData?.GuildSettings?.Channels?.[k] ?? [],
+                                );
+                                const hasAnyConfigured = configuredArrays.some(
+                                    (arr: string[]) => arr.length > 0,
+                                );
+                                const channelIdToCheck = interaction.channel.isThread()
+                                    ? interaction.channel.parentId
+                                    : interaction.channel.id;
+                                let allowed = false;
+                                for (const arr of configuredArrays) {
+                                    if (arr.length && arr.includes(channelIdToCheck)) {
+                                        allowed = true;
+                                        break;
+                                    }
+                                }
 
-                        let configError = false;
-                        noChannelsWithConfig(interaction, () => {
-                            configError = true;
-                        });
+                                if (!hasAnyConfigured) {
+                                    const content =
+                                        "Sorry but you can't use this command." +
+                                        ' Configuration of channels required. Please check with the server administrator.';
+                                    await safeReply(interaction, {
+                                        content,
+                                        flags: MessageFlags.Ephemeral,
+                                    });
+                                    return;
+                                }
 
-                        noChannelsNoConfig(interaction, () => {
-                            message.content +=
-                                ' Configuration of channels required. Please check with the server administrator.';
-                            configError = true;
-                        });
+                                if (!allowed) {
+                                    await safeReply(interaction, message);
+                                    return;
+                                }
+                                handled = true;
+                            } catch {}
+                        }
 
-                        if (configError) {
-                            await interaction.reply(message);
-                            message.content = "Sorry but you can't use this command.";
-                            return;
+                        if (!handled && !shouldSkipConfigChecks) {
+                            const { noChannelsNoConfig, noChannelsWithConfig } =
+                                await withConfiguration(
+                                    ctx,
+                                    interaction,
+                                    'channels',
+                                    ...options.subCommands[subCommandName].restrictToConfigChannels,
+                                );
+
+                            let configError = false;
+                            let suffix = '';
+                            noChannelsWithConfig(interaction, () => {
+                                configError = true;
+                            });
+
+                            noChannelsNoConfig(interaction, () => {
+                                suffix =
+                                    ' Configuration of channels required. Please check with the server administrator.';
+                                configError = true;
+                            });
+
+                            if (configError) {
+                                const content = "Sorry but you can't use this command." + suffix;
+                                await safeReply(interaction, {
+                                    content,
+                                    flags: MessageFlags.Ephemeral,
+                                });
+                                return;
+                            }
                         }
                     }
 
@@ -152,59 +305,101 @@ export function defineCommand<
 
         if (originalAutocomplete) {
             options.autocomplete = async (ctx: Context, interaction: AutocompleteInteraction) => {
-                if (interaction.isAutocomplete()) {
-                    const subCommandName = interaction.options.getSubcommand(false);
-                    if (subCommandName && options.subCommands?.[subCommandName]?.autocomplete) {
-                        if (options.subCommands[subCommandName].permissions) {
-                            for (const permission of options.subCommands[subCommandName]
-                                .permissions) {
-                                if (!interaction.memberPermissions.has(permission)) {
-                                    await interaction.respond([]);
-                                    return;
-                                }
-                            }
+                if (!interaction.isAutocomplete()) return;
+
+                const subCommandName = interaction.options.getSubcommand(false);
+                if (!(subCommandName && options.subCommands?.[subCommandName]?.autocomplete)) {
+                    return originalAutocomplete(ctx, interaction);
+                }
+
+                if (options.subCommands[subCommandName].permissions) {
+                    for (const permission of options.subCommands[subCommandName].permissions) {
+                        if (!interaction.memberPermissions.has(permission)) {
+                            await safeAutocompleteRespond(interaction, []);
+                            return;
                         }
+                    }
+                }
 
-                        if (options.subCommands[subCommandName].allowedRoles) {
-                            if (
-                                !checkForRoles(
-                                    interaction,
-                                    ...options.subCommands[subCommandName].allowedRoles,
-                                )
-                            ) {
-                                await interaction.respond([]);
-                                return;
-                            }
-                        }
-
-                        if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
-                            const { noRolesNoConfig, noRolesWithConfig } = await withConfiguration(
-                                ctx,
-                                interaction,
-                                'roles',
-                                ...options.subCommands[subCommandName].restrictToConfigRoles,
-                            );
-
-                            let configError = false;
-                            noRolesWithConfig(interaction, () => {
-                                configError = true;
-                            });
-
-                            noRolesNoConfig(interaction, () => {
-                                configError = true;
-                            });
-
-                            if (configError) {
-                                await interaction.respond([]);
-                                return;
-                            }
-                        }
-
-                        await options.subCommands[subCommandName].autocomplete!(ctx, interaction);
+                if (options.subCommands[subCommandName].allowedRoles) {
+                    if (
+                        !checkForRoles(
+                            interaction,
+                            ...options.subCommands[subCommandName].allowedRoles,
+                        )
+                    ) {
+                        await safeAutocompleteRespond(interaction, []);
                         return;
                     }
-                    originalAutocomplete(ctx, interaction);
                 }
+
+                try {
+                    const guildData: any = await ctx.store.getGuild({
+                        guild: interaction.guild.id,
+                    });
+                    if (guildData) {
+                        if (options.subCommands[subCommandName].restrictToConfigRoles?.length) {
+                            const keys = options.subCommands[subCommandName].restrictToConfigRoles
+                                .map((req) => {
+                                    return (configurationRolesContainer.find(
+                                        (t) => t[0] === req,
+                                    ) || [null, null])[1];
+                                })
+                                .filter(Boolean) as string[];
+                            const configuredArrays = keys.map(
+                                (k) => guildData?.GuildSettings?.Roles?.[k] ?? [],
+                            );
+                            const hasAnyConfigured = configuredArrays.some(
+                                (arr: string[]) => arr.length > 0,
+                            );
+                            let allowed = false;
+                            for (const arr of configuredArrays) {
+                                if (arr.length && checkForRoles(interaction, ...arr)) {
+                                    allowed = true;
+                                    break;
+                                }
+                            }
+                            if (!hasAnyConfigured || !allowed) {
+                                await safeAutocompleteRespond(interaction, []);
+                                return;
+                            }
+                        }
+
+                        if (options.subCommands[subCommandName].restrictToConfigChannels?.length) {
+                            const keys = options.subCommands[
+                                subCommandName
+                            ].restrictToConfigChannels
+                                .map((req) => {
+                                    return (configurationChannelsContainer.find(
+                                        (t) => t[0] === req,
+                                    ) || [null, null])[1];
+                                })
+                                .filter(Boolean) as string[];
+                            const configuredArrays = keys.map(
+                                (k) => guildData?.GuildSettings?.Channels?.[k] ?? [],
+                            );
+                            const hasAnyConfigured = configuredArrays.some(
+                                (arr: string[]) => arr.length > 0,
+                            );
+                            const channelIdToCheck = interaction.channel.isThread()
+                                ? interaction.channel.parentId
+                                : interaction.channel.id;
+                            let allowed = false;
+                            for (const arr of configuredArrays) {
+                                if (arr.length && arr.includes(channelIdToCheck)) {
+                                    allowed = true;
+                                    break;
+                                }
+                            }
+                            if (!hasAnyConfigured || !allowed) {
+                                await safeAutocompleteRespond(interaction, []);
+                                return;
+                            }
+                        }
+                    }
+                } catch {}
+
+                await options.subCommands[subCommandName].autocomplete!(ctx, interaction);
             };
         }
     }
@@ -227,6 +422,26 @@ export function defineSubCommand(options: SubCommand): SubCommand {
         throw new Error('SubCommand must have name and handler');
     }
     return options;
+}
+
+export async function handleInteractionDeferral(
+    interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction,
+    deferralOptions: DeferralOptions | undefined,
+    commandName: string,
+): Promise<void> {
+    if (!deferralOptions?.defer) {
+        return;
+    }
+
+    if (interaction.replied || interaction.deferred) {
+        return;
+    }
+
+    try {
+        await safeDeferReply(interaction, { ephemeral: deferralOptions.ephemeral });
+    } catch (error) {
+        console.error(`[DEFERRAL] Failed to defer interaction for command: ${commandName}`, error);
+    }
 }
 
 function isCommand<Interaction extends ChatInputCommandInteraction | ContextMenuCommandInteraction>(

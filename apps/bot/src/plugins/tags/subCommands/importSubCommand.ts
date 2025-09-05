@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationChannels, ConfigurationRoles } from '../../../container';
@@ -22,11 +22,13 @@ function checkRequiredVariables(obj: unknown): obj is TagImportData {
 }
 
 export const ImportSubCommand = defineSubCommand({
+    deferral: {
+        defer: true,
+        ephemeral: true,
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guild.id;
         const jsonString = interaction.options.getString('json', true);
-
-        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
         let data: unknown;
         try {

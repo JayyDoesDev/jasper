@@ -16,15 +16,16 @@ export const RemoveUserSubCommand = defineSubCommand({
             .map((key) => ({ name: key as string, value: key as string }));
         await interaction.respond(filtered);
     },
+
+    deferral: { defer: true, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Users'];
         const user = interaction.options.getUser('user')!;
 
         if (!getUserConfigurationContainer().includes(config)) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `The configuration **${config}** does not exist.`,
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -43,7 +44,7 @@ export const RemoveUserSubCommand = defineSubCommand({
                 updatedUsers.map(async (k) => `${(await interaction.guild.members.fetch(k)).user}`),
             );
             const description = updatedUserNames.join(', ') || 'No users';
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationUpdateEmbed({
                         configName: 'Users',
@@ -60,7 +61,7 @@ export const RemoveUserSubCommand = defineSubCommand({
         );
         const description = userNames.join(', ') || 'No users';
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Users',

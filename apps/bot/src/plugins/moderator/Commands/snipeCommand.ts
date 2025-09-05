@@ -24,13 +24,13 @@ export = {
             options: [],
             type: ApplicationCommandType.CHAT_INPUT,
         },
+        deferral: { defer: true, ephemeral: false },
         on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             const snipe = ctx.snipe.get(interaction.channelId) as Message<true> | undefined;
 
             if (!snipe) {
-                return interaction.reply({
+                return interaction.editReply({
                     content: 'No message to snipe!',
-                    flags: MessageFlags.Ephemeral,
                 });
             }
 
@@ -126,7 +126,7 @@ export = {
 
             const components = [containerBuilder];
 
-            return interaction.reply({
+            return interaction.editReply({
                 components,
                 files: screenshotBuffer
                     ? [{ attachment: screenshotBuffer, name: 'screenshot.png' }]

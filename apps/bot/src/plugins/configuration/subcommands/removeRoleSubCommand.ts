@@ -17,15 +17,16 @@ export const RemoveRoleSubCommand = defineSubCommand({
 
         await interaction.respond(filtered);
     },
+
+    deferral: { defer: true, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Roles'];
         const role = interaction.options.getRole('role')!;
 
         if (!getRoleConfigurationContainer().includes(config)) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `The configuration **${config}** does not exist.`,
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -42,7 +43,7 @@ export const RemoveRoleSubCommand = defineSubCommand({
             const updatedRoles = await ctx.services.settings.getRoles<Snowflake>(guildId, config);
             const updatedRoleMentions = updatedRoles.map((roleId) => `<@&${roleId}>`);
             const description = updatedRoleMentions.join(', ') || 'No roles';
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationUpdateEmbed({
                         configName: 'Roles',
@@ -57,7 +58,7 @@ export const RemoveRoleSubCommand = defineSubCommand({
         const roleMentions = roleExistsInDB.map((roleId) => `<@&${roleId}>`);
         const description = roleMentions.join(', ') || 'No roles';
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Roles',

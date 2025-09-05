@@ -9,14 +9,15 @@ import { GuildSnowflake } from '../../../services/settingsService';
 import { Options } from '../../../services/tagService';
 
 export const SetSkullboardEmojiSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const emoji = interaction.options.getString('emoji')!;
 
         if (!validateEmoji(emoji)) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `The emoji **${emoji}** is not valid.`,
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -25,7 +26,7 @@ export const SetSkullboardEmojiSubCommand = defineSubCommand({
         const skullboardSettings = await ctx.services.settings.getSkullboard<Snowflake>(guildId);
 
         if (skullboardSettings?.SkullboardEmoji === emoji) {
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Skullboard',
@@ -42,7 +43,7 @@ export const SetSkullboardEmojiSubCommand = defineSubCommand({
             guildId,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Skullboard',

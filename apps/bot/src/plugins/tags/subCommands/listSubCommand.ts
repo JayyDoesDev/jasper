@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, Snowflake } from '@antibot/interactions';
-import { ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ComponentType } from 'discord.js';
 
 import { chunk } from '../../../array';
 import { Context } from '../../../classes/context';
@@ -10,6 +10,10 @@ import { TagResponse } from '../../../services/tagService';
 import { State } from '../../types';
 
 export const ListSubCommand = defineSubCommand({
+    deferral: {
+        defer: true,
+        ephemeral: true,
+    },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
 
@@ -18,9 +22,8 @@ export const ListSubCommand = defineSubCommand({
         );
 
         if (!tagsResponse || !Array.isArray(tagsResponse) || !tagsResponse.length) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'No tags found.',
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -44,14 +47,13 @@ export const ListSubCommand = defineSubCommand({
         const state = ctx.pagination.get(interaction.user.id);
 
         if (!state) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Failed to initialize pagination state',
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 {
                     components: [
@@ -97,7 +99,6 @@ export const ListSubCommand = defineSubCommand({
                     title: `Server Tag List`,
                 },
             ],
-            flags: MessageFlags.Ephemeral,
         });
     },
     name: 'list',

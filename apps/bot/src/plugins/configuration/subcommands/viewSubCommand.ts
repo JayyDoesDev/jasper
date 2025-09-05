@@ -49,6 +49,8 @@ const bool = (bool: boolean) => {
 };
 
 export const ViewChannelSubCommand = defineSubCommand({
+    deferral: { defer: true, ephemeral: true },
+
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         await ctx.services.settings.configure<Options>({ guildId: interaction.guildId! });
         const { Channels, InactiveThreads, Roles, Skullboard, Users } =
@@ -232,9 +234,9 @@ export const ViewChannelSubCommand = defineSubCommand({
                 ),
         ];
 
-        await interaction.reply({
+        await interaction.editReply({
             components: viewComponents,
-            flags: [MessageFlags.Ephemeral, MessageFlags.IsComponentsV2],
+            flags: [MessageFlags.IsComponentsV2],
         });
     },
     name: 'view',
