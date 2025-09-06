@@ -11,7 +11,7 @@ import { Options } from '../services/settingsService';
 
 import { Listener } from './listener';
 
-interface PlaywrightRenderRequest {
+interface WebserverRenderRequest {
     [key: string]: unknown;
     attachments?: null | string[];
     avatar: string;
@@ -114,7 +114,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                         return [channel.id, channel.name].join(':');
                     });
 
-                    const response = await this.ctx.webserver.request<PlaywrightRenderRequest>(
+                    const response = await this.ctx.webserver.request<WebserverRenderRequest>(
                         'POST',
                         '/fun/skullboard',
                         {

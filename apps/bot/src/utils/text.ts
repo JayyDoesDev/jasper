@@ -5,4 +5,3 @@ export function truncateForTextDisplay(text: string, max = 4000): string {
     const sliceLen = Math.max(0, max - 3);
     return text.slice(0, sliceLen) + '...';
 }
-
