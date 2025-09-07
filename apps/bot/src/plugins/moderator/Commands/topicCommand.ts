@@ -1,5 +1,5 @@
 import { ApplicationCommandType, PermissionsBitField } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { shuffle } from '../../../array';
 import { Context } from '../../../classes/context';
@@ -15,6 +15,10 @@ export = {
             options: [],
             type: ApplicationCommandType.CHAT_INPUT,
         },
+        deferral: {
+            defer: true,
+            ephemeral: true,
+        },
         on: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
             await ctx.services.settings.configure<Options>({ guildId: interaction.guildId });
             const { Text } = ctx.services.settings.getSettings();
@@ -26,14 +30,13 @@ export = {
 
             if (channel.isSendable()) {
                 channel.send({ content }).catch(() => {
-                    return interaction.reply({
+                    return interaction.editReply({
                         content: 'Failed to send the topic!',
-                        flags: MessageFlags.Ephemeral,
                     });
                 });
             }
 
-            return interaction.reply({ content: 'Topic sent!', flags: MessageFlags.Ephemeral });
+            return interaction.editReply({ content: 'Topic sent!' });
         },
         permissions: [PermissionsBitField.SendMessages],
         restrictToConfigRoles: [ConfigurationRoles.AdminRoles, ConfigurationRoles.StaffRoles],

@@ -17,15 +17,16 @@ export const AddChannelSubCommand = defineSubCommand({
 
         await interaction.respond(filtered);
     },
+
+    deferral: { defer: true, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const config = interaction.options.getString('config')! as keyof Settings['Channels'];
         const channel = interaction.options.getChannel('channel')!;
 
         if (!getChannelConfigurationContainer().includes(config)) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `The configuration **${config}** does not exist.`,
-                flags: MessageFlags.Ephemeral,
             });
             return;
         }
@@ -38,7 +39,7 @@ export const AddChannelSubCommand = defineSubCommand({
 
         if (channelExistsInDB.includes(channel.id)) {
             const description = channelExistsInDB.map((k) => `<#${k}>`).join(', ') || 'No channels';
-            await interaction.reply({
+            await interaction.editReply({
                 components: [
                     createConfigurationExistsEmbed({
                         configName: 'Channels',
@@ -59,7 +60,7 @@ export const AddChannelSubCommand = defineSubCommand({
         const updatedChannels = await ctx.services.settings.getChannels<Snowflake>(guildId, config);
         const description = updatedChannels.map((k) => `<#${k}>`).join(', ') || 'No channels';
 
-        await interaction.reply({
+        await interaction.editReply({
             components: [
                 createConfigurationUpdateEmbed({
                     configName: 'Channels',

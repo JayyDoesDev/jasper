@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from '@antibot/interactions';
-import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { defineSubCommand } from '../../../define';
@@ -17,6 +17,8 @@ export const RemoveActionSubCommand = defineSubCommand({
 
         await interaction.respond(filtered);
     },
+
+    deferral: { defer: true, ephemeral: true },
     handler: async (ctx: Context, interaction: ChatInputCommandInteraction) => {
         const guildId = interaction.guildId!;
         const input = interaction.options.getString('action')!;
@@ -31,9 +33,8 @@ export const RemoveActionSubCommand = defineSubCommand({
             action = input;
         } else {
             if (!actionsExistInDB[index - 1] || index <= 0 || index > actionsExistInDB.length) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `I couldn't find an action at index **${index}**`,
-                    flags: MessageFlags.Ephemeral,
                 });
                 return;
             }
@@ -45,9 +46,8 @@ export const RemoveActionSubCommand = defineSubCommand({
             values: action,
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             content: `I've removed **${action}** from the actions list.`,
-            flags: MessageFlags.Ephemeral,
         });
     },
 

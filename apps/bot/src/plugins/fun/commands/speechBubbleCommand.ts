@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ApplicationCommandType } from '@antibot/interactions';
-import { AttachmentBuilder, ChatInputCommandInteraction, MessageFlags } from 'discord.js';
+import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 
 import { Context } from '../../../classes/context';
 import { ConfigurationRoles } from '../../../container';
@@ -36,6 +36,7 @@ export = {
             ],
             type: ApplicationCommandType.CHAT_INPUT,
         },
+        deferral: { defer: true, ephemeral: false },
         on: async (ctx: Context, interaction) => {
             const image = interaction.options.getAttachment('image', true);
             const position = interaction.options.getString('position') ?? 'top';
@@ -43,15 +44,12 @@ export = {
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
             const contentType = image.contentType?.toLowerCase() ?? '';
             if (!allowedTypes.includes(contentType)) {
-                return interaction.reply({
+                return interaction.editReply({
                     content: 'Please upload a valid image (JPEG, PNG or WebP).',
-                    flags: MessageFlags.Ephemeral,
                 });
             }
 
             try {
-                await interaction.deferReply();
-
                 const response = await ctx.webserver.request(
                     'POST',
                     '/fun/speechbubble',
@@ -82,7 +80,7 @@ export = {
                     files: [attachment],
                 });
             } catch (error) {
-                console.error('Caption command error:', error);
+                console.error('[speechbubble] request failed:', error);
                 return interaction.editReply({
                     content: 'There was an error generating the caption.',
                 });
