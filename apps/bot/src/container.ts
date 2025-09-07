@@ -2,6 +2,7 @@ export enum ConfigurationChannels {
     AllowedTagChannels,
     AllowedSnipeChannels,
     AutomaticSlowmodeChannels,
+    AllowedSkullboardChannels,
 }
 
 export enum ConfigurationRoles {
@@ -32,6 +33,8 @@ export const configurationChannelsContainer = [
     [ConfigurationChannels.AllowedTagChannels, 'AllowedTagChannels'],
     [ConfigurationChannels.AllowedSnipeChannels, 'AllowedSnipeChannels'],
     [ConfigurationChannels.AutomaticSlowmodeChannels, 'AutomaticSlowmodeChannels'],
+    
+    [ConfigurationChannels.AllowedSkullboardChannels, 'AllowedSkullboardChannels'],
 ] as const;
 
 export const configurationUsersContainer = [

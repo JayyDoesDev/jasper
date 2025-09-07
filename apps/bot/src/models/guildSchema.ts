@@ -27,6 +27,7 @@ export type Settings = {
         LogChannel: Nullable<Snowflake>;
     };
     Channels: {
+        AllowedSkullboardChannels: Snowflake[];
         AllowedSnipeChannels: Snowflake[];
         AllowedTagChannels: Snowflake[];
         AutomaticSlowmodeChannels: Snowflake[];
