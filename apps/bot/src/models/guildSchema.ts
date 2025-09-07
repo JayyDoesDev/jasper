@@ -86,6 +86,7 @@ export default model<GuildDocument>(
                     LogChannel: { default: null, type: String },
                 },
                 Channels: {
+                    AllowedSkullboardChannels: { default: [], type: [] },
                     AllowedSnipeChannels: { default: [], type: [] },
                     AllowedTagChannels: { default: [], type: [] },
                     AutomaticSlowmodeChannels: { default: [], type: [] },

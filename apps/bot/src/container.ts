@@ -33,7 +33,6 @@ export const configurationChannelsContainer = [
     [ConfigurationChannels.AllowedTagChannels, 'AllowedTagChannels'],
     [ConfigurationChannels.AllowedSnipeChannels, 'AllowedSnipeChannels'],
     [ConfigurationChannels.AutomaticSlowmodeChannels, 'AutomaticSlowmodeChannels'],
-    
     [ConfigurationChannels.AllowedSkullboardChannels, 'AllowedSkullboardChannels'],
 ] as const;
 
