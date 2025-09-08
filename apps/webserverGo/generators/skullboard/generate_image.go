@@ -53,56 +53,27 @@ func replaceMentionsFromMessageContent(content string, mentions []string) string
 }
 
 func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
-	width := 800
+	width := 800 
     height := 0
 
 	tempDC := gg.NewContext(10000, 10000)
 	tempDC.SetFontFace(font)
 
-	lines := tempDC.WordWrap(replaceMentionsFromMessageContent(data.Content, data.Mentions), float64(width))
-
-	longestLineWidth := 0.0
-	for _, line := range lines {
-		w, _ := tempDC.MeasureString(line)
-		if w > longestLineWidth {
-			longestLineWidth = w
-		}
-	}
-
-	width = int(longestLineWidth) + padding*2 + pfpSize + textMargin
-
 	messageMaxWidth := float64(width - padding*2 - pfpSize - textMargin)
-	lines = tempDC.WordWrap(data.Content, messageMaxWidth)
+	lines := tempDC.WordWrap(replaceMentionsFromMessageContent(data.Content, data.Mentions), messageMaxWidth)
 	messageHeight := float64(len(lines)) * lineHeight
     height = int(messageHeight + padding*2)
 
+
 	usernameHeight := fontSize + 2
-	usernameLength, _ := tempDC.MeasureString(data.Username)
-	timestampLength, _ := tempDC.MeasureString(data.Timestamp)
-	if data.RoleIconURL != "" {
-		usernameLength += 25 + 10
-	}
-	if messageBoxX + usernameLength + timestampLength + pfpSize > float64(width) {
-		width = int(messageBoxX + usernameLength + timestampLength + pfpSize)
-	}
 	height += usernameHeight
 
+    // Add reply height if present
     if data.ReplyContent != "" {
-        height += 50.0
-        replyIconWidth := float64(104 * 40 / 54)
-        replyAvatarWidth := 35.0
-        replyUsernameWidth, _ := tempDC.MeasureString(data.ReplyUsername)
-        replyContentWidth, _ := tempDC.MeasureString(data.ReplyContent)
-        replyTotalWidth := replyIconWidth + replyAvatarWidth + replyUsernameWidth + replyContentWidth + messageBoxX
-        if replyTotalWidth > float64(width) {
-            width = int(replyTotalWidth)
-        }
+        height += 50
     }
 
-    if width > 800 {
-        width = 800
-    }
-
+	// Add attachment heights
 	if len(data.Attachments) > 0 {
 		for _, attachmentURL := range data.Attachments {
 			attachmentImage, err := utils.LoadImageFromURL(attachmentURL)
@@ -110,23 +81,24 @@ func calculateWidthHeight(font font.Face, data MessageData) (int, int, error) {
 				slog.Error("Failed to load attachment image", "url", attachmentURL, "error", err)
 				return 0, 0, err
 			}
+			
+			// Scale attachment to fit within available width if necessary
 			attachmentWidth := attachmentImage.Bounds().Dx()
 			attachmentHeight := attachmentImage.Bounds().Dy()
-			height += attachmentHeight + 20
-
-			attachmentTotalWidth := attachmentWidth + int(messageBoxX)
-			if attachmentTotalWidth > width {
-				width = attachmentTotalWidth
+			
+			maxAttachmentWidth := width - int(messageBoxX)
+			if attachmentWidth > maxAttachmentWidth {
+				// Scale down proportionally
+				scale := float64(maxAttachmentWidth) / float64(attachmentWidth)
+				attachmentHeight = int(float64(attachmentHeight) * scale)
 			}
+			
+			height += attachmentHeight + 20
 		}
 	}
 
-	totalWidth := int(width)
-	totalHeight := int(height)
-
-	return totalWidth, totalHeight, nil
+	return width, height, nil
 }
-
 
 func GenerateDiscordMessage(data MessageData) (image.Image, error) {
 	font, err := utils.LoadFont("./fonts/Roboto-Regular.ttf", fontSize)
