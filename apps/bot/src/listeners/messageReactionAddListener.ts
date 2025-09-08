@@ -296,7 +296,7 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                                     .setDivider(true),
                             )
                             .addTextDisplayComponents(
-                                new TextDisplayBuilder().setContent(` ${message.content}`),
+                                new TextDisplayBuilder().setContent(`> ${message.content}`),
                             )
                             .addSectionComponents(
                                 new SectionBuilder()
