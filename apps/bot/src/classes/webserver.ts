@@ -33,7 +33,7 @@ export default class WebServer {
         body?: Body,
         raw?: boolean,
     ): Promise<any> {
-        const response = await fetch(`${this.ctx.env.get('jasper_api_url')}${route}`, {
+        const response = await fetch(`http://${this.ctx.env.get('jasper_api_url')}${route}`, {
             body: body ? JSON.stringify(body) : undefined,
             headers: {
                 'Content-Type': 'application/json',

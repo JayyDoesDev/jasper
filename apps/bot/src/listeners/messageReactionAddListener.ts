@@ -35,8 +35,15 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
         try {
             const guildId = reaction.message.guildId!;
             await this.ctx.services.settings.configure<Options>({ guildId });
-            const { Skullboard } = this.ctx.services.settings.getSettings();
+            const { Channels, Skullboard } = this.ctx.services.settings.getSettings();
             const skulledService = this.ctx.services.skulledMessages.configure({ guildId });
+
+            if (
+                !Channels?.AllowedSkullboardChannels ||
+                !Channels.AllowedSkullboardChannels.includes(reaction.message.channel.id)
+            ) {
+                return;
+            }
 
             const isNewSkulledMessage = await skulledService.add(reaction.message.id);
             if (!isNewSkulledMessage) return;

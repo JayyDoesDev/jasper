@@ -67,6 +67,7 @@ class SettingsService extends Service {
                 LogChannel: null,
             },
             Channels: {
+                AllowedSkullboardChannels: [],
                 AllowedSnipeChannels: [],
                 AllowedTagChannels: [],
                 AutomaticSlowmodeChannels: [],
@@ -121,6 +122,7 @@ class SettingsService extends Service {
                 LogChannel: BulkDeleteLogging.LogChannel,
             },
             Channels: {
+                AllowedSkullboardChannels: Channels.AllowedSkullboardChannels,
                 AllowedSnipeChannels: Channels.AllowedSnipeChannels,
                 AllowedTagChannels: Channels.AllowedTagChannels,
                 AutomaticSlowmodeChannels: Channels.AutomaticSlowmodeChannels,

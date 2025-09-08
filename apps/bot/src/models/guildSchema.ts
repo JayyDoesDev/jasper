@@ -27,6 +27,7 @@ export type Settings = {
         LogChannel: Nullable<Snowflake>;
     };
     Channels: {
+        AllowedSkullboardChannels: Snowflake[];
         AllowedSnipeChannels: Snowflake[];
         AllowedTagChannels: Snowflake[];
         AutomaticSlowmodeChannels: Snowflake[];
@@ -85,6 +86,7 @@ export default model<GuildDocument>(
                     LogChannel: { default: null, type: String },
                 },
                 Channels: {
+                    AllowedSkullboardChannels: { default: [], type: [] },
                     AllowedSnipeChannels: { default: [], type: [] },
                     AllowedTagChannels: { default: [], type: [] },
                     AutomaticSlowmodeChannels: { default: [], type: [] },
