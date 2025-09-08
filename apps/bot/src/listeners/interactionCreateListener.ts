@@ -554,7 +554,7 @@ export default class InteractionCreateListener extends Listener<'interactionCrea
         const currentUserState = this.ctx.pagination.get(author);
         if (!currentUserState) return;
 
-        if (interaction.customId.startsWith('add_topics_subcommand_button')) {
+        if (interaction.customId.startsWith('add_topic_subcommand_button')) {
             const newTopicPage = await handlePagination({
                 buildContainer: (pageContent, footerText) => [
                     new ContainerBuilder()
