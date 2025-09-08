@@ -43,7 +43,7 @@ async function main() {
             }),
         );
 
-        mongoose.connect(ctx.env.get('db'));
+        mongoose.connect(ctx.env.get('db'), { maxPoolSize: 10 });
 
         mongoose.connection.on('connected', () => {
             console.log('Database connected');
