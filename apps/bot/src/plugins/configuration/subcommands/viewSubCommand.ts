@@ -92,6 +92,15 @@ export const ViewChannelSubCommand = defineSubCommand({
                                         isUser: false,
                                     },
                                 ),
+                                createField(
+                                    'Allowed Skullboard Channels',
+                                    Channels.AllowedSkullboardChannels,
+                                    {
+                                        isChannel: true,
+                                        isRole: false,
+                                        isUser: false,
+                                    },
+                                ),
                             ],
                             false,
                         ),

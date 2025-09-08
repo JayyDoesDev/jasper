@@ -63,6 +63,7 @@ Configure these variables in your `.env` file:
 | `YOUTUBE_API_KEY_1` | Primary YouTube Data API key | ✅ Yes (for Subscriber Counter Functionality) |
 | `YOUTUBE_API_KEY_2` | Secondary YouTube Data API key (optional backup) | ❌ No |
 | `YOUTUBE_API_KEY_3` | Tertiary YouTube Data API key (optional backup) | ❌ No |
+| `PORT` | Port for the server to listen on | ✅ Yes |
 
 **Note**: You need at least one YouTube API key for YouTube-related endpoints to work. Multiple keys provide redundancy and help avoid rate limiting.
 

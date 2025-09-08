@@ -32,6 +32,6 @@ func main() {
 	r.HandleFunc("/fun/speechbubble", routes_fun.BubbleHandler).Methods("POST")
 	r.HandleFunc("/fun/skullboard", routes_fun.SkullboardHandler).Methods("POST")
 
-	fmt.Println("Server is running on :8080")
+	fmt.Println("Server is running on " + os.Getenv("PORT"))
 	log.Fatal(http.ListenAndServe(os.Getenv("PORT"), r))
 }
