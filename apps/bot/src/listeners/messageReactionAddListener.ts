@@ -1,8 +1,21 @@
 import {
     AttachmentBuilder,
+    MessageFlags,
     MessageReaction,
     PartialMessageReaction,
     TextChannel,
+} from 'discord.js';
+import {
+    ButtonBuilder,
+    ButtonStyle,
+    ContainerBuilder,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
+    SectionBuilder,
+    SeparatorBuilder,
+    SeparatorSpacingSize,
+    TextDisplayBuilder,
+    ThumbnailBuilder,
 } from 'discord.js';
 
 import { Context } from '../classes/context';
@@ -180,65 +193,139 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
                     const attachment = new AttachmentBuilder(imageBuffer, {
                         name: 'screenshot.png',
                     });
-                    await skullboardChannel.send({
-                        embeds: [
-                            {
-                                color: global.embedColor,
-                                fields: [
-                                    {
-                                        inline: true,
-                                        name: 'Author',
-                                        value: `<@${message.author?.id}>`,
-                                    },
-                                    {
-                                        inline: true,
-                                        name: 'Channel',
-                                        value: `<#${message.channel.id}>`,
-                                    },
-                                    {
-                                        inline: true,
-                                        name: 'Message Link',
-                                        value: `[Jump to message](https://discord.com/channels/${message.guildId}/${message.channel.id}/${message.id})`,
-                                    },
-                                ],
-                                image: {
-                                    url: 'attachment://screenshot.png',
-                                },
-                                timestamp: new Date().toISOString(),
-                                title: `${message.author?.username} (${message.author?.id})`,
-                            },
-                        ],
-                        files: [attachment],
-                    });
+
+                    const components = [
+                        new ContainerBuilder()
+                            .addSectionComponents(
+                                new SectionBuilder()
+                                    .setThumbnailAccessory(
+                                        new ThumbnailBuilder().setURL(
+                                            member.user.displayAvatarURL({
+                                                forceStatic: true,
+                                                size: 1024,
+                                            }),
+                                        ),
+                                    )
+                                    .addTextDisplayComponents(
+                                        new TextDisplayBuilder().setContent(
+                                            `### **Author:** <@${message.author?.id}>`,
+                                        ),
+                                        new TextDisplayBuilder().setContent(
+                                            `### **ID:** \`${message.author?.id}\``,
+                                        ),
+                                    ),
+                            )
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder().setContent(
+                                    `### **Channel:** <#${message.channel.id}>`,
+                                ),
+                            )
+                            .addSeparatorComponents(
+                                new SeparatorBuilder()
+                                    .setSpacing(SeparatorSpacingSize.Large)
+                                    .setDivider(true),
+                            )
+                            .addMediaGalleryComponents(
+                                new MediaGalleryBuilder().addItems(
+                                    new MediaGalleryItemBuilder().setURL(
+                                        'attachment://screenshot.png',
+                                    ),
+                                ),
+                            )
+                            .addSectionComponents(
+                                new SectionBuilder()
+                                    .setButtonAccessory(
+                                        new ButtonBuilder()
+                                            .setStyle(ButtonStyle.Link)
+                                            .setLabel('Jump to Message')
+                                            .setURL(
+                                                `https://discord.com/channels/${message.guildId}/${message.channel.id}/${message.id}`,
+                                            ),
+                                    )
+                                    .addTextDisplayComponents(
+                                        new TextDisplayBuilder().setContent(
+                                            `-# <t:${Math.floor(message.createdTimestamp / 1000)}:R>`,
+                                        ),
+                                    ),
+                            ),
+                    ];
+
+                    await skullboardChannel
+                        .send({
+                            allowedMentions: { parse: [], roles: [], users: [] },
+                            components,
+                            content: '',
+                            files: [attachment],
+                            flags: MessageFlags.IsComponentsV2,
+                        })
+                        .then(async (skullboardMsg) => {
+                            await skullboardMsg.react(Skullboard.SkullboardEmoji);
+                        });
                 } catch (error) {
                     console.error('Error generating message image:', error);
-                    await skullboardChannel.send({
-                        embeds: [
-                            {
-                                color: global.embedColor,
-                                description: `${message.content}`,
-                                fields: [
-                                    {
-                                        inline: true,
-                                        name: 'Author',
-                                        value: `<@${message.author?.id}>`,
-                                    },
-                                    {
-                                        inline: true,
-                                        name: 'Channel',
-                                        value: `<#${message.channel.id}>`,
-                                    },
-                                    {
-                                        inline: true,
-                                        name: 'Message Link',
-                                        value: `[Jump to message](https://discord.com/channels/${message.guildId}/${message.channel.id}/${message.id})`,
-                                    },
-                                ],
-                                timestamp: new Date().toISOString(),
-                                title: `${message.author?.username} (${message.author?.id})`,
-                            },
-                        ],
-                    });
+
+                    const components = [
+                        new ContainerBuilder()
+                            .addSectionComponents(
+                                new SectionBuilder()
+                                    .setThumbnailAccessory(
+                                        new ThumbnailBuilder().setURL(
+                                            member.user.displayAvatarURL({
+                                                forceStatic: true,
+                                                size: 1024,
+                                            }),
+                                        ),
+                                    )
+                                    .addTextDisplayComponents(
+                                        new TextDisplayBuilder().setContent(
+                                            `### **Author:** <@${message.author?.id}>`,
+                                        ),
+                                        new TextDisplayBuilder().setContent(
+                                            `### **ID:** \`${message.author?.id}\``,
+                                        ),
+                                    ),
+                            )
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder().setContent(
+                                    `### **Channel:** <#${message.channel.id}>`,
+                                ),
+                            )
+                            .addSeparatorComponents(
+                                new SeparatorBuilder()
+                                    .setSpacing(SeparatorSpacingSize.Large)
+                                    .setDivider(true),
+                            )
+                            .addTextDisplayComponents(
+                                new TextDisplayBuilder().setContent(`> ${message.content}`),
+                            )
+                            .addSectionComponents(
+                                new SectionBuilder()
+                                    .setButtonAccessory(
+                                        new ButtonBuilder()
+                                            .setStyle(ButtonStyle.Link)
+                                            .setLabel('Jump to Message')
+                                            .setURL(
+                                                `https://discord.com/channels/${message.guildId}/${message.channel.id}/${message.id}`,
+                                            ),
+                                    )
+                                    .addTextDisplayComponents(
+                                        new TextDisplayBuilder().setContent(
+                                            `-# <t:${Math.floor(message.createdTimestamp / 1000)}:R>`,
+                                        ),
+                                    ),
+                            ),
+                    ];
+
+                    await skullboardChannel
+                        .send({
+                            allowedMentions: { parse: [], roles: [], users: [] },
+                            components,
+                            content: '',
+                            flags: MessageFlags.IsComponentsV2,
+                        })
+                        .then(async (skullboardMsg) => {
+                            await skullboardMsg.react(Skullboard.SkullboardEmoji);
+                        });
                 }
             }
         } catch (error) {
