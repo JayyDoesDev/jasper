@@ -14,7 +14,6 @@ import {
     configurationRolesContainer,
 } from './container';
 import GuildSchema from './models/guildSchema';
-import UserSchema from './models/userSchema';
 import { checkForRoles } from './roles';
 import { Options } from './services/settingsService';
 
@@ -92,10 +91,6 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
 
 export async function guildExists(guildId: Snowflake): Promise<boolean> {
     return (await GuildSchema.findOne({ _id: guildId })) ? true : false;
-}
-
-export async function userExists(userId: Snowflake): Promise<boolean> {
-    return (await UserSchema.findOne({ _id: userId })) ? true : false;
 }
 
 export async function withConfiguration<

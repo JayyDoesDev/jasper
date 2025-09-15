@@ -75,7 +75,7 @@ export type Tag = {
 };
 
 export default model<GuildDocument>(
-    'support-tags',
+    'settings',
     new Schema(
         {
             _id: String,
