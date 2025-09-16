@@ -126,23 +126,24 @@ export class SQLiteAdapter implements DatabaseAdapter {
         let sql = 'SELECT * FROM guilds';
         const params: any[] = [];
 
-        if (query.$or) {
+        const queryObj = query as Record<string, any>;
+        if ('$or' in queryObj && queryObj.$or) {
             // Handle $or queries (used in migrations)
-            const conditions = query.$or.map(() => this.buildCondition(params)).join(' OR ');
+            const conditions = queryObj.$or.map(() => this.buildCondition(params)).join(' OR ');
             sql += ` WHERE ${conditions}`;
-        } else if (query._id) {
+        } else if ('_id' in queryObj && queryObj._id) {
             sql += ' WHERE id = ?';
-            params.push(query._id);
+            params.push(queryObj._id);
         }
 
         const stmt = this.db.prepare(sql);
         const rows = stmt.all(...params);
         const guilds = rows.map(row => this.rowToGuildDocument(row));
 
-        if (query.$or) {
+        if ('$or' in queryObj && queryObj.$or) {
             // Filter results based on the $or conditions
             return guilds.filter(guild => {
-                return query.$or.some((condition: any) => this.matchesCondition(guild, condition));
+                return queryObj.$or.some((condition: any) => this.matchesCondition(guild, condition));
             }) as T;
         }
 
@@ -160,14 +161,15 @@ export class SQLiteAdapter implements DatabaseAdapter {
             if (key.includes('.')) {
                 const nestedValue = this.getNestedValue(guild, key);
                 if (value && typeof value === 'object') {
-                    if (value.$exists !== undefined) {
+                    const operators = value as Record<string, any>;
+                    if ('$exists' in operators) {
                         const exists = nestedValue !== undefined && nestedValue !== null;
-                        if (exists !== value.$exists) return false;
+                        if (exists !== operators.$exists) return false;
                     }
-                    if (value.$eq !== undefined && nestedValue !== value.$eq) return false;
-                    if (value.$size !== undefined) {
-                        if (!Array.isArray(nestedValue)) return value.$size === 0;
-                        if (nestedValue.length !== value.$size) return false;
+                    if ('$eq' in operators && nestedValue !== operators.$eq) return false;
+                    if ('$size' in operators) {
+                        if (!Array.isArray(nestedValue)) return operators.$size === 0;
+                        if (nestedValue.length !== operators.$size) return false;
                     }
                 } else if (nestedValue !== value) {
                     return false;
@@ -187,8 +189,9 @@ export class SQLiteAdapter implements DatabaseAdapter {
 
         if (Array.isArray(guilds)) {
             for (const guild of guilds) {
-                if (update.$set) {
-                    for (const [key, value] of Object.entries(update.$set)) {
+                const updateOperators = update as Record<string, any>;
+                if ('$set' in updateOperators && updateOperators.$set) {
+                    for (const [key, value] of Object.entries(updateOperators.$set)) {
                         this.setNestedValue(guild, key, value);
                     }
                     await this.upsertGuild(guild);

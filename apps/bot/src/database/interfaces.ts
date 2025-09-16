@@ -12,6 +12,29 @@ export interface DatabaseConfig {
 }
 
 /**
+ * MongoDB-style query operators for compatibility
+ */
+export interface QueryOperators {
+    $exists?: boolean;
+    $eq?: any;
+    $size?: number;
+}
+
+/**
+ * MongoDB-style query conditions
+ */
+export interface QueryCondition {
+    [key: string]: any | QueryOperators;
+}
+
+/**
+ * MongoDB-style update operators
+ */
+export interface UpdateOperators {
+    $set?: Record<string, any>;
+}
+
+/**
  * Core database operations interface
  */
 export interface DatabaseAdapter {

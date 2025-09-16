@@ -99,14 +99,15 @@ export class JsonAdapter implements DatabaseAdapter {
         // Simple query implementation for JSON
         const guilds = Object.values(this.data.guilds);
         
-        if (query.$or) {
+        const queryObj = query as Record<string, any>;
+        if ('$or' in queryObj && queryObj.$or) {
             // Handle $or queries (used in migrations)
             return guilds.filter(guild => {
-                return query.$or.some((condition: any) => this.matchesCondition(guild, condition));
+                return queryObj.$or.some((condition: any) => this.matchesCondition(guild, condition));
             }) as T;
         }
         
-        return guilds.filter(guild => this.matchesQuery(guild, query)) as T;
+        return guilds.filter(guild => this.matchesQuery(guild, queryObj)) as T;
     }
 
     private matchesCondition(guild: any, condition: any): boolean {
@@ -114,14 +115,15 @@ export class JsonAdapter implements DatabaseAdapter {
             if (key.includes('.')) {
                 const nestedValue = this.getNestedValue(guild, key);
                 if (value && typeof value === 'object') {
-                    if (value.$exists !== undefined) {
+                    const operators = value as Record<string, any>;
+                    if ('$exists' in operators) {
                         const exists = nestedValue !== undefined && nestedValue !== null;
-                        if (exists !== value.$exists) return false;
+                        if (exists !== operators.$exists) return false;
                     }
-                    if (value.$eq !== undefined && nestedValue !== value.$eq) return false;
-                    if (value.$size !== undefined) {
-                        if (!Array.isArray(nestedValue)) return value.$size === 0;
-                        if (nestedValue.length !== value.$size) return false;
+                    if ('$eq' in operators && nestedValue !== operators.$eq) return false;
+                    if ('$size' in operators) {
+                        if (!Array.isArray(nestedValue)) return operators.$size === 0;
+                        if (nestedValue.length !== operators.$size) return false;
                     }
                 } else if (nestedValue !== value) {
                     return false;
@@ -149,8 +151,9 @@ export class JsonAdapter implements DatabaseAdapter {
 
         if (Array.isArray(guilds)) {
             for (const guild of guilds) {
-                if (update.$set) {
-                    for (const [key, value] of Object.entries(update.$set)) {
+                const updateOperators = update as Record<string, any>;
+                if ('$set' in updateOperators && updateOperators.$set) {
+                    for (const [key, value] of Object.entries(updateOperators.$set)) {
                         this.setNestedValue(guild, key, value);
                     }
                     this.data.guilds[guild._id] = guild;
