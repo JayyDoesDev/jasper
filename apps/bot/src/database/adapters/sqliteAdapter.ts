@@ -165,7 +165,10 @@ export class SQLiteAdapter implements DatabaseAdapter {
                         if (exists !== value.$exists) return false;
                     }
                     if (value.$eq !== undefined && nestedValue !== value.$eq) return false;
-                    if (value.$size !== undefined && (!Array.isArray(nestedValue) || nestedValue.length !== value.$size)) return false;
+                    if (value.$size !== undefined) {
+                        if (!Array.isArray(nestedValue)) return value.$size === 0;
+                        if (nestedValue.length !== value.$size) return false;
+                    }
                 } else if (nestedValue !== value) {
                     return false;
                 }

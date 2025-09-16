@@ -67,13 +67,33 @@ Create a `.env` file in the root directory with these required environment varia
 BOTID=
 PUBLICKEY=
 TOKEN=
+# Database Configuration - Choose your backend
+DATABASE_TYPE=mongodb # Options: mongodb, sqlite, json
+# For MongoDB (default):
 MONGODB=
+# For SQLite/JSON file storage:
+DATABASE_PATH=./data/jasper.db
 PREFIX=
 GUILD_ONLY_COMMANDS=1 # 1 = true 0 = false
 GUILD_ONLY_COMMANDS_GUILD_ID=
 REDISHOST=
 REDISPORT=
 ```
+
+##### Database Configuration
+
+Jasper supports three database backends:
+
+- **MongoDB** (default): Best for production deployments
+- **SQLite**: Great for development and single-server deployments  
+- **JSON**: Simple file-based storage for development/testing
+
+See [`DATABASE_CONFIGURATION.md`](apps/bot/DATABASE_CONFIGURATION.md) for detailed configuration instructions.
+
+Examples:
+- MongoDB: [`examples/mongodb.env`](apps/bot/examples/mongodb.env)
+- SQLite: [`examples/sqlite.env`](apps/bot/examples/sqlite.env)
+- JSON: [`examples/json.env`](apps/bot/examples/json.env)
 
 #### Optional Features
 

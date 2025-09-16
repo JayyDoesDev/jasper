@@ -10,6 +10,12 @@ dist
 temp/cache/
 latestthread.json
 latestvideo.json
+
+# Database files
+data/
+*.db
+*.sqlite
+*.sqlite3
 # User-specific files
 *.rsuser
 *.suo
