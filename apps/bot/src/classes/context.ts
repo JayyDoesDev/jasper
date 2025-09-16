@@ -97,6 +97,8 @@ export class Context extends Client {
             { aliases: ['public_key', 'publickey'], env: 'PUBLICKEY' },
             { aliases: ['botToken', 'token', 'bot'], env: 'TOKEN' },
             { aliases: ['db'], env: 'MONGODB' },
+            { aliases: ['db_type', 'database_type'], env: 'DATABASE_TYPE', default: 'mongodb' },
+            { aliases: ['db_path', 'database_path'], env: 'DATABASE_PATH' },
             { aliases: ['prefix'], env: 'PREFIX' },
             { aliases: ['guild_only_commands', 'guild_only'], env: 'GUILD_ONLY_COMMANDS' },
             {

@@ -16,6 +16,7 @@ import {
 import GuildSchema from './models/guildSchema';
 import { checkForRoles } from './roles';
 import { Options } from './services/settingsService';
+import { getDatabase } from './database/connection';
 
 type ConfigReturn<Interaction, Key extends 'channels' | 'roles'> = Key extends 'roles'
     ? ConfigurationRoleFunctions<Interaction>
@@ -36,19 +37,31 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
 
     if (!guildInCache) {
         try {
-            const guildInDb = await GuildSchema.findOne({ _id: guildId });
+            const database = getDatabase();
+            const guildInDb = await database.findGuild(guildId);
 
             if (guildInDb) {
                 ctx.store.setForeignKey({ guild: guildId }, guildInDb);
                 return <R>guildInDb;
             } else {
-                const newGuild = new GuildSchema({
+                const newGuild = {
                     _id: guildId,
                     GuildSettings: {
+                        BulkDeleteLogging: {
+                            BulkDelLoggingBoolean: false,
+                            IgnoredLoggingChannels: [],
+                            LogChannel: null,
+                        },
                         Channels: {
+                            AllowedSkullboardChannels: [],
                             AllowedSnipeChannels: [],
                             AllowedTagChannels: [],
                             AutomaticSlowmodeChannels: [],
+                        },
+                        InactiveThreads: {
+                            graceTime: 1440,
+                            warningCheck: false,
+                            warningTime: 2880,
                         },
                         Roles: {
                             AllowedAdminRoles: [],
@@ -60,6 +73,7 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
                             SupportRoles: [],
                         },
                         Skullboard: {
+                            SkullboardBoolean: false,
                             SkullboardChannel: null,
                             SkullboardEmoji: '💀',
                             SkullboardReactionThreshold: 4,
@@ -69,18 +83,19 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
                     },
                     InactiveThreads: [],
                     Tags: [],
-                });
-                await newGuild.save();
+                };
+                const savedGuild = await database.upsertGuild(newGuild);
 
-                ctx.store.setForeignKey({ guild: guildId }, newGuild);
+                ctx.store.setForeignKey({ guild: guildId }, savedGuild);
 
-                return <R>newGuild;
+                return <R>savedGuild;
             }
         } catch (error) {
             console.error('Error trying to find or create a guild', error);
         }
     } else {
-        const guildInDb = await GuildSchema.findOne({ _id: guildId });
+        const database = getDatabase();
+        const guildInDb = await database.findGuild(guildId);
         if (guildInDb && !_.isEqual(guildInCache, guildInDb)) {
             ctx.store.setForeignKey({ guild: guildId }, guildInDb);
         }
@@ -90,7 +105,9 @@ export async function getGuild<R extends object>(ctx: Context, guildId: Snowflak
 }
 
 export async function guildExists(guildId: Snowflake): Promise<boolean> {
-    return (await GuildSchema.findOne({ _id: guildId })) ? true : false;
+    const database = getDatabase();
+    const guild = await database.findGuild(guildId);
+    return guild !== null;
 }
 
 export async function withConfiguration<

@@ -1,14 +1,46 @@
 const { config } = require('dotenv');
-const mongoose = require('mongoose');
+const { DatabaseManager } = require('../database/factory');
+const path = require('path');
 
-const GuildModel = require('../models/guildSchema');
-const schema = GuildModel.default;
 config();
 
 async function migrateSkullDefault() {
-    await mongoose.connect(process.env.MONGODB);
+    const dbManager = DatabaseManager.getInstance();
+    
+    // Initialize database connection
+    const dbType = process.env.DATABASE_TYPE || 'mongodb';
+    let dbConfig;
+    
+    switch (dbType) {
+        case 'mongodb':
+            dbConfig = {
+                type: 'mongodb',
+                connectionString: process.env.MONGODB,
+                options: { maxPoolSize: 10 }
+            };
+            break;
+        case 'sqlite':
+            const sqlitePath = process.env.DATABASE_PATH || './data/jasper.db';
+            dbConfig = {
+                type: 'sqlite',
+                filePath: path.resolve(sqlitePath)
+            };
+            break;
+        case 'json':
+            const jsonPath = process.env.DATABASE_PATH || './data/jasper.json';
+            dbConfig = {
+                type: 'json',
+                filePath: path.resolve(jsonPath)
+            };
+            break;
+        default:
+            throw new Error(`Unsupported database type: ${dbType}`);
+    }
+    
+    await dbManager.initialize(dbConfig);
+    const database = dbManager.getAdapter();
 
-    const guilds = await schema.updateMany(
+    const result = await database.bulkUpdate(
         {
             $or: [
                 { 'Skullboard.SkullboardEmoji': { $exists: false } },
@@ -23,11 +55,11 @@ async function migrateSkullDefault() {
         },
     );
 
-    console.log(`Updated ${guilds.modifiedCount} guilds with default Skullboard emoji.`);
-    mongoose.connection.close();
+    console.log(`Updated ${result.modifiedCount} guilds with default Skullboard emoji.`);
+    await database.disconnect();
 }
 
 migrateSkullDefault().catch((err) => {
     console.error(err);
-    mongoose.connection.close();
+    process.exit(1);
 });

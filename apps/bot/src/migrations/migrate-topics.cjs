@@ -1,12 +1,44 @@
 const { config } = require('dotenv');
-const mongoose = require('mongoose');
+const { DatabaseManager } = require('../database/factory');
+const path = require('path');
 
-const GuildModel = require('../models/guildSchema');
-const schema = GuildModel.default;
 config();
 
 async function migrateTopics() {
-    await mongoose.connect(process.env.MONGODB);
+    const dbManager = DatabaseManager.getInstance();
+    
+    // Initialize database connection
+    const dbType = process.env.DATABASE_TYPE || 'mongodb';
+    let dbConfig;
+    
+    switch (dbType) {
+        case 'mongodb':
+            dbConfig = {
+                type: 'mongodb',
+                connectionString: process.env.MONGODB,
+                options: { maxPoolSize: 10 }
+            };
+            break;
+        case 'sqlite':
+            const sqlitePath = process.env.DATABASE_PATH || './data/jasper.db';
+            dbConfig = {
+                type: 'sqlite',
+                filePath: path.resolve(sqlitePath)
+            };
+            break;
+        case 'json':
+            const jsonPath = process.env.DATABASE_PATH || './data/jasper.json';
+            dbConfig = {
+                type: 'json',
+                filePath: path.resolve(jsonPath)
+            };
+            break;
+        default:
+            throw new Error(`Unsupported database type: ${dbType}`);
+    }
+    
+    await dbManager.initialize(dbConfig);
+    const database = dbManager.getAdapter();
 
     const defaultTopics = [
         'If you could have any superpower, what would it be and why?',
@@ -62,7 +94,7 @@ async function migrateTopics() {
         'If you could build your own dream house, what crazy features would it have?',
     ];
 
-    const guilds = await schema.updateMany(
+    const result = await database.bulkUpdate(
         {
             $or: [
                 { 'GuildSettings.Text.Topics': { $exists: false } },
@@ -73,11 +105,11 @@ async function migrateTopics() {
         { $set: { 'GuildSettings.Text.Topics': defaultTopics } },
     );
 
-    console.log(`Updated ${guilds.modifiedCount} guilds with default topics.`);
-    mongoose.connection.close();
+    console.log(`Updated ${result.modifiedCount} guilds with default topics.`);
+    await database.disconnect();
 }
 
 migrateTopics().catch((err) => {
     console.error(err);
-    mongoose.connection.close();
+    process.exit(1);
 });

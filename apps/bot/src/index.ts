@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 import { Context } from './classes/context';
+import { initializeDatabase } from './database/connection';
 import { getLatestYoutubeVideo, updateSubCountChannel } from './youtube';
 
 config();
@@ -43,15 +44,8 @@ async function main() {
             }),
         );
 
-        mongoose.connect(ctx.env.get('db'), { maxPoolSize: 10 });
-
-        mongoose.connection.on('connected', () => {
-            console.log('Database connected');
-        });
-
-        mongoose.connection.on('disconnected', () => {
-            console.log('Database disconnected');
-        });
+        // Initialize database with the new abstraction layer
+        await initializeDatabase(ctx);
 
         setInterval(postNewVideo, Number(ctx.env.get('youtube_post_timer')) * 1000);
 
