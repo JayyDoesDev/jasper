@@ -52,27 +52,21 @@ export default class MessageReactionAddListener extends Listener<'messageReactio
             const skulledService = this.ctx.services.skulledMessages.configure({ guildId });
 
             if (
-                !Channels?.AllowedSkullboardChannels ||
-                !Channels.AllowedSkullboardChannels.includes(reaction.message.channel.id)
-            ) {
-                return;
-            }
-
-            const isNewSkulledMessage = await skulledService.add(reaction.message.id);
-            if (!isNewSkulledMessage) return;
-
-            if (
                 reaction.emoji.name !== Skullboard.SkullboardEmoji ||
                 reaction.count < Skullboard.SkullboardReactionThreshold
             ) {
                 return;
             }
 
+            if (!Channels.AllowedSkullboardChannels.includes(reaction.message.channelId)) return;
+            const isSKulled = await skulledService.add(reaction.message.id);
+            if (!isSKulled) return;
+
             const skullboardChannel = this.ctx.channels.resolve(
                 Skullboard.SkullboardChannel,
             ) as TextChannel;
-            const fetchedChannel = await this.ctx.channels.fetch(reaction.message.channel.id);
 
+            const fetchedChannel = await this.ctx.channels.fetch(reaction.message.channel.id);
             if (fetchedChannel?.isTextBased()) {
                 const message = await fetchedChannel.messages.fetch(reaction.message.id);
                 const member = message.guild.members.resolve(message.author.id);
