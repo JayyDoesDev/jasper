@@ -24,7 +24,7 @@ import WebServer from './webserver';
 class Services {
     public readonly inactiveThreads: InactiveThreadsService;
     public readonly settings: SettingsService;
-    skulledMessages: SkulledMessageService;
+    public readonly skulledMessages: SkulledMessageService;
     public readonly tags: TagService;
     constructor(public ctx: Context) {
         this.tags = new TagService(ctx);
